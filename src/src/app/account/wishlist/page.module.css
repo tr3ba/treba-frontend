@@ -1,0 +1,117 @@
+.headerRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.addButton {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid #dadada;
+    background-color: #ffffff;
+    font-size: 20px;
+    line-height: 1;
+    color: #ff6e2a;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.addButton:hover {
+    border-color: #ff6e2a;
+    background-color: #fff6f0;
+}
+
+.lists {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.listCard {
+    border-radius: 10px;
+    border: 1px solid #dadada;
+    background-color: #ffffff;
+    padding: 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.listHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.listTitle {
+    margin: 0;
+    font-family: "Montserrat", sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #28251d;
+}
+
+.defaultTag {
+    font-weight: 500;
+    color: #002aff;
+    font-size: 13px;
+}
+
+.listCount {
+    margin: 4px 0 0;
+    font-family: "Montserrat", sans-serif;
+    font-size: 13px;
+    color: #898888;
+}
+
+.listActions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.iconButton {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: #898888;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.iconButton:hover {
+    background-color: #fff6f0;
+    color: #ff6e2a;
+}
+
+.actionIcon {
+    width: 18px;
+    height: 18px;
+}
+
+.itemsRow {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.itemThumb {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    border: 1px solid #eeeeee;
+    overflow: hidden;
+    flex: 0 0 auto;
+}
+
+.itemImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}

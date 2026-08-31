@@ -1,0 +1,113 @@
+.sidebar {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.userCard {
+    border-radius: 10px;
+    background-color: #ffffff;
+    border: 1px solid #dadada;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.userIconWrap {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: #fff1e8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.userIcon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: invert(46%) sepia(97%) saturate(1626%) hue-rotate(360deg) brightness(101%) contrast(101%);
+}
+
+.userInfo {
+    min-width: 0;
+}
+
+.userName {
+    margin: 0;
+    font-family: "Montserrat", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #28251d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.userEmail {
+    margin: 4px 0 0 0;
+    font-family: "Montserrat", sans-serif;
+    font-size: 12.5px;
+    font-weight: 400;
+    color: #898888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav {
+    border-radius: 10px;
+    background-color: #ffffff;
+    border: 1px solid #dadada;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.navItem {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: #28251d;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.navItem:hover {
+    color: #ff6e2a;
+    background-color: #fff6f0;
+}
+
+.navItemActive {
+    color: #ff6e2a;
+    background-color: #fff6f0;
+    font-weight: 600;
+}
+
+.navItemActive .navIcon {
+    filter: invert(46%) sepia(97%) saturate(1626%) hue-rotate(360deg) brightness(101%) contrast(101%);
+}
+
+.navIcon {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+    object-fit: contain;
+    transition: filter 0.2s ease;
+}
+
+.navItem:hover .navIcon {
+    filter: invert(46%) sepia(97%) saturate(1626%) hue-rotate(360deg) brightness(101%) contrast(101%);
+}
+
+.navText {
+    font-family: "Montserrat", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.3;
+}

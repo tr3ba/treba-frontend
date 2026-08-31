@@ -1,0 +1,78 @@
+.mainBanner {
+    position: relative;
+    width: 1384px;
+    height: 230px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.track {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.trackInner {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.mainBannerImage {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+/* стрелки по бокам — увеличены на ~40% относительно исходной иконки */
+
+.bannerArrowLeft,
+.bannerArrowRight {
+    position: absolute;
+    top: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    z-index: 5;
+    transition: background-color 0.2s ease;
+}
+
+.bannerArrowLeft:hover,
+.bannerArrowRight:hover {
+    background: rgba(255, 255, 255, 1);
+}
+
+.bannerArrowLeft {
+    left: 20px;
+}
+
+.bannerArrowRight {
+    right: 20px;
+}
+
+.bannerArrowLeft img,
+.bannerArrowRight img {
+    width: 34px;
+    height: 34px;
+    display: block;
+}
+
+/* правая стрелка — зеркалим ту же иконку, что смотрит влево */
+.arrowMirrored {
+    transform: scaleX(-1);
+}
