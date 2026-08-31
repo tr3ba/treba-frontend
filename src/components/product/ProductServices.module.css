@@ -1,0 +1,45 @@
+.section {
+    border-top: 1px solid #e5e3dd;
+    padding-top: 24px;
+    margin-top: 24px;
+    scroll-margin-top: 90px;
+}
+
+.title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #28251d;
+    margin: 0 0 16px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.card {
+    border: 1px solid #e5e3dd;
+    border-radius: 10px;
+    padding: 14px;
+}
+
+.name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #28251d;
+    margin: 0 0 6px;
+}
+
+.description {
+    font-size: 12px;
+    color: #8a8578;
+    margin: 0 0 10px;
+}
+
+.price {
+    font-size: 15px;
+    font-weight: 700;
+    color: #28251d;
+    margin: 0;
+}
