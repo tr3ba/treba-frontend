@@ -40,7 +40,7 @@ jobs:
               "docker pull 319426459282.dkr.ecr.eu-west-1.amazonaws.com/treba-frontend:latest",
               "docker stop treba-frontend || true",
               "docker rm treba-frontend || true",
-              "docker run -d --name treba-frontend --restart unless-stopped -p 3000:3000 319426459282.dkr.ecr.eu-west-1.amazonaws.com/treba-frontend:latest",
+              "docker run -d --name treba-frontend --restart unless-stopped -p 80:3000 319426459282.dkr.ecr.eu-west-1.amazonaws.com/treba-frontend:latest",
               "sleep 8",
               "curl -fsS http://localhost:3000 >/dev/null",
               "docker ps --filter name=treba-frontend"
