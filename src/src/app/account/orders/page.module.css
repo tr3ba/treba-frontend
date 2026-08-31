@@ -1,0 +1,124 @@
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.searchWrap {
+    flex: 1;
+    min-width: 240px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    border-radius: 10px;
+    border: 1px solid #dadada;
+    background-color: #ffffff;
+}
+
+.searchIcon {
+    flex: 0 0 auto;
+}
+
+.searchInput {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: "Montserrat", sans-serif;
+    font-size: 14px;
+    color: #28251d;
+}
+
+.searchInput::placeholder {
+    color: #898888;
+}
+
+.periodSelect {
+    padding: 11px 16px;
+    border-radius: 10px;
+    border: 1px solid #dadada;
+    background-color: #ffffff;
+    font-family: "Montserrat", sans-serif;
+    font-size: 14px;
+    color: #28251d;
+    cursor: pointer;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.orderRow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+    border-radius: 10px;
+    border: 1px solid #dadada;
+    background-color: #ffffff;
+}
+
+.orderInfo {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.orderNumber {
+    margin: 0;
+    font-family: "Montserrat", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #28251d;
+}
+
+.orderNumberCancelled {
+    color: #898888;
+    text-decoration: line-through;
+}
+
+.orderStatus {
+    margin: 0;
+    font-family: "Montserrat", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.statusDone {
+    color: #16a34a;
+}
+
+.statusCancelled {
+    color: #898888;
+    font-weight: 400;
+}
+
+.orderThumb {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    opacity: 0.85;
+}
+
+.expandButton {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.expandButton:hover {
+    background-color: #fff6f0;
+}

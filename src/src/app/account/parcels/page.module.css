@@ -1,0 +1,69 @@
+.trackBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.trackLabel {
+    margin: 0;
+    font-family: "Montserrat", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #28251d;
+}
+
+.sectionTitle {
+    margin: 8px 0 0;
+    font-family: "Montserrat", sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: #28251d;
+}
+
+.infoGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.infoCard {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #dadada;
+    background-color: #ffffff;
+}
+
+.infoIconWrap {
+    flex: 0 0 auto;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: #fff1e8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.infoIcon {
+    width: 26px;
+    height: 26px;
+    filter: invert(46%) sepia(97%) saturate(1626%) hue-rotate(360deg) brightness(101%) contrast(101%);
+}
+
+.infoTitle {
+    margin: 0 0 6px;
+    font-family: "Montserrat", sans-serif;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #28251d;
+}
+
+.infoText {
+    margin: 0;
+    font-family: "Montserrat", sans-serif;
+    font-size: 13px;
+    color: #898888;
+}

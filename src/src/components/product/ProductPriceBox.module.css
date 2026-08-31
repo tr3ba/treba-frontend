@@ -1,0 +1,65 @@
+.box {
+    border: 1px solid #e5e3dd;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.oldPrice {
+    color: #8a8578;
+    text-decoration: line-through;
+    font-size: 14px;
+}
+
+.priceRow {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.price {
+    font-size: 28px;
+    font-weight: 700;
+    color: #28251d;
+}
+
+.currency {
+    font-size: 20px;
+    font-weight: 600;
+    color: #28251d;
+}
+
+.cartButton {
+    background: #ff6e2a;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.cartButton:hover {
+    background: #e8611f;
+}
+
+.outOfStock {
+    color: #8a8578;
+    font-size: 14px;
+    margin: 0;
+}
+
+.notifyButton {
+    background: transparent;
+    color: #ff6e2a;
+    border: 1.5px solid #ff6e2a;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
