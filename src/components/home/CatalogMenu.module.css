@@ -1,0 +1,167 @@
+.wrapper {
+    position: relative;
+}
+
+.catalogButton {
+    width: 205px;
+    height: 58px;
+    padding: 15px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #ff6e2a;
+    border: none;
+    outline: 2px solid transparent;
+    outline-offset: -2px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.25s ease, outline-color 0.25s ease;
+}
+
+.catalogButton:hover {
+    background: transparent;
+    outline-color: #ff6e2a;
+}
+
+.catalogIcon {
+    width: 29.79px;
+    height: 27.96px;
+    display: block;
+    object-fit: contain;
+}
+
+.catalogText {
+    font-family: "Montserrat", sans-serif;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1;
+    color: #ffffff;
+}
+
+/* Обёртка выпадающего меню */
+.megaMenu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    background: #f5f5f5;
+    border-radius: 15px;
+    padding: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    z-index: 50;
+}
+
+/* Левая колонка со списком категорий */
+.categoryList {
+    width: 270px;
+    background: #ffffff;
+    border: 1px solid #dadada;
+    border-radius: 15px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.categoryRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #1e1e1c;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.categoryRow:hover,
+.categoryRowActive {
+    background: rgba(255, 110, 42, 0.12);
+    color: #ff6e2a;
+}
+
+.categoryRowIcon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+    transition: filter 0.15s ease;
+}
+
+.categoryRow:hover .categoryRowIcon,
+.categoryRowActive .categoryRowIcon {
+    filter: invert(46%) sepia(97%) saturate(1626%) hue-rotate(360deg) brightness(101%) contrast(101%);
+}
+
+.categoryRowLabel {
+    font-family: "Montserrat", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+.categoryRowActive .categoryRowLabel {
+    font-weight: 500;
+    text-decoration: underline;
+}
+
+.categoryRowArrow {
+    margin-left: auto;
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+    transform: rotate(-90deg);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.categoryRow:hover .categoryRowArrow,
+.categoryRowActive .categoryRowArrow {
+    opacity: 1;
+}
+
+/* Правая панель с подкатегориями */
+.subcategoriesPanel {
+    background: #ffffff;
+    border: 1px solid #dadada;
+    border-radius: 15px;
+    padding: 24px 28px;
+    column-count: 4;
+    column-gap: 36px;
+    width: 1100px;
+}
+
+.subcatGroup {
+    display: inline-block;
+    width: 100%;
+    break-inside: avoid;
+    margin-bottom: 22px;
+}
+
+.subcatTitle {
+    font-family: "Montserrat", sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: #ff6e2a;
+    margin-bottom: 8px;
+}
+
+.subcatItem {
+    display: block;
+    font-family: "Montserrat", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: #1e1e1c;
+    text-decoration: none;
+    padding: 3px 0;
+    transition: color 0.15s ease;
+}
+
+.subcatItem:hover {
+    color: #ff6e2a;
+    text-decoration: underline;
+}

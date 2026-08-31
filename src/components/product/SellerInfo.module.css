@@ -1,0 +1,54 @@
+.wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid #e5e3dd;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s ease;
+}
+
+.wrapper:hover {
+    border-color: #ff6e2a;
+}
+
+.logoWrap {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f7f7f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo {
+    object-fit: contain;
+}
+
+.textBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #28251d;
+}
+
+.link {
+    font-size: 12px;
+    color: #8a8578;
+}
+
+.arrow {
+    margin-left: auto;
+    color: #8a8578;
+    font-size: 20px;
+}
