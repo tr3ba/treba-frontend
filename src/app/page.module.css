@@ -249,12 +249,13 @@
   opacity: 1;
 }
 
-/* каркас: левая колонка + основной контент */
 
 .pageContent {
   display: flex;
   align-items: flex-start;
   padding-top: 24px;
+  max-width: 1920px;
+  margin: 0 auto;
 }
 
 .leftColumn {

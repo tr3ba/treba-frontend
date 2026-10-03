@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import styles from "./CatalogMenu.module.css";
 import { categories } from "../../data/categories";
 
@@ -48,9 +49,9 @@ export default function CatalogMenu() {
             {categories.map((category) => {
               const isActive = category.id === activeId;
               return (
-                <a
+                <Link
                   key={category.id}
-                  href="#"
+                  href={`/catalog/${category.id}`}
                   className={`${styles.categoryRow} ${isActive ? styles.categoryRowActive : ""}`}
                   onMouseEnter={() => setActiveId(category.id)}
                 >
@@ -67,7 +68,7 @@ export default function CatalogMenu() {
                       className={styles.categoryRowArrow}
                     />
                   )}
-                </a>
+                </Link>
               );
             })}
           </div>

@@ -1,0 +1,39 @@
+.page {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px 32px 60px;
+}
+
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #8a8578;
+    margin-bottom: 14px;
+}
+
+.crumb {
+    color: #8a8578;
+    transition: color 0.15s ease;
+}
+
+.crumb:hover {
+    color: #ff6e2a;
+}
+
+.separator {
+    color: #cfcac0;
+}
+
+.crumbCurrent {
+    color: #28251d;
+    font-weight: 500;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #28251d;
+    margin: 0 0 20px;
+}

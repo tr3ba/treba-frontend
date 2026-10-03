@@ -9,3 +9,8 @@ function delay<T>(value: T): Promise<T> {
 export async function getCategories(): Promise<Category[]> {
   return delay(categories);
 }
+
+export async function getCategoryById(id: string): Promise<Category | null> {
+  const found = categories.find((category) => category.id === id) ?? null;
+  return delay(found);
+}

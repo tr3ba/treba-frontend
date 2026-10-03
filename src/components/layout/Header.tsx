@@ -3,6 +3,7 @@ import pageStyles from "../../app/page.module.css";
 import CatalogMenu from "../home/CatalogMenu";
 import SearchBar from "../home/SearchBar";
 import UserMenu from "../home/UserMenu";
+import HeaderCartButton from "./HeaderCartButton";
 
 // Синій header + верхня промо-плашка
 export default function Header() {
@@ -28,7 +29,7 @@ export default function Header() {
           <SearchBar />
 
           <div className={pageStyles.headerActions}>
-            <button className={pageStyles.actionButton} aria-label="Избранное">
+            <button className={pageStyles.actionButton} aria-label="Список бажань">
               <span className={`${pageStyles.iconSwap} ${pageStyles.heartIcon}`}>
                 <img src="/icons/heart.svg" alt="" className={pageStyles.iconOutline} />
                 <img src="/icons/heart1.svg" alt="" className={pageStyles.iconFilled} />
@@ -37,12 +38,7 @@ export default function Header() {
 
             <UserMenu />
 
-            <button className={pageStyles.actionButton} aria-label="Корзина">
-              <span className={`${pageStyles.iconSwap} ${pageStyles.headerCartIcon}`}>
-                <img src="/icons/shop.svg" alt="" className={pageStyles.iconOutline} />
-                <img src="/icons/shop1.svg" alt="" className={pageStyles.iconFilled} />
-              </span>
-            </button>
+            <HeaderCartButton />
           </div>
         </div>
       </header>

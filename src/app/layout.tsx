@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
+import { CartProvider } from "../context/CartContext";
 
 const montserrat = Montserrat({
   subsets: ["latin", "cyrillic"],
@@ -11,7 +12,7 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: "Treba",
-  description: "Marketplace",
+  description: "TREBA — український маркетплейс",
 };
 
 export default function RootLayout({
@@ -25,8 +26,10 @@ export default function RootLayout({
     <html lang="uk">
       <body className={montserrat.variable}>
         <AuthProvider>
-          {children}
-          {modal}
+          <CartProvider>
+            {children}
+            {modal}
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

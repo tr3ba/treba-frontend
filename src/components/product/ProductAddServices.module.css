@@ -1,0 +1,59 @@
+.box {
+    border: 1px solid #e5e3dd;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #28251d;
+    margin: 0 0 14px;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.checkbox {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: #ff6e2a;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #28251d;
+}
+
+.description {
+    font-size: 12.5px;
+    color: #8a8578;
+}
+
+.price {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #28251d;
+    white-space: nowrap;
+}

@@ -91,6 +91,7 @@
 
 .navItemActive .navIcon {
     filter: invert(46%) sepia(97%) saturate(1626%) hue-rotate(360deg) brightness(101%) contrast(101%);
+    transform: scale(1.08);
 }
 
 .navIcon {
@@ -98,11 +99,23 @@
     height: 20px;
     flex: 0 0 auto;
     object-fit: contain;
-    transition: filter 0.2s ease;
+    /* принудительно чёрный, независимо от исходного цвета svg */
+    filter: brightness(0);
+    transition: filter 0.2s ease, transform 0.2s ease;
 }
 
 .navItem:hover .navIcon {
     filter: invert(46%) sepia(97%) saturate(1626%) hue-rotate(360deg) brightness(101%) contrast(101%);
+    transform: scale(1.08);
+}
+
+.navText {
+    transition: transform 0.2s ease;
+}
+
+.navItem:hover .navText {
+    transform: scale(1.05);
+    transform-origin: left center;
 }
 
 .navText {

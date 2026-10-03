@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import AddToCartButton from "../cart/AddToCartButton";
 import styles from "./ProductCard.module.css";
-
 
 type ProductCardProps = {
   id: string;
@@ -23,24 +23,21 @@ export default function ProductCard({
   isPromo = false,
 }: ProductCardProps) {
   return (
-    <Link href={`/product/${id}`} className={styles.card}>
-      <div className={styles.imageWrap}>
-  {image ? (
-    <Image
-      src={image}
-      alt={title}
-      fill
-      className={styles.image}
-      sizes="217px"
-    />
-  ) : (
-    <div className={styles.imagePlaceholder} aria-hidden="true">
-      <img src="/icons/catalog.svg" alt="" className={styles.imagePlaceholderIcon} />
-    </div>
-  )}
-</div>
+    <article className={styles.card}>
+      {/* Посилання розтягнуте на всю картку через ::after, кнопка кошика — поверх нього */}
+      <Link href={`/product/${id}`} className={styles.cardLink}>
+        <div className={styles.imageWrap}>
+          {image ? (
+            <Image src={image} alt={title} fill className={styles.image} sizes="217px" />
+          ) : (
+            <div className={styles.imagePlaceholder} aria-hidden="true">
+              <img src="/icons/catalog.svg" alt="" className={styles.imagePlaceholderIcon} />
+            </div>
+          )}
+        </div>
 
-      <h3 className={styles.title}>{title}</h3>
+        <h3 className={styles.title}>{title}</h3>
+      </Link>
 
       <div className={styles.ratingRow}>
         <span className={styles.star}>★</span>
@@ -49,9 +46,7 @@ export default function ProductCard({
 
       <div className={styles.bottomRow}>
         <div className={styles.priceBlock}>
-          {isPromo && oldPrice ? (
-            <div className={styles.oldPrice}>{oldPrice}₴</div>
-          ) : null}
+          {isPromo && oldPrice ? <div className={styles.oldPrice}>{oldPrice}₴</div> : null}
 
           <div className={isPromo ? styles.pricePromo : styles.priceRegular}>
             <span>{price}</span>
@@ -59,10 +54,16 @@ export default function ProductCard({
           </div>
         </div>
 
-        <button className={styles.cartButton} aria-label="Додати товар у кошик">
-  <img src="/icons/shop1.svg" alt="" className={styles.cardCartIcon} />
-</button>
+        <AddToCartButton
+          product={{
+            id,
+            title,
+            price,
+            image,
+            oldPrice: isPromo ? oldPrice : null,
+          }}
+        />
       </div>
-        </Link>
+    </article>
   );
 }

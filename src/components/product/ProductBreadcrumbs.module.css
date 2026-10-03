@@ -1,0 +1,26 @@
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #8a8578;
+    margin-bottom: 14px;
+}
+
+.crumb {
+    color: #8a8578;
+    transition: color 0.15s ease;
+}
+
+.crumb:hover {
+    color: #ff6e2a;
+}
+
+.separator {
+    color: #cfcac0;
+}
+
+.crumbCurrent {
+    color: #28251d;
+    font-weight: 500;
+}

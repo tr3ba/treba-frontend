@@ -50,6 +50,7 @@ export type Product = {
 
   // Поля
   code?: string;
+  description?: string;
   reviewsCount?: number;
   images?: string[];
   seller?: Seller;

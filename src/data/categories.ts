@@ -1,5 +1,6 @@
 export type SubcategoryColumn = {
   title: string;
+  image?: string;
   items: string[];
 };
 
@@ -7,6 +8,7 @@ export type Category = {
   id: string;
   label: string;
   icon: string;
+  description?: string;
   subcategories?: SubcategoryColumn[];
 };
 
@@ -15,13 +17,17 @@ export const categories: Category[] = [
     id: "laptops",
     label: "Ноутбуки та комп'ютери",
     icon: "/icons/laptop.svg",
+    description:
+      "Ноутбуки, настільні ПК, комплектуючі та периферія — все для роботи, навчання й ігор в одному розділі.",
     subcategories: [
       {
         title: "Ноутбуки та ПК",
+        image: "/categories/laptops-pc.png",
         items: ["Ноутбуки", "Ігрові ноутбуки", "Моноблоки", "Настільні комп'ютери", "Нетбуки"],
       },
       {
         title: "Комплектуючі",
+        image: "/categories/components.png",
         items: [
           "Відеокарти",
           "Процесори",
@@ -35,18 +41,22 @@ export const categories: Category[] = [
       },
       {
         title: "Периферія",
+        image: "/categories/peripherals.png",
         items: ["Клавіатури", "Миші", "Монітори", "Веб-камери", "Колонки для ПК", "Килимки для миші"],
       },
       {
         title: "Мережеве обладнання",
+        image: "/categories/network.png",
         items: ["Роутери", "Wi-Fi адаптери", "Мережеві карти", "Powerline адаптери", "Модеми"],
       },
       {
         title: "Оргтехніка",
+        image: "/categories/office-equipment.png",
         items: ["Принтери", "Сканери", "Багатофункціональні пристрої", "Витратні матеріали", "Шредери"],
       },
       {
         title: "Софт та ліцензії",
+        image: "/categories/software.png",
         items: ["Операційні системи", "Антивіруси", "Офісні пакети"],
       },
     ],
@@ -55,6 +65,8 @@ export const categories: Category[] = [
     id: "electronics",
     label: "Смартфони, ТВ та електроніка",
     icon: "/icons/phone.svg",
+    description:
+      "Смартфони, телевізори, планшети, аудіо та гаджети — техніка для зв'язку, розваг і щоденного життя.",
     subcategories: [
       {
         title: "Смартфони і аксесуари",
@@ -86,6 +98,8 @@ export const categories: Category[] = [
     id: "gaming",
     label: "Товари для геймерів",
     icon: "/icons/game.svg",
+    description:
+      "Консолі, ігрові ПК, геймерська периферія та підписки — усе, щоб грати з комфортом.",
     subcategories: [
       {
         title: "Ігрові консолі",
@@ -117,6 +131,8 @@ export const categories: Category[] = [
     id: "appliances",
     label: "Побутова техніка",
     icon: "/icons/washingmachine.svg",
+    description:
+      "Велика і дрібна побутова техніка, клімат-контроль та прилади для догляду за домом.",
     subcategories: [
       {
         title: "Великі побутові прилади",
@@ -144,6 +160,8 @@ export const categories: Category[] = [
     id: "home",
     label: "Товари для дому",
     icon: "/icons/sofa.svg",
+    description:
+      "Меблі, текстиль, посуд, освітлення та господарські дрібниці для затишного дому.",
     subcategories: [
       {
         title: "Меблі",
@@ -190,7 +208,7 @@ export const categories: Category[] = [
         ],
       },
       {
-        title: "Інвертар для дому та офісу",
+        title: "Інвентар для дому та офісу",
         items: [
           "Прання та прасування",
           "Інструменти для прибирання",
@@ -209,7 +227,7 @@ export const categories: Category[] = [
         title: "Побутова хімія",
         items: [
           "Засоби для прання",
-          "Засоби для псудомийних машин",
+          "Засоби для посудомийних машин",
           "Засоби для чищення ванн",
           "Кондиціонери для білизни",
           "Засоби для догляду за побутовою технікою",
@@ -249,6 +267,8 @@ export const categories: Category[] = [
     id: "tools",
     label: "Інструменти та автотовари",
     icon: "/icons/drill.svg",
+    description:
+      "Ручний та електроінструмент, вимірювальні прилади й автотовари для майстрів і аматорів.",
     subcategories: [
       {
         title: "Ручний інструмент",
@@ -276,6 +296,8 @@ export const categories: Category[] = [
     id: "plumbing",
     label: "Сантехніка та ремонт",
     icon: "/icons/shower.svg",
+    description:
+      "Сантехніка, опалення, будматеріали та електрика — все для ремонту від фундаменту до фарби.",
     subcategories: [
       {
         title: "Сантехніка",
@@ -303,6 +325,8 @@ export const categories: Category[] = [
     id: "garden",
     label: "Дача, сад та город",
     icon: "/icons/garden.svg",
+    description:
+      "Інвентар, садова техніка, полив, насіння та меблі для дачі й присадибної ділянки.",
     subcategories: [
       {
         title: "Садовий інвентар",
@@ -330,6 +354,8 @@ export const categories: Category[] = [
     id: "sport",
     label: "Спорт та захоплення",
     icon: "/icons/ball.svg",
+    description:
+      "Тренажери, велосипеди, туристичне спорядження та екіпірування для активного життя.",
     subcategories: [
       {
         title: "Фітнес та тренажери",
@@ -361,6 +387,8 @@ export const categories: Category[] = [
     id: "clothes",
     label: "Одяг, взуття та прикраси",
     icon: "/icons/clothes.svg",
+    description:
+      "Одяг і взуття для всієї родини, прикраси та аксесуари на кожен день і для свят.",
     subcategories: [
       {
         title: "Жіночий одяг",
@@ -388,6 +416,8 @@ export const categories: Category[] = [
     id: "beauty",
     label: "Краса і здоров'я",
     icon: "/icons/beauty.svg",
+    description:
+      "Догляд за обличчям і волоссям, косметика, парфумерія та товари для здоров'я.",
     subcategories: [
       {
         title: "Догляд за обличчям",
@@ -419,6 +449,8 @@ export const categories: Category[] = [
     id: "kids",
     label: "Дитячі товари",
     icon: "/icons/pazzle.svg",
+    description:
+      "Іграшки, товари для немовлят, дитячі меблі, шкільне приладдя та транспорт.",
     subcategories: [
       {
         title: "Іграшки",
@@ -446,6 +478,8 @@ export const categories: Category[] = [
     id: "pets",
     label: "Зоотовари",
     icon: "/icons/zoo.svg",
+    description:
+      "Корм, аксесуари та ветаптека для собак, котів, птахів, гризунів і мешканців акваріума.",
     subcategories: [
       {
         title: "Для собак",
@@ -473,6 +507,8 @@ export const categories: Category[] = [
     id: "books",
     label: "Канцтовари та книги",
     icon: "/icons/books.svg",
+    description:
+      "Книги для дорослих і дітей, канцелярія, офісне приладдя та товари для творчості.",
     subcategories: [
       {
         title: "Книги",
@@ -496,6 +532,8 @@ export const categories: Category[] = [
     id: "drinks",
     label: "Алкогольні напої та продукти",
     icon: "/icons/drink.svg",
+    description:
+      "Напої, продукти харчування, делікатеси та алкоголь із доставкою додому.",
     subcategories: [
       {
         title: "Алкоголь",
@@ -519,6 +557,8 @@ export const categories: Category[] = [
     id: "business",
     label: "Товари для бізнесу та послуги",
     icon: "/icons/qr.svg",
+    description:
+      "Обладнання, пакування, послуги та офісні рішення для малого й середнього бізнесу.",
     subcategories: [
       {
         title: "Обладнання для бізнесу",
@@ -542,6 +582,8 @@ export const categories: Category[] = [
     id: "tours",
     label: "Тури та відпочинок",
     icon: "/icons/relax.svg",
+    description:
+      "Тури, готелі, активний відпочинок та все необхідне для подорожей.",
     subcategories: [
       {
         title: "Тури",
@@ -565,6 +607,8 @@ export const categories: Category[] = [
     id: "sale",
     label: "Акції",
     icon: "/icons/discount.svg",
+    description:
+      "Актуальні знижки та спеціальні пропозиції від продавців TREBA — оновлюються щодня.",
     subcategories: [
       {
         title: "Категорії акцій",
@@ -576,6 +620,8 @@ export const categories: Category[] = [
     id: "total-sale",
     label: "Тотальний розпродаж",
     icon: "/icons/discount.svg",
+    description:
+      "Фінальні ціни на техніку, одяг і товари для дому — кількість обмежена.",
     subcategories: [
       {
         title: "Тотальний розпродаж",
