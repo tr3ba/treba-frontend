@@ -1,0 +1,177 @@
+.layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 32px;
+    align-items: start;
+}
+
+/* Список товарів */
+.listCard {
+    background: #ffffff;
+    border: 1px solid #e5e3dd;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.listHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 20px;
+    background: #faf9f7;
+    border-bottom: 1px solid #efede8;
+}
+
+.listCount {
+    font-size: 14px;
+    font-weight: 600;
+    color: #28251d;
+}
+
+.clearButton {
+    border: none;
+    background: transparent;
+    padding: 4px 0;
+    font-family: inherit;
+    font-size: 13px;
+    color: #8a8578;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.clearButton:hover {
+    color: #ff0008;
+}
+
+.list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Порожній кошик / успішне замовлення */
+.stateCard {
+    max-width: 560px;
+    margin: 24px auto 0;
+    padding: 40px 32px;
+    background: #ffffff;
+    border: 1px solid #e5e3dd;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+}
+
+.stateIcon {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: #fff6f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+}
+
+.stateIconImg {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    filter: brightness(0) invert(46%) sepia(97%) saturate(1626%) hue-rotate(360deg) brightness(101%) contrast(101%);
+}
+
+.stateIconSuccess {
+    background: #47d328;
+    color: #ffffff;
+    font-size: 38px;
+    font-weight: 700;
+}
+
+.stateTitle {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #28251d;
+}
+
+.stateText {
+    margin: 0;
+    max-width: 420px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #8a8578;
+}
+
+.stateText strong {
+    color: #28251d;
+}
+
+.stateActions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.primaryButton,
+.secondaryButton {
+    padding: 13px 24px;
+    border-radius: 10px;
+    font-size: 14.5px;
+    font-weight: 600;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.primaryButton {
+    background: #ff6e2a;
+    color: #ffffff;
+}
+
+.primaryButton:hover {
+    background: #e8611f;
+}
+
+.secondaryButton {
+    border: 1.5px solid #ff6e2a;
+    color: #ff6e2a;
+}
+
+.secondaryButton:hover {
+    background: #fff6f0;
+}
+
+/* Заглушка завантаження */
+.skeleton {
+    border-radius: 12px;
+    background: linear-gradient(90deg, #f3f2ef 0%, #faf9f7 50%, #f3f2ef 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.2s ease-in-out infinite;
+}
+
+.skeletonList {
+    height: 320px;
+}
+
+.skeletonSummary {
+    height: 380px;
+}
+
+@keyframes shimmer {
+    from {
+        background-position: 200% 0;
+    }
+
+    to {
+        background-position: -200% 0;
+    }
+}
+
+@media (max-width: 1024px) {
+    .layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "./page.module.css";
 import ProductCard from "../components/home/ProductCard";
 import BannerSlider from "../components/home/BannerSlider";
@@ -27,10 +28,10 @@ export default async function Home() {
           <aside className={styles.sidebar}>
             <nav className={styles.categoryNav} aria-label="Категорії">
   {categories.map((category) => (
-    <a key={category.id} className={styles.categoryItem} href="#">
+    <Link key={category.id} className={styles.categoryItem} href={`/catalog/${category.id}`}>
       <img src={category.icon} alt="" className={styles.categoryIcon} />
       <span className={styles.categoryText}>{category.label}</span>
-    </a>
+    </Link>
   ))}
 
   {}

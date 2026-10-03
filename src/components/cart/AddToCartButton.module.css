@@ -1,0 +1,56 @@
+.button {
+    position: relative;
+    z-index: 2;
+    width: 39.4px;
+    height: 39.4px;
+    border: none;
+    border-radius: 50%;
+    background: #47d328;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.button:hover {
+    background: #3cbd20;
+}
+
+.button:active {
+    transform: scale(0.92);
+}
+
+.inCart {
+    background: #ff6e2a;
+}
+
+.inCart:hover {
+    background: #e8611f;
+}
+
+.icon {
+    width: 21.2px;
+    height: 17.5px;
+    display: block;
+    object-fit: contain;
+}
+
+.check {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1.5px solid #ff6e2a;
+    color: #ff6e2a;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

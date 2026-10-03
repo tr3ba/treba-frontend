@@ -7,6 +7,79 @@
     gap: 12px;
 }
 
+.topRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.variants {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.variantsLabel {
+    font-size: 13px;
+    color: #8a8578;
+}
+
+.swatch {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    outline: 1.5px solid #e5e3dd;
+    cursor: pointer;
+    padding: 0;
+    transition: outline-color 0.15s ease;
+}
+
+.swatch:hover:not(:disabled) {
+    outline-color: #ff6e2a;
+}
+
+.swatchActive {
+    outline-color: #ff6e2a;
+}
+
+.swatch:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.iconActions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.iconButton {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid #e5e3dd;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.iconButton:hover {
+    border-color: #ff6e2a;
+    background-color: #fff6f0;
+}
+
+.iconImg {
+    width: 15px;
+    height: 15px;
+    object-fit: contain;
+    filter: brightness(0);
+}
+
 .oldPrice {
     color: #8a8578;
     text-decoration: line-through;
@@ -31,6 +104,18 @@
     color: #28251d;
 }
 
+.bonus {
+    margin: -6px 0 0;
+    font-size: 12.5px;
+    color: #8a8578;
+}
+
+.buttonRow {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .cartButton {
     background: #ff6e2a;
     color: #fff;
@@ -45,6 +130,30 @@
 
 .cartButton:hover {
     background: #e8611f;
+}
+
+.cartButtonInCart {
+    background: #47d328;
+}
+
+.cartButtonInCart:hover {
+    background: #3cbd20;
+}
+
+.creditButton {
+    background: #002aff;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.creditButton:hover {
+    background: #0022cc;
 }
 
 .outOfStock {

@@ -1,12 +1,12 @@
 .wrapper {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    flex-direction: row;
+    gap: 14px;
 }
 
 .mainImageWrap {
     position: relative;
-    width: 100%;
+    flex: 1;
     aspect-ratio: 1 / 1;
     background: #f7f7f5;
     border-radius: 12px;
@@ -20,8 +20,12 @@
 
 .thumbs {
     display: flex;
+    flex-direction: column;
     gap: 8px;
-    flex-wrap: wrap;
+    width: 64px;
+    flex-shrink: 0;
+    max-height: 480px;
+    overflow-y: auto;
 }
 
 .thumb {
@@ -34,6 +38,12 @@
     background: #f7f7f5;
     cursor: pointer;
     padding: 0;
+    flex-shrink: 0;
+    transition: border-color 0.15s ease;
+}
+
+.thumb:hover {
+    border-color: #ffb98a;
 }
 
 .thumbActive {

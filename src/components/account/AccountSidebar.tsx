@@ -7,42 +7,42 @@ import styles from "./AccountSidebar.module.css";
 
 // Пункти навігації особистого кабінету
 const navItems = [
-  { label: "Особисті дані", icon: "/icons/user1.svg", href: "/account" },
+  { label: "Особисті дані", icon: "/icons/user.svg", href: "/account" },
   { label: "Замовлення", icon: "/icons/box.svg", href: "/account/orders" },
   {
     label: "Листування з продавцями",
-    icon: "/icons/chat.svg",
+    icon: "/icons/chat1.svg",
     href: "/account/messages",
   },
   {
     label: "Персональні пропозиції",
-    icon: "/icons/discount.svg",
+    icon: "/icons/revised.svg",
     href: "/account/proposals",
   },
-  { label: "Кошик", icon: "/icons/shop.svg", href: "/account/cart" },
-  { label: "Списки бажань", icon: "/icons/heart.svg", href: "/account/wishlist" },
+  { label: "Кошик", icon: "/icons/cart.svg", href: "/account/cart" },
+  { label: "Списки бажань", icon: "/icons/heart2.svg", href: "/account/wishlist" },
   {
     label: "Списки порівнянь",
-    icon: "/icons/circle.svg",
+    icon: "/icons/libra.svg",
     href: "/account/comparisons",
   },
   {
     label: "Сервіс та повернення",
-    icon: "/icons/returns.svg",
+    icon: "/icons/return1.svg",
     href: "/account/service",
   },
-  { label: "Переглянуті товари", icon: "/icons/track.svg", href: "/account/viewed" },
-  { label: "Участь в акціях", icon: "/icons/gamepad.svg", href: "/account/promotions" },
-  { label: "Відгуки", icon: "/icons/star.svg", href: "/account/reviews" },
-  { label: "Розміри", icon: "/icons/clothes.svg", href: "/account/sizes" },
+  { label: "Переглянуті товари", icon: "/icons/eye.svg", href: "/account/viewed" },
+  { label: "Участь в акціях", icon: "/icons/promotion.svg", href: "/account/promotions" },
+  { label: "Відгуки", icon: "/icons/reviews.svg", href: "/account/reviews" },
+  { label: "Розміри", icon: "/icons/sizes.svg", href: "/account/sizes" },
   {
     label: "Подарункові сертифікати",
-    icon: "/icons/discount.svg",
+    icon: "/icons/certificates.svg",
     href: "/account/certificates",
   },
   { label: "Посилки", icon: "/icons/delivery.svg", href: "/account/parcels" },
-  { label: "Гаманець", icon: "/icons/warranty.svg", href: "/account/wallet" },
-  { label: "Підписки", icon: "/icons/telegram.svg", href: "/account/subscriptions" },
+  { label: "Гаманець", icon: "/icons/wallet.svg", href: "/account/wallet" },
+  { label: "Підписки", icon: "/icons/subscriptions.svg", href: "/account/subscriptions" },
 ];
 
 export default function AccountSidebar() {

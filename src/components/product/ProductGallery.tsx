@@ -16,17 +16,6 @@ export default function ProductGallery({ images, title }: ProductGalleryProps) {
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.mainImageWrap}>
-        <Image
-          src={images[activeIndex]}
-          alt={title}
-          fill
-          className={styles.mainImage}
-          sizes="500px"
-          priority
-        />
-      </div>
-
       {images.length > 1 && (
         <div className={styles.thumbs}>
           {images.map((src, index) => (
@@ -37,11 +26,22 @@ export default function ProductGallery({ images, title }: ProductGalleryProps) {
               onClick={() => setActiveIndex(index)}
               aria-label={`Показати фото ${index + 1}`}
             >
-              <Image src={src} alt="" fill className={styles.thumbImage} sizes="70px" />
+              <Image src={src} alt="" fill className={styles.thumbImage} sizes="64px" />
             </button>
           ))}
         </div>
       )}
+
+      <div className={styles.mainImageWrap}>
+        <Image
+          src={images[activeIndex]}
+          alt={title}
+          fill
+          className={styles.mainImage}
+          sizes="500px"
+          priority
+        />
+      </div>
     </div>
   );
 }
