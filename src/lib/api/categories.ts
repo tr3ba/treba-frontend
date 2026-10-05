@@ -1,4 +1,8 @@
-import { Category, categories } from "../../data/categories";
+import { Category, categories as mockCategories } from "../../data/categories";
+import type { ApiCategoryTree } from "../../types/api";
+import { apiFetch } from "./client";
+import { mapCategoryTree } from "./mappers";
+import { USE_MOCKS } from "./mode";
 
 const FAKE_DELAY_MS = 300;
 
@@ -7,10 +11,18 @@ function delay<T>(value: T): Promise<T> {
 }
 
 export async function getCategories(): Promise<Category[]> {
-  return delay(categories);
+  if (USE_MOCKS) return delay(mockCategories);
+
+  const tree = await apiFetch<ApiCategoryTree[]>("/api/v1/categories");
+  return mapCategoryTree(tree);
 }
 
 export async function getCategoryById(id: string): Promise<Category | null> {
-  const found = categories.find((category) => category.id === id) ?? null;
-  return delay(found);
+  if (USE_MOCKS) {
+    return delay(mockCategories.find((category) => category.id === id) ?? null);
+  }
+
+  // Отдельного эндпоинта по slug нет — ищем в дереве
+  const categories = await getCategories();
+  return categories.find((category) => category.id === id) ?? null;
 }
