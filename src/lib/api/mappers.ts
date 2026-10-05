@@ -50,16 +50,23 @@ export function mapCategoryTree(tree: ApiCategoryTree[]): Category[] {
   return activeSorted(tree.filter((node) => node.parentId === null)).map(mapCategory);
 }
 
-/** Карта Guid категории -> slug (по всем уровням дерева). Нужна для товаров. */
-export function buildCategorySlugMap(tree: ApiCategoryTree[]): Map<string, string> {
+/**
+ * Карта Guid категории (любого уровня) -> slug её категории ВЕРХНЕГО уровня.
+ * Наши Category — это только верхний уровень, поэтому товар из «Зволожувачі повітря»
+ * относим к «Побутова техніка»: по нему строятся хлебные крошки и фильтр по категории.
+ */
+export function buildRootCategorySlugMap(tree: ApiCategoryTree[]): Map<string, string> {
   const map = new Map<string, string>();
-  const walk = (nodes: ApiCategoryTree[]) => {
+  const walk = (nodes: ApiCategoryTree[], rootSlug: string) => {
     for (const node of nodes) {
-      map.set(node.id, node.slug);
-      walk(node.children);
+      map.set(node.id, rootSlug);
+      walk(node.children, rootSlug);
     }
   };
-  walk(tree);
+  for (const root of tree) {
+    map.set(root.id, root.slug);
+    walk(root.children, root.slug);
+  }
   return map;
 }
 
@@ -67,11 +74,12 @@ export function buildCategorySlugMap(tree: ApiCategoryTree[]): Map<string, strin
 
 /**
  * Товар каталога -> наш Product.
- * categorySlugById — чтобы categoryId совпадал с id наших категорий (slug).
+ * rootSlugByCategoryId (из buildRootCategorySlugMap) — чтобы categoryId товара
+ * совпадал с id наших категорий верхнего уровня (slug).
  */
 export function mapCatalogProduct(
   dto: ApiCatalogProduct,
-  categorySlugById?: Map<string, string>
+  rootSlugByCategoryId?: Map<string, string>
 ): Product {
   // Бэк уже сортирует фото: главное первым
   const images = dto.images
@@ -85,7 +93,7 @@ export function mapCatalogProduct(
     oldPrice: null, // бэк пока не отдаёт старую цену в каталоге
     image: images[0],
     images,
-    categoryId: categorySlugById?.get(dto.categoryId) ?? dto.categoryId,
+    categoryId: rootSlugByCategoryId?.get(dto.categoryId) ?? dto.categoryId,
     inStock: dto.stockQuantity > 0,
     code: dto.sku,
     description: dto.description || dto.shortDescription,
