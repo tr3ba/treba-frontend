@@ -1,17 +1,7 @@
-export type SubcategoryColumn = {
-  title: string;
-  image?: string;
-  items: string[];
-};
+import type { Category } from "../types/category";
 
-export type Category = {
-  id: string;
-  label: string;
-  icon: string;
-  description?: string;
-  subcategories?: SubcategoryColumn[];
-};
-
+// Мок-данные категорий: используются при NEXT_PUBLIC_USE_MOCKS=true,
+// а также как источник иконок и картинок колонок для данных с бэка.
 export const categories: Category[] = [
   {
     id: "laptops",

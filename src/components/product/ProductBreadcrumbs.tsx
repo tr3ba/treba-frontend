@@ -1,13 +1,24 @@
 import Link from "next/link";
-import { categories } from "../../data/categories";
+import { getCategoryById } from "../../lib/api/categories";
+import type { Category } from "../../types/category";
 import styles from "./ProductBreadcrumbs.module.css";
 
 type ProductBreadcrumbsProps = {
   categoryId?: string;
 };
 
-export default function ProductBreadcrumbs({ categoryId }: ProductBreadcrumbsProps) {
-  const category = categories.find((item) => item.id === categoryId);
+// Категорию ищем через API-слой; если бэк недоступен — показываем «Каталог»
+async function findCategory(categoryId?: string): Promise<Category | null> {
+  if (!categoryId) return null;
+  try {
+    return await getCategoryById(categoryId);
+  } catch {
+    return null;
+  }
+}
+
+export default async function ProductBreadcrumbs({ categoryId }: ProductBreadcrumbsProps) {
+  const category = await findCategory(categoryId);
 
   return (
     <nav className={styles.breadcrumbs} aria-label="Хлібні крихти">

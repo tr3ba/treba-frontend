@@ -2,8 +2,9 @@
 // Компоненты работают только с нашими типами — при изменениях API правим только этот файл.
 
 import type { ApiCatalogProduct, ApiCategoryTree } from "../../types/api";
+import type { Category } from "../../types/category";
 import type { Product } from "../../types/product";
-import { categories as mockCategories, type Category } from "../../data/categories";
+import { categories as mockCategories } from "../../data/categories";
 import { formatPrice } from "../format";
 import { resolveMediaUrl } from "./client";
 

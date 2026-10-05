@@ -3,18 +3,18 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import styles from "./CatalogMenu.module.css";
-import { categories } from "../../data/categories";
+import { useCategories } from "../../context/CategoriesContext";
 
 const CLOSE_DELAY = 200;
 
-const defaultActiveId = categories.find((c) => c.subcategories?.length)?.id ?? null;
-
 export default function CatalogMenu() {
+  const categories = useCategories();
   const [isOpen, setIsOpen] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const activeCategory = categories.find((c) => c.id === activeId);
+  const defaultActiveId = categories.find((c) => c.subcategories?.length)?.id ?? null;
 
   const handleOpen = () => {
     if (closeTimer.current) {
@@ -61,7 +61,7 @@ export default function CatalogMenu() {
                     className={styles.categoryRowIcon}
                   />
                   <span className={styles.categoryRowLabel}>{category.label}</span>
-                  {category.subcategories && (
+                  {(category.subcategories?.length ?? 0) > 0 && (
                     <img
                       src="/icons/arrow.svg"
                       alt=""

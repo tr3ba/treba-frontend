@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { SubcategoryColumn } from "../../data/categories";
+import type { SubcategoryColumn } from "../../types/category";
 import styles from "./CategorySubcategories.module.css";
 
 type CategorySubcategoriesProps = {

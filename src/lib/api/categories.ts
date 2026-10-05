@@ -1,5 +1,6 @@
-import { Category, categories as mockCategories } from "../../data/categories";
+import type { Category } from "../../types/category";
 import type { ApiCategoryTree } from "../../types/api";
+import { categories as mockCategories } from "../../data/categories";
 import { apiFetch } from "./client";
 import { mapCategoryTree } from "./mappers";
 import { USE_MOCKS } from "./mode";
