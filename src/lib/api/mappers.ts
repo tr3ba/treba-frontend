@@ -22,9 +22,10 @@ function activeSorted(nodes: ApiCategoryTree[]): ApiCategoryTree[] {
 /**
  * Узел верхнего уровня -> наша Category.
  * Уровень 2 (children) -> колонки subcategories, уровень 3 -> пункты колонок.
+ * Иконки и картинки колонок на бэке пока не хранятся — если их нет,
+ * берём из мок-категории с таким же slug (и мок-колонки с таким же названием).
  */
 export function mapCategory(node: ApiCategoryTree): Category {
-  // Иконки на бэке не хранятся — берём из мок-категории с таким же slug
   const mock = mockCategories.find((category) => category.id === node.slug);
 
   return {
@@ -32,11 +33,14 @@ export function mapCategory(node: ApiCategoryTree): Category {
     label: node.name,
     icon: mock?.icon ?? resolveMediaUrl(node.imageUrl) ?? DEFAULT_CATEGORY_ICON,
     description: node.description ?? undefined,
-    subcategories: activeSorted(node.children).map((column) => ({
-      title: column.name,
-      image: resolveMediaUrl(column.imageUrl),
-      items: activeSorted(column.children).map((item) => item.name),
-    })),
+    subcategories: activeSorted(node.children).map((column) => {
+      const mockColumn = mock?.subcategories?.find((item) => item.title === column.name);
+      return {
+        title: column.name,
+        image: resolveMediaUrl(column.imageUrl) ?? mockColumn?.image,
+        items: activeSorted(column.children).map((item) => item.name),
+      };
+    }),
   };
 }
 
