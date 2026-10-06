@@ -8,7 +8,6 @@ import {
   ReactNode,
 } from "react";
 
-
 export type UserProfile = {
   phone?: string;
   lastName?: string;
@@ -22,19 +21,19 @@ export type UserProfile = {
   pets?: string;
   additionalInfo?: string;
 
-  // Отримувач замовлення 
+  // Отримувач замовлення
   recipientFirstName?: string;
   recipientLastName?: string;
   recipientPhone?: string;
 
-  // Адреса доставки 
+  // Адреса доставки
   addressCity?: string;
   addressStreet?: string;
   addressBuilding?: string;
   deliveryMethod?: string;
   addressBranch?: string;
 
-  // Побажання щодо замовлень 
+  // Побажання щодо замовлень
   additionalInfoOptions?: string;
 };
 
@@ -44,39 +43,82 @@ type User = {
   email: string;
 } & UserProfile;
 
-type StoredUser = User & { password: string };
+/**
+ * DEMO AUTH ONLY.
+ *
+ * Пароль тимчасово потрібен для локального demo-login.
+ * Дані зберігаються лише в sessionStorage і зникають після
+ * завершення браузерної сесії.
+ *
+ * У production ця логіка має бути замінена backend authentication.
+ */
+type DemoStoredUser = User & {
+  password: string;
+};
 
 type AuthContextValue = {
   user: User | null;
   isLoading: boolean;
+
   register: (
     name: string,
     email: string,
     password: string,
     profile?: UserProfile
   ) => void;
+
   login: (email: string, password: string) => void;
   logout: () => void;
   updateProfile: (patch: UserProfile) => void;
 };
 
-const USERS_KEY = "treba_users";
-const SESSION_KEY = "treba_session";
+const DEMO_USERS_KEY = "treba_demo_users";
+const DEMO_SESSION_KEY = "treba_demo_session";
+
+// Старі ключі, де пароль раніше зберігався постійно.
+const LEGACY_USERS_KEY = "treba_users";
+const LEGACY_SESSION_KEY = "treba_session";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-function getStoredUsers(): StoredUser[] {
-  if (typeof window === "undefined") return [];
+function normalizeEmail(email: string) {
+  return email.trim().toLowerCase();
+}
+
+function getDemoUsers(): DemoStoredUser[] {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
   try {
-    const raw = window.localStorage.getItem(USERS_KEY);
-    return raw ? (JSON.parse(raw) as StoredUser[]) : [];
+    const raw = window.sessionStorage.getItem(DEMO_USERS_KEY);
+
+    if (!raw) {
+      return [];
+    }
+
+    const parsed: unknown = JSON.parse(raw);
+
+    return Array.isArray(parsed) ? (parsed as DemoStoredUser[]) : [];
   } catch {
     return [];
   }
 }
 
-function saveStoredUsers(users: StoredUser[]) {
-  window.localStorage.setItem(USERS_KEY, JSON.stringify(users));
+function saveDemoUsers(users: DemoStoredUser[]) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.sessionStorage.setItem(DEMO_USERS_KEY, JSON.stringify(users));
+}
+
+function createSessionUser(storedUser: DemoStoredUser): User {
+  const user = { ...storedUser };
+
+  delete (user as Partial<DemoStoredUser>).password;
+
+  return user;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -85,11 +127,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const raw = window.localStorage.getItem(SESSION_KEY);
+      /**
+       * Видаляємо стару demo-auth інформацію,
+       * яка могла містити пароль у persistent localStorage.
+       */
+      window.localStorage.removeItem(LEGACY_USERS_KEY);
+      window.localStorage.removeItem(LEGACY_SESSION_KEY);
+
+      const raw = window.sessionStorage.getItem(DEMO_SESSION_KEY);
+
       if (raw) {
-        setUser(JSON.parse(raw) as User);
+        const parsed: unknown = JSON.parse(raw);
+
+        if (parsed && typeof parsed === "object") {
+          setUser(parsed as User);
+        }
       }
     } catch {
+      window.sessionStorage.removeItem(DEMO_SESSION_KEY);
     } finally {
       setIsLoading(false);
     }
@@ -101,68 +156,122 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     password: string,
     profile?: UserProfile
   ) {
-    const normalizedEmail = email.trim().toLowerCase();
-    const users = getStoredUsers();
+    const normalizedName = name.trim();
+    const normalizedEmail = normalizeEmail(email);
 
-    if (users.some((u) => u.email === normalizedEmail)) {
+    if (!normalizedName) {
+      throw new Error("Вкажіть ім'я");
+    }
+
+    if (!normalizedEmail || !normalizedEmail.includes("@")) {
+      throw new Error("Вкажіть коректний email");
+    }
+
+    if (!password) {
+      throw new Error("Вкажіть пароль");
+    }
+
+    const users = getDemoUsers();
+
+    if (users.some((existingUser) => existingUser.email === normalizedEmail)) {
       throw new Error("Користувач з таким email вже зареєстрований");
     }
 
-    const newUser: StoredUser = {
+    const newUser: DemoStoredUser = {
       id: crypto.randomUUID(),
-      name: name.trim(),
+      name: normalizedName,
       email: normalizedEmail,
       password,
       ...profile,
     };
 
-    saveStoredUsers([...users, newUser]);
+    saveDemoUsers([...users, newUser]);
 
-    const { password: _password, ...sessionUser } = newUser;
-    window.localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
+    const sessionUser = createSessionUser(newUser);
+
+    window.sessionStorage.setItem(
+      DEMO_SESSION_KEY,
+      JSON.stringify(sessionUser)
+    );
+
     setUser(sessionUser);
   }
 
   function login(email: string, password: string) {
-    const normalizedEmail = email.trim().toLowerCase();
-    const users = getStoredUsers();
-    const found = users.find((u) => u.email === normalizedEmail);
+    const normalizedEmail = normalizeEmail(email);
 
-    if (!found || found.password !== password) {
+    if (!normalizedEmail || !password) {
+      throw new Error("Вкажіть email та пароль");
+    }
+
+    const users = getDemoUsers();
+
+    const foundUser = users.find(
+      (storedUser) => storedUser.email === normalizedEmail
+    );
+
+    if (!foundUser || foundUser.password !== password) {
       throw new Error("Невірний email або пароль");
     }
 
-    const { password: _password, ...sessionUser } = found;
-    window.localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
+    const sessionUser = createSessionUser(foundUser);
+
+    window.sessionStorage.setItem(
+      DEMO_SESSION_KEY,
+      JSON.stringify(sessionUser)
+    );
+
     setUser(sessionUser);
   }
 
   function logout() {
-    window.localStorage.removeItem(SESSION_KEY);
+    window.sessionStorage.removeItem(DEMO_SESSION_KEY);
     setUser(null);
   }
 
-  
   function updateProfile(patch: UserProfile) {
-    setUser((prev) => {
-      if (!prev) return prev;
-      const updated: User = { ...prev, ...patch };
+    setUser((previousUser) => {
+      if (!previousUser) {
+        return previousUser;
+      }
 
-      window.localStorage.setItem(SESSION_KEY, JSON.stringify(updated));
+      const updatedUser: User = {
+        ...previousUser,
+        ...patch,
+      };
 
-      const users = getStoredUsers();
-      const nextUsers = users.map((u) =>
-        u.id === updated.id ? { ...u, ...patch } : u
+      window.sessionStorage.setItem(
+        DEMO_SESSION_KEY,
+        JSON.stringify(updatedUser)
       );
-      saveStoredUsers(nextUsers);
 
-      return updated;
+      const users = getDemoUsers();
+
+      const updatedUsers = users.map((storedUser) =>
+        storedUser.id === updatedUser.id
+          ? {
+              ...storedUser,
+              ...patch,
+            }
+          : storedUser
+      );
+
+      saveDemoUsers(updatedUsers);
+
+      return updatedUser;
     });
   }
 
   return (
     <AuthContext.Provider
-      value={{ user, isLoading, register, login, logout, updateProfile }}
+      value={{
+        user,
+        isLoading,
+        register,
+        login,
+        logout,
+        updateProfile,
+      }}
     >
       {children}
     </AuthContext.Provider>
@@ -170,9 +279,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error("useAuth должен использоваться внутри AuthProvider");
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error(
+      "useAuth має використовуватися всередині AuthProvider"
+    );
   }
-  return ctx;
+
+  return context;
 }
