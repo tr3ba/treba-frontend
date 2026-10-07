@@ -21,6 +21,8 @@
 
 .mainContent {
     flex: 1;
+    /* без min-width: 0 широкое содержимое растягивает страницу вбок */
+    min-width: 0;
     margin-left: 32px;
     margin-right: 80px;
     display: flex;
@@ -28,18 +30,49 @@
     gap: 16px;
 }
 
+@media (max-width: 1440px) {
+    .leftColumn {
+        width: 280px;
+        margin-left: 40px;
+    }
+
+    .mainContent {
+        margin-right: 40px;
+    }
+}
+
 @media (max-width: 1100px) {
     .pageContent {
         flex-direction: column;
+        /* колонки на всю ширину экрана, а не по ширине содержимого */
+        align-items: stretch;
     }
 
     .leftColumn {
         width: auto;
+        min-width: 0;
         margin: 0 24px;
         position: static;
+        align-self: stretch;
     }
 
     .mainContent {
         margin: 16px 24px 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .pageContent {
+        padding-top: 12px;
+        padding-bottom: 32px;
+    }
+
+    .leftColumn {
+        margin: 0 12px;
+    }
+
+    .mainContent {
+        margin: 12px 12px 0;
+        gap: 12px;
     }
 }
