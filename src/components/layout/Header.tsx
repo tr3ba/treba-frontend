@@ -3,6 +3,7 @@ import CatalogMenu from "../home/CatalogMenu";
 import SearchBar from "../home/SearchBar";
 import UserMenu from "../home/UserMenu";
 import HeaderCartButton from "./HeaderCartButton";
+import MobileCatalog from "./MobileCatalog";
 import styles from "./Header.module.css";
 
 // Синій header + верхня промо-плашка
@@ -15,9 +16,8 @@ export default function Header() {
 
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          <button type="button" className={styles.menuButton} aria-label="Меню">
-            <img src="/icons/menu.svg" alt="" className={styles.menuIcon} />
-          </button>
+          {/* бургер с каталогом — только на планшете и телефоне */}
+          <MobileCatalog />
 
           <Link href="/" className={styles.logoLink}>
             <img src="/logo/MainLogo.svg" alt="Treba" className={styles.logo} />
