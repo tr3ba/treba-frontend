@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import pageStyles from "../../app/page.module.css";
 import styles from "./SearchBar.module.css";
 
 const BLUR_DELAY = 150;
@@ -44,8 +43,8 @@ export default function SearchBar() {
   };
 
   return (
-    <div className={pageStyles.searchWrapper}>
-      <div className={pageStyles.searchBox}>
+    <div className={styles.searchWrapper}>
+      <div className={styles.searchBox}>
         <input
           type="text"
           value={value}
@@ -55,10 +54,10 @@ export default function SearchBar() {
           placeholder="Я шукаю..."
           className={styles.searchInput}
         />
-        <img src="/icons/mic.svg" alt="" className={pageStyles.micIcon} />
+        <img src="/icons/mic.svg" alt="" className={styles.micIcon} />
       </div>
 
-      <button type="button" className={pageStyles.searchButton}>
+      <button type="button" className={styles.searchButton}>
         Знайти
       </button>
 

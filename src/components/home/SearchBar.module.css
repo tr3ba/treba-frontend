@@ -1,3 +1,26 @@
+.searchWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-left: 10px;
+}
+
+.searchBox {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 15px;
+    padding-right: 10px;
+    background: #ffffff;
+    border: 1px solid #ff6e2a;
+    border-radius: 10px 0 0 10px;
+}
+
 .searchInput {
     flex: 1;
     min-width: 0;
@@ -13,6 +36,36 @@
 
 .searchInput::placeholder {
     color: #a6a5a5;
+}
+
+.micIcon {
+    width: 26px;
+    height: 26px;
+    display: block;
+    flex-shrink: 0;
+}
+
+.searchButton {
+    width: 120px;
+    height: 58px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ff6e2a;
+    border: none;
+    border-radius: 0 10px 10px 0;
+    font-family: "Montserrat", sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.searchButton:hover {
+    background-color: #ff8f57;
 }
 
 /* Выпадающая панель с популярными запитами */

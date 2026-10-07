@@ -1,0 +1,128 @@
+/* верхняя промо-плашка */
+.topPromo {
+    height: 84px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-block: 20px;
+    padding-inline: 80px;
+    background-color: #ffffff;
+    background-image: url("/patterns/circlepattern.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% auto;
+}
+
+.topPromoText {
+    margin: 0;
+    font-family: "Montserrat", sans-serif;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 44px;
+    text-align: center;
+    color: #002aff;
+}
+
+/* синий header */
+.header {
+    width: 100%;
+    height: 120px;
+    background-color: #002aff;
+}
+
+.headerInner {
+    height: 100%;
+    padding-inline: 80px;
+    display: flex;
+    align-items: center;
+}
+
+.menuButton {
+    width: 28px;
+    height: 20px;
+    padding: 0;
+    margin-right: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.menuIcon {
+    width: 28px;
+    height: 20px;
+    display: block;
+}
+
+.logoLink {
+    display: flex;
+    align-items: center;
+    margin-right: 65px;
+}
+
+.logo {
+    width: 195.4px;
+    height: 48.2px;
+    display: block;
+    object-fit: contain;
+}
+
+/* иконки справа: избранное, профиль, корзина */
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin-left: 40px;
+}
+
+.actionButton {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.heartIcon {
+    width: 34px;
+    height: 34px;
+    display: block;
+    object-fit: contain;
+}
+
+/* hover-иконка: контур -> заливка (две картинки друг на друге, переключение через opacity) */
+.iconSwap {
+    position: relative;
+    display: block;
+}
+
+.iconSwap img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.2s ease;
+}
+
+.iconOutline {
+    opacity: 1;
+}
+
+.iconFilled {
+    opacity: 0;
+}
+
+.actionButton:hover .iconOutline {
+    opacity: 0;
+}
+
+.actionButton:hover .iconFilled {
+    opacity: 1;
+}
