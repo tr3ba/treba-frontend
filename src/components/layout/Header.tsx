@@ -23,12 +23,19 @@ export default function Header() {
             <img src="/logo/MainLogo.svg" alt="Treba" className={styles.logo} />
           </Link>
 
-          <CatalogMenu />
+          {/* на планшете и телефоне каталог открывается через бургер */}
+          <div className={styles.catalogSlot}>
+            <CatalogMenu />
+          </div>
 
           <SearchBar />
 
           <div className={styles.headerActions}>
-            <button type="button" className={styles.actionButton} aria-label="Список бажань">
+            <button
+              type="button"
+              className={`${styles.actionButton} ${styles.wishlistButton}`}
+              aria-label="Список бажань"
+            >
               <span className={`${styles.iconSwap} ${styles.heartIcon}`}>
                 <img src="/icons/heart.svg" alt="" className={styles.iconOutline} />
                 <img src="/icons/heart1.svg" alt="" className={styles.iconFilled} />

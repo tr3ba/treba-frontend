@@ -76,3 +76,27 @@
         transform: scale(1);
     }
 }
+
+/* ---------- планшет и телефон: иконка меньше ---------- */
+@media (max-width: 1024px) {
+    .cartIcon {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+@media (max-width: 768px) {
+    .cartIcon {
+        width: 26px;
+        height: 26px;
+    }
+
+    .badge {
+        top: -5px;
+        right: -8px;
+        min-width: 18px;
+        height: 18px;
+        font-size: 10px;
+        line-height: 14px;
+    }
+}

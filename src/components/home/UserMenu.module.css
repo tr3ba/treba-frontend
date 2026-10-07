@@ -114,3 +114,18 @@
 .logoutButton:hover {
     background-color: #ff8f57;
 }
+
+/* ---------- планшет и телефон: иконка меньше ---------- */
+@media (max-width: 1024px) {
+    .userIcon {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+@media (max-width: 768px) {
+    .userIcon {
+        width: 26px;
+        height: 26px;
+    }
+}

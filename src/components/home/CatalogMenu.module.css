@@ -165,3 +165,32 @@
     color: #ff6e2a;
     text-decoration: underline;
 }
+
+/* ---------- ноутбук: кнопка компактнее, панель подкатегорий не вылезает за экран ---------- */
+@media (max-width: 1440px) {
+    .catalogButton {
+        width: 170px;
+        height: 52px;
+        padding: 12px 20px;
+    }
+
+    .catalogIcon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .catalogText {
+        font-size: 20px;
+    }
+
+    .subcategoriesPanel {
+        width: min(1100px, calc(100vw - 640px));
+        column-count: 3;
+    }
+}
+
+@media (max-width: 1280px) {
+    .subcategoriesPanel {
+        column-count: 2;
+    }
+}
