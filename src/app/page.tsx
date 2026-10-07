@@ -137,6 +137,7 @@ export default async function Home() {
             image={product.image}
             rating={product.rating}
             isPromo={product.isPromo}
+            fluid
           />
           {index === 4 && (
             <div className={styles.promoCard}>
@@ -173,6 +174,7 @@ export default async function Home() {
     image={product.image}
     rating={product.rating}
     isPromo={product.isPromo}
+    fluid
   />
 ))}
     </div>

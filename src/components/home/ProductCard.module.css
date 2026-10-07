@@ -154,3 +154,63 @@
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
     z-index: 5;
 }
+
+/* ---------- резиновая картка: ширина = ширина комірки сітки ---------- */
+.cardFluid {
+    width: 100%;
+    flex: none;
+}
+
+.cardFluid .imageWrap {
+    width: 100%;
+}
+
+/* на сенсорних екранах наведення немає — не збільшуємо картку при дотику */
+@media (hover: none) {
+    .card:hover {
+        transform: none;
+        box-shadow: none;
+    }
+}
+
+/* ---------- телефон: 2 картки в ряд, текст крупніший ---------- */
+@media (max-width: 768px) {
+    .cardFluid {
+        height: auto;
+        min-height: 260px;
+        padding: 8px;
+    }
+
+    .cardFluid .imageWrap {
+        height: auto;
+        aspect-ratio: 1 / 1;
+    }
+
+    .cardFluid .title {
+        margin-top: 10px;
+        font-size: 13px;
+        line-height: 1.25;
+    }
+
+    .cardFluid .rating {
+        font-size: 11px;
+    }
+
+    .cardFluid .bottomRow {
+        padding-top: 8px;
+    }
+
+    .cardFluid .oldPrice {
+        font-size: 11px;
+    }
+
+    .cardFluid .pricePromo,
+    .cardFluid .priceRegular {
+        font-size: 20px;
+    }
+
+    .cardFluid .currency {
+        font-size: 11px;
+        line-height: 14px;
+    }
+}

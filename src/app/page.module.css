@@ -23,6 +23,8 @@
 
 .mainContent {
   flex: 1;
+  /* без min-width: 0 сетка не может сжаться уже своего содержимого */
+  min-width: 0;
   margin-left: 32px;
 }
 
@@ -89,7 +91,8 @@
 /* Ласкаво просимо! */
 
 .welcomeCard {
-  width: 308px;
+  width: 100%;
+  max-width: 308px;
   min-height: 187px;
   border-radius: 10px;
   background-color: #ffffff;
@@ -151,7 +154,8 @@
 /* Ми в соціальних мережах */
 
 .socialCard {
-  width: 308px;
+  width: 100%;
+  max-width: 308px;
   min-height: 88px;
   border-radius: 10px;
   background-color: #ffffff;
@@ -189,11 +193,6 @@
   opacity: 0.75;
 }
 
-.mainContent {
-  flex: 1;
-  margin-left: 32px;
-}
-
 .mainBannerSection {
   display: flex;
   align-items: flex-start;
@@ -206,15 +205,16 @@
   /* расстояние от баннера до плашек */
   display: flex;
   align-items: stretch;
-  justify-content: space-between;
-  width: 1384px;
+  gap: 2px;
+  width: 100%;
+  max-width: 1384px;
 }
 
 /* одна плашка */
 
 .bannerBadge {
-  width: 460.1px;
-  height: 89.8px;
+  flex: 1 1 0;
+  min-height: 89.8px;
   border-radius: 10px;
   background-color: #f9f9f9;
   display: flex;
@@ -288,7 +288,7 @@
 }
 
 .promoCard {
-  width: 217.3px;
+  width: 100%;
   height: 280px;
   background: #ffffff;
   border: 0.75px solid #ff6e2a;
@@ -305,9 +305,9 @@
 
 .secondBannerSection {
   margin-top: 50px;
-  /* расстояние вниз от карточек */
-  width: 1384px;
-  /* та же ширина, что у основного баннера и плашек */
+  /* расстояние вниз от карточек; та же ширина, что у основного баннера и плашек */
+  width: 100%;
+  max-width: 1384px;
 }
 
 .secondBanner {
@@ -316,10 +316,6 @@
   border-radius: 10px;
   display: block;
   object-fit: cover;
-}
-
-.secondBannerSection {
-  margin-top: 50px;
 }
 
 .footerTextSection {
@@ -382,4 +378,146 @@
 
 .readMoreArrowOpen {
   transform: rotate(180deg);
+}
+
+/* ---------- ноутбук ---------- */
+@media (max-width: 1440px) {
+  .leftColumn {
+    width: 260px;
+    margin-left: 40px;
+  }
+
+  .categoryText {
+    font-size: 15px;
+  }
+
+  .mainContent {
+    margin-right: 40px;
+  }
+
+  .productsTitle {
+    font-size: 32px;
+  }
+
+  .productsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  }
+
+  .secondBanner {
+    height: auto;
+  }
+
+  .footerTextInner {
+    padding-inline: 40px;
+  }
+}
+
+/* ---------- планшет: боковой каталог скрыт, его заменяет бургер в шапке ---------- */
+@media (max-width: 1024px) {
+  .pageContent {
+    padding-inline: 24px;
+  }
+
+  .leftColumn {
+    display: none;
+  }
+
+  .mainContent {
+    margin: 0;
+  }
+
+  .productsSection,
+  .secondBannerSection {
+    margin-top: 36px;
+  }
+
+  .productsTitle {
+    font-size: 28px;
+  }
+
+  .productsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  }
+
+  .footerTextInner {
+    padding-inline: 24px;
+  }
+}
+
+/* ---------- телефон ---------- */
+@media (max-width: 768px) {
+  .pageContent {
+    padding: 12px 12px 0;
+  }
+
+  /* плашки «Доставка / Повернення / Гарантія» — горизонтальная прокрутка */
+  .bannerBadges {
+    margin-top: 12px;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .bannerBadges::-webkit-scrollbar {
+    display: none;
+  }
+
+  .bannerBadge {
+    flex: 0 0 78%;
+    min-height: 0;
+    padding: 10px 12px;
+    align-items: flex-start;
+  }
+
+  .badgeIconWrapper {
+    padding: 2px 8px 0 0;
+  }
+
+  .badgeTitle {
+    font-size: 14px;
+  }
+
+  .badgeSubtitle {
+    font-size: 11px;
+  }
+
+  .productsSection,
+  .secondBannerSection {
+    margin-top: 24px;
+  }
+
+  .productsTitle {
+    margin-bottom: 12px;
+    font-size: 20px;
+  }
+
+  /* 2 карточки в ряд, как у Rozetka */
+  .productsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .promoCard {
+    height: auto;
+  }
+
+  .secondBanner {
+    border-radius: 8px;
+  }
+
+  .footerTextSection {
+    margin-top: 32px;
+  }
+
+  .footerTextInner {
+    padding-inline: 12px;
+  }
+
+  .footerTitle {
+    font-size: 18px;
+  }
+
+  .footerParagraph {
+    font-size: 14px;
+  }
 }

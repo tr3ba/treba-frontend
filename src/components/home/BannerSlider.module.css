@@ -1,7 +1,9 @@
 .mainBanner {
     position: relative;
-    width: 1384px;
-    height: 230px;
+    width: 100%;
+    max-width: 1384px;
+    /* пропорция банера 1384×230 — на будь-якій ширині банер видно повністю */
+    aspect-ratio: 1384 / 230;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -75,4 +77,42 @@
 /* правая стрелка — зеркалим ту же иконку, что смотрит влево */
 .arrowMirrored {
     transform: scaleX(-1);
+}
+
+/* ---------- планшет: стрелки меньше ---------- */
+@media (max-width: 1024px) {
+
+    .bannerArrowLeft,
+    .bannerArrowRight {
+        width: 32px;
+        height: 32px;
+    }
+
+    .bannerArrowLeft {
+        left: 10px;
+    }
+
+    .bannerArrowRight {
+        right: 10px;
+    }
+
+    .bannerArrowLeft img,
+    .bannerArrowRight img {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+/* ---------- телефон: стрелки скрыты, слайды листаются автоматически ---------- */
+@media (max-width: 768px) {
+
+    .mainBanner,
+    .track {
+        border-radius: 8px;
+    }
+
+    .bannerArrowLeft,
+    .bannerArrowRight {
+        display: none;
+    }
 }
