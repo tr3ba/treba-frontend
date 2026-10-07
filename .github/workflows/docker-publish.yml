@@ -34,8 +34,20 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          API_URL=$(aws ssm get-parameter \
+            --name "/treba/frontend/NEXT_PUBLIC_API_URL" \
+            --query "Parameter.Value" \
+            --output text)
+
+          USE_MOCKS=$(aws ssm get-parameter \
+            --name "/treba/frontend/NEXT_PUBLIC_USE_MOCKS" \
+            --query "Parameter.Value" \
+            --output text)
+
           docker build \
             -f docker/Dockerfile.frontend \
+            --build-arg NEXT_PUBLIC_API_URL="$API_URL" \
+            --build-arg NEXT_PUBLIC_USE_MOCKS="$USE_MOCKS" \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
             .
 
