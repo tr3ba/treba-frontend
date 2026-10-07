@@ -89,3 +89,84 @@
     font-weight: 400;
     color: #898888;
 }
+
+/* ---------- ноутбук ---------- */
+@media (max-width: 1440px) {
+    .inner {
+        padding-inline: 40px;
+    }
+
+    .columns {
+        gap: 64px;
+    }
+}
+
+/* ---------- планшет: колонки переносятся, соцсети отдельной строкой ---------- */
+@media (max-width: 1024px) {
+    .footer {
+        margin-top: 40px;
+    }
+
+    .inner {
+        padding: 32px 24px 24px;
+    }
+
+    .columns {
+        flex-wrap: wrap;
+        gap: 28px 48px;
+    }
+
+    .socialColumn {
+        flex-basis: 100%;
+    }
+}
+
+/* ---------- телефон: соцсети сверху, ссылки в 2 колонки ---------- */
+@media (max-width: 768px) {
+    .footer {
+        margin-top: 32px;
+    }
+
+    .inner {
+        padding: 24px 16px 20px;
+    }
+
+    .columns {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px 16px;
+    }
+
+    .socialColumn {
+        grid-column: 1 / -1;
+    }
+
+    .socialRow {
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    /* иконки крупнее — в них удобнее попадать пальцем */
+    .socialIcon img {
+        width: 24px;
+        height: 24px;
+    }
+
+    .columnTitle {
+        margin-bottom: 12px;
+    }
+
+    .footerLink {
+        margin-bottom: 10px;
+    }
+
+    .bottomRow {
+        margin-top: 16px;
+        padding-top: 16px;
+    }
+
+    .copyright {
+        font-size: 12px;
+        line-height: 1.4;
+    }
+}
