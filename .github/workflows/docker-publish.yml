@@ -60,4 +60,3 @@ jobs:
 
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           fi
-

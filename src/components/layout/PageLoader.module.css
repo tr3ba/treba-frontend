@@ -1,0 +1,100 @@
+.page {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px 32px 60px;
+}
+
+/* Серый блок с бегущим бликом */
+.block {
+    border-radius: 8px;
+    background: linear-gradient(90deg, #f1efea 0%, #e5e3dd 50%, #f1efea 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.title {
+    width: 320px;
+    max-width: 70%;
+    height: 28px;
+    margin-bottom: 12px;
+}
+
+.subtitle {
+    width: 520px;
+    max-width: 90%;
+    height: 14px;
+    margin-bottom: 32px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid #e5e3dd;
+    border-radius: 10px;
+    background-color: #ffffff;
+}
+
+.cardImage {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+}
+
+.cardLine {
+    height: 12px;
+}
+
+.cardLineShort {
+    width: 60%;
+    height: 12px;
+}
+
+.cardPrice {
+    width: 40%;
+    height: 18px;
+    margin-top: 6px;
+}
+
+/* Текст только для экранных дикторов */
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: -100% 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .block {
+        animation: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .page {
+        padding: 16px 16px 40px;
+    }
+
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+}
