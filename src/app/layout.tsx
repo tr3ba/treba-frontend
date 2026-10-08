@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   description: "TREBA — український маркетплейс",
 };
 
+// Все страницы рендерятся при запросе, а не во время next build:
+// данные живые (цены, остатки), а API на этапе сборки недоступен.
+// Кэширование (revalidate) — отдельным шагом, этап 7.
+export const dynamic = "force-dynamic";
+
 // Категории для меню каталога. Если бэк недоступен — сайт работает дальше с пустым меню.
 async function loadCategories(): Promise<Category[]> {
   try {
