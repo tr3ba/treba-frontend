@@ -34,14 +34,33 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          API_URL=$(aws ssm get-parameter \
+            --name "/treba/frontend/NEXT_PUBLIC_API_URL" \
+            --query "Parameter.Value" \
+            --output text)
+
+          USE_MOCKS=$(aws ssm get-parameter \
+            --name "/treba/frontend/NEXT_PUBLIC_USE_MOCKS" \
+            --query "Parameter.Value" \
+            --output text)
+
+          echo "Testing API from Docker..."
+          docker run --rm node:24-alpine \
+            node -e "fetch('https://treba.duckdns.org/api/v1/categories').then(r=>console.log(r.status)).catch(e=>{console.error(e);process.exit(1)})"
+
           docker build \
             -f docker/Dockerfile.frontend \
+            --build-arg NEXT_PUBLIC_API_URL="$API_URL" \
+            --build-arg NEXT_PUBLIC_USE_MOCKS="$USE_MOCKS" \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
             .
 
-          docker tag \
-            $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
-            $ECR_REGISTRY/$ECR_REPOSITORY:latest
-
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+          if [ "$GITHUB_REF_NAME" = "main" ]; then
+            docker tag \
+              $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+              $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          fi
