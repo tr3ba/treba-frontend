@@ -44,10 +44,6 @@ jobs:
             --query "Parameter.Value" \
             --output text)
 
-          echo "Testing API from Docker..."
-          docker run --rm node:24-alpine \
-            node -e "fetch('https://treba.duckdns.org/api/v1/categories').then(r=>console.log(r.status)).catch(e=>{console.error(e);process.exit(1)})"
-
           docker build \
             -f docker/Dockerfile.frontend \
             --build-arg NEXT_PUBLIC_API_URL="$API_URL" \

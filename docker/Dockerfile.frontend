@@ -16,8 +16,6 @@ ARG NEXT_PUBLIC_USE_MOCKS
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_USE_MOCKS=$NEXT_PUBLIC_USE_MOCKS
 
-RUN node -e "console.log(process.env.NEXT_PUBLIC_API_URL, process.env.NEXT_PUBLIC_USE_MOCKS); fetch(process.env.NEXT_PUBLIC_API_URL + '/api/v1/categories').then(r => console.log('API:', r.status)).catch(e => { console.error(e); process.exit(1) })"
-
 RUN npm run build
 
 FROM node:24-alpine AS runner
