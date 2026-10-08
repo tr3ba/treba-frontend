@@ -1,38 +1,44 @@
 import Link from "next/link";
-import pageStyles from "../../app/page.module.css";
 import CatalogMenu from "../home/CatalogMenu";
 import SearchBar from "../home/SearchBar";
 import UserMenu from "../home/UserMenu";
 import HeaderCartButton from "./HeaderCartButton";
+import MobileCatalog from "./MobileCatalog";
+import styles from "./Header.module.css";
 
 // Синій header + верхня промо-плашка
 export default function Header() {
   return (
     <>
-      <div className={pageStyles.topPromo}>
-        <div className={pageStyles.topPromoPattern} aria-hidden="true" />
-        <p className={pageStyles.topPromoText}>Перша доставка за 0₴</p>
+      <div className={styles.topPromo}>
+        <p className={styles.topPromoText}>Перша доставка за 0₴</p>
       </div>
 
-      <header className={pageStyles.header}>
-        <div className={pageStyles.headerInner}>
-          <button className={pageStyles.menuButton} aria-label="Меню">
-            <img src="/icons/menu.svg" alt="" className={pageStyles.menuIcon} />
-          </button>
+      <header className={styles.header}>
+        <div className={styles.headerInner}>
+          {/* бургер с каталогом — только на планшете и телефоне */}
+          <MobileCatalog />
 
-          <Link href="/" className={pageStyles.logoLink}>
-            <img src="/logo/MainLogo.svg" alt="Treba" className={pageStyles.logo} />
+          <Link href="/" className={styles.logoLink}>
+            <img src="/logo/MainLogo.svg" alt="Treba" className={styles.logo} />
           </Link>
 
-          <CatalogMenu />
+          {/* на планшете и телефоне каталог открывается через бургер */}
+          <div className={styles.catalogSlot}>
+            <CatalogMenu />
+          </div>
 
           <SearchBar />
 
-          <div className={pageStyles.headerActions}>
-            <button className={pageStyles.actionButton} aria-label="Список бажань">
-              <span className={`${pageStyles.iconSwap} ${pageStyles.heartIcon}`}>
-                <img src="/icons/heart.svg" alt="" className={pageStyles.iconOutline} />
-                <img src="/icons/heart1.svg" alt="" className={pageStyles.iconFilled} />
+          <div className={styles.headerActions}>
+            <button
+              type="button"
+              className={`${styles.actionButton} ${styles.wishlistButton}`}
+              aria-label="Список бажань"
+            >
+              <span className={`${styles.iconSwap} ${styles.heartIcon}`}>
+                <img src="/icons/heart.svg" alt="" className={styles.iconOutline} />
+                <img src="/icons/heart1.svg" alt="" className={styles.iconFilled} />
               </span>
             </button>
 

@@ -1,0 +1,244 @@
+/* верхняя промо-плашка */
+.topPromo {
+    height: 84px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-block: 20px;
+    padding-inline: 80px;
+    background-color: #ffffff;
+    background-image: url("/patterns/circlepattern.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% auto;
+}
+
+.topPromoText {
+    margin: 0;
+    font-family: "Montserrat", sans-serif;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 44px;
+    text-align: center;
+    color: #002aff;
+}
+
+/* синий header */
+.header {
+    width: 100%;
+    height: 120px;
+    background-color: #002aff;
+}
+
+.headerInner {
+    height: 100%;
+    padding-inline: 80px;
+    display: flex;
+    align-items: center;
+}
+
+.logoLink {
+    display: flex;
+    align-items: center;
+    margin-right: 65px;
+}
+
+.logo {
+    width: 195.4px;
+    height: 48.2px;
+    display: block;
+    object-fit: contain;
+}
+
+/* иконки справа: избранное, профиль, корзина */
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin-left: 40px;
+}
+
+.actionButton {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.heartIcon {
+    width: 34px;
+    height: 34px;
+    display: block;
+    object-fit: contain;
+}
+
+/* hover-иконка: контур -> заливка (две картинки друг на друге, переключение через opacity) */
+.iconSwap {
+    position: relative;
+    display: block;
+}
+
+.iconSwap img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.2s ease;
+}
+
+.iconOutline {
+    opacity: 1;
+}
+
+.iconFilled {
+    opacity: 0;
+}
+
+.actionButton:hover .iconOutline {
+    opacity: 0;
+}
+
+.actionButton:hover .iconFilled {
+    opacity: 1;
+}
+
+/* каталог: обёртка, чтобы прятать его на узких экранах */
+.catalogSlot {
+    flex-shrink: 0;
+}
+
+/* ---------- ноутбук ---------- */
+@media (max-width: 1440px) {
+    .topPromo {
+        padding-inline: 40px;
+    }
+
+    .headerInner {
+        padding-inline: 40px;
+    }
+
+    .logoLink {
+        margin-right: 32px;
+    }
+
+    .logo {
+        width: 150px;
+        height: 37px;
+    }
+
+    .headerActions {
+        gap: 20px;
+        margin-left: 24px;
+    }
+
+    .heartIcon {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+/* ---------- планшет ---------- */
+@media (max-width: 1024px) {
+    .topPromo {
+        height: 60px;
+        padding-block: 10px;
+        padding-inline: 24px;
+    }
+
+    .topPromoText {
+        font-size: 24px;
+        line-height: 1.2;
+    }
+
+    .header {
+        height: 88px;
+    }
+
+    .headerInner {
+        padding-inline: 24px;
+    }
+
+    .logoLink {
+        margin-right: 20px;
+    }
+
+    .logo {
+        width: 120px;
+        height: 30px;
+    }
+
+    .catalogSlot {
+        display: none;
+    }
+
+    .headerActions {
+        gap: 18px;
+        margin-left: 20px;
+    }
+
+    .heartIcon {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+/* ---------- телефон: бургер + логотип + поиск + иконки в одну строку ---------- */
+@media (max-width: 768px) {
+    .topPromo {
+        height: 40px;
+        padding: 8px 16px;
+        background-size: cover;
+    }
+
+    .topPromoText {
+        font-size: 16px;
+    }
+
+    .header {
+        height: 64px;
+    }
+
+    .headerInner {
+        /* относительно этого блока позиционируются подсказки поиска на всю ширину */
+        position: relative;
+        padding-inline: 12px;
+        gap: 10px;
+    }
+
+    .logoLink {
+        margin-right: 0;
+        flex-shrink: 0;
+    }
+
+    .logo {
+        width: 76px;
+        height: 19px;
+    }
+
+    /* избранное на телефоне переедет в нижнюю панель */
+    .wishlistButton {
+        display: none;
+    }
+
+    .headerActions {
+        gap: 14px;
+        margin-left: 0;
+        flex-shrink: 0;
+    }
+}
+
+@media (max-width: 400px) {
+    .headerInner {
+        gap: 8px;
+    }
+
+    .logo {
+        width: 64px;
+        height: 16px;
+    }
+}

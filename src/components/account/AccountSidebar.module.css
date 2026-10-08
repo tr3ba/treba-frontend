@@ -109,18 +109,109 @@
     transform: scale(1.08);
 }
 
-.navText {
-    transition: transform 0.2s ease;
-}
-
 .navItem:hover .navText {
     transform: scale(1.05);
     transform-origin: left center;
 }
 
 .navText {
+    transition: transform 0.2s ease;
     font-family: "Montserrat", sans-serif;
     font-size: 14px;
     font-weight: 400;
     line-height: 1.3;
+}
+
+/* ---------- кнопка «Розділ кабінету»: только на планшете и телефоне ---------- */
+.sectionToggle {
+    display: none;
+    width: 100%;
+    padding: 12px 16px;
+    align-items: center;
+    gap: 12px;
+    background-color: #ffffff;
+    border: 1px solid #dadada;
+    border-radius: 10px;
+    color: #28251d;
+    font-family: "Montserrat", sans-serif;
+    text-align: left;
+    cursor: pointer;
+}
+
+.toggleIcon {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 auto;
+    object-fit: contain;
+    filter: invert(46%) sepia(97%) saturate(1626%) hue-rotate(360deg) brightness(101%) contrast(101%);
+}
+
+.toggleText {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.toggleHint {
+    font-size: 11px;
+    color: #8a8578;
+}
+
+.toggleLabel {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ff6e2a;
+}
+
+.toggleChevron {
+    flex: 0 0 auto;
+    color: #8a8578;
+    transition: transform 0.2s ease;
+}
+
+.toggleChevronOpen {
+    transform: rotate(180deg);
+}
+
+/* ---------- планшет и телефон: список разделов раскрывается по кнопке ---------- */
+@media (max-width: 1100px) {
+    .sidebar {
+        gap: 12px;
+    }
+
+    .userCard {
+        padding: 14px 16px;
+    }
+
+    .sectionToggle {
+        display: flex;
+    }
+
+    .nav {
+        display: none;
+        padding: 8px;
+    }
+
+    .navOpen {
+        display: flex;
+    }
+
+    /* увеличение текста при наведении на тач-экране не нужно */
+    .navItem:hover .navText {
+        transform: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .userIconWrap {
+        width: 38px;
+        height: 38px;
+    }
+
+    .userIcon {
+        width: 20px;
+        height: 20px;
+    }
 }

@@ -1,3 +1,26 @@
+.searchWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-left: 10px;
+}
+
+.searchBox {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 15px;
+    padding-right: 10px;
+    background: #ffffff;
+    border: 1px solid #ff6e2a;
+    border-radius: 10px 0 0 10px;
+}
+
 .searchInput {
     flex: 1;
     min-width: 0;
@@ -13,6 +36,36 @@
 
 .searchInput::placeholder {
     color: #a6a5a5;
+}
+
+.micIcon {
+    width: 26px;
+    height: 26px;
+    display: block;
+    flex-shrink: 0;
+}
+
+.searchButton {
+    width: 120px;
+    height: 58px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ff6e2a;
+    border: none;
+    border-radius: 0 10px 10px 0;
+    font-family: "Montserrat", sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.searchButton:hover {
+    background-color: #ff8f57;
 }
 
 /* Выпадающая панель с популярными запитами */
@@ -59,4 +112,74 @@
 .suggestionPill:hover {
     border-color: #ff6e2a;
     color: #ff6e2a;
+}
+
+/* ---------- ноутбук ---------- */
+@media (max-width: 1440px) {
+
+    .searchBox,
+    .searchButton {
+        height: 52px;
+    }
+
+    .searchButton {
+        width: 100px;
+    }
+}
+
+/* ---------- планшет ---------- */
+@media (max-width: 1024px) {
+    .searchWrapper {
+        margin-left: 0;
+    }
+
+    .searchBox,
+    .searchButton {
+        height: 48px;
+    }
+
+    .searchButton {
+        width: 90px;
+        font-size: 15px;
+    }
+}
+
+/* ---------- телефон: только поле, без кнопки и микрофона ---------- */
+@media (max-width: 768px) {
+    .searchWrapper {
+        /* static: подсказки позиционируются относительно всей строки шапки */
+        position: static;
+    }
+
+    .searchBox {
+        height: 40px;
+        padding-inline: 12px;
+        border-radius: 10px;
+    }
+
+    /* 16px оставляем: при меньшем шрифте iPhone увеличивает страницу при фокусе */
+    .searchInput {
+        font-size: 16px;
+    }
+
+    .micIcon,
+    .searchButton {
+        display: none;
+    }
+
+    .suggestions {
+        left: 12px;
+        right: 12px;
+        top: calc(100% + 4px);
+        padding: 16px;
+    }
+
+    .suggestionsList {
+        gap: 8px;
+    }
+
+    .suggestionPill {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
 }

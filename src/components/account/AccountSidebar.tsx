@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
@@ -48,8 +49,12 @@ const navItems = [
 export default function AccountSidebar() {
   const { user } = useAuth();
   const pathname = usePathname();
+  // Планшет и телефон: список разделов свёрнут в кнопку с текущим разделом
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   if (!user) return null;
+
+  const currentItem = navItems.find((item) => item.href === pathname) ?? navItems[0];
 
   return (
     <aside className={styles.sidebar}>
@@ -63,7 +68,41 @@ export default function AccountSidebar() {
         </div>
       </section>
 
-      <nav className={styles.nav} aria-label="Розділи кабінету">
+      <button
+        type="button"
+        className={styles.sectionToggle}
+        aria-expanded={isMenuOpen}
+        aria-controls="account-sections"
+        onClick={() => setIsMenuOpen((prev) => !prev)}
+      >
+        <img src={currentItem.icon} alt="" className={styles.toggleIcon} />
+        <span className={styles.toggleText}>
+          <span className={styles.toggleHint}>Розділ кабінету</span>
+          <span className={styles.toggleLabel}>{currentItem.label}</span>
+        </span>
+        <svg
+          className={`${styles.toggleChevron} ${isMenuOpen ? styles.toggleChevronOpen : ""}`}
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          aria-hidden="true"
+        >
+          <path
+            d="M3 6l5 5 5-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+
+      <nav
+        id="account-sections"
+        className={`${styles.nav} ${isMenuOpen ? styles.navOpen : ""}`}
+        aria-label="Розділи кабінету"
+      >
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -71,6 +110,8 @@ export default function AccountSidebar() {
               key={item.href}
               href={item.href}
               className={`${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
+              aria-current={isActive ? "page" : undefined}
+              onClick={() => setIsMenuOpen(false)}
             >
               <img src={item.icon} alt="" className={styles.navIcon} />
               <span className={styles.navText}>{item.label}</span>

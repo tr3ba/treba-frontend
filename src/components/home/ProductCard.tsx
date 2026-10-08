@@ -11,6 +11,8 @@ type ProductCardProps = {
   rating?: number;
   oldPrice?: string | null;
   isPromo?: boolean;
+  /** Картка тягнеться на ширину комірки сітки (головна). За замовчуванням — фіксована ширина */
+  fluid?: boolean;
 };
 
 export default function ProductCard({
@@ -21,14 +23,21 @@ export default function ProductCard({
   rating = 4.5,
   oldPrice = null,
   isPromo = false,
+  fluid = false,
 }: ProductCardProps) {
   return (
-    <article className={styles.card}>
+    <article className={fluid ? `${styles.card} ${styles.cardFluid}` : styles.card}>
       {/* Посилання розтягнуте на всю картку через ::after, кнопка кошика — поверх нього */}
       <Link href={`/product/${id}`} className={styles.cardLink}>
         <div className={styles.imageWrap}>
           {image ? (
-            <Image src={image} alt={title} fill className={styles.image} sizes="217px" />
+            <Image
+              src={image}
+              alt={title}
+              fill
+              className={styles.image}
+              sizes={fluid ? "(max-width: 768px) 50vw, 217px" : "217px"}
+            />
           ) : (
             <div className={styles.imagePlaceholder} aria-hidden="true">
               <img src="/icons/catalog.svg" alt="" className={styles.imagePlaceholderIcon} />
