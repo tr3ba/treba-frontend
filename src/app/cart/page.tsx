@@ -6,13 +6,25 @@ import Footer from "../../components/home/Footer";
 import CartView from "../../components/cart/CartView";
 import ProductCarousel from "../../components/product/ProductCarousel";
 import { getRecommendedProducts } from "../../lib/api/products";
+import type { Product } from "../../types/product";
 
 export const metadata: Metadata = {
   title: "Кошик — Treba",
 };
 
+// Рекомендации — необязательный блок. Корзина живёт в localStorage,
+// поэтому при недоступном бэке страница работает, просто без карусели.
+async function loadRecommended(): Promise<Product[]> {
+  try {
+    return await getRecommendedProducts();
+  } catch (error) {
+    console.error("Не вдалося завантажити рекомендації:", error);
+    return [];
+  }
+}
+
 export default async function CartPage() {
-  const recommended = await getRecommendedProducts();
+  const recommended = await loadRecommended();
 
   return (
     <>
