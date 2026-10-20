@@ -6,7 +6,7 @@
 //   берём каталог и фильтруем по storeId на фронте. Когда бэк добавит параметр storeId
 //   и счётчики по категориям — меняем только getSellerProducts;
 // - профиль магазина: публичного GET /api/v1/stores/{id} нет -> название берём из товаров;
-// - рейтинга, отзывов о продавце, графика работы на бэке нет -> в режиме бэка их не показываем.
+// - рейтинга, отзывов о продавце, графика работы на бэке нет -> страница показывает пустые состояния.
 
 import { cache } from "react";
 import type { Product } from "../../types/product";
@@ -19,18 +19,11 @@ import type {
   SellerReview,
   SellerReviewsSort,
 } from "../../types/seller";
-import { mockSellerReviews, mockSellers } from "../../data/sellers";
 import { getCategories } from "./categories";
 import { getCatalogProducts } from "./products";
 import { parsePrice } from "../format";
-import { USE_MOCKS } from "./mode";
 
-const FAKE_DELAY_MS = 300;
 const DEFAULT_PAGE_SIZE = 20;
-
-function delay<T>(value: T): Promise<T> {
-  return new Promise((resolve) => setTimeout(() => resolve(value), FAKE_DELAY_MS));
-}
 
 // cache() — layout и страница вкладки вызывают одно и то же за один рендер
 const getProductsOfSeller = cache(async (sellerId: string): Promise<Product[]> => {
@@ -41,10 +34,6 @@ const getProductsOfSeller = cache(async (sellerId: string): Promise<Product[]> =
 // ---------- Профиль ----------
 
 export const getSellerById = cache(async (id: string): Promise<SellerProfile | null> => {
-  if (USE_MOCKS) {
-    return delay(mockSellers.find((seller) => seller.id === id) ?? null);
-  }
-
   // Профиля магазина на бэке нет: магазин «существует», если у него есть товары
   const products = await getProductsOfSeller(id);
   const seller = products[0]?.seller;
@@ -96,7 +85,7 @@ export async function getSellerProducts(
   const page = Math.min(Math.max(1, query.page ?? 1), totalPages);
   const start = (page - 1) * pageSize;
 
-  const result: SellerProductsResult = {
+  return {
     products: sorted.slice(start, start + pageSize),
     total: sorted.length,
     totalAll: all.length,
@@ -105,9 +94,6 @@ export async function getSellerProducts(
     pageSize,
     totalPages,
   };
-
-  // Задержка моков уже есть в getCatalogProducts/getCategories
-  return result;
 }
 
 // ---------- Отзывы о продавце ----------
@@ -117,23 +103,25 @@ function reviewAverage(review: SellerReview): number {
   return (service + delivery + accuracy) / 3;
 }
 
+// Эндпоинта отзывов о магазине на бэке нет. Когда появится — здесь будет apiFetch,
+// сортировка и компоненты останутся как есть.
+async function fetchSellerReviews(sellerId: string): Promise<SellerReview[]> {
+  void sellerId;
+  return [];
+}
+
 export async function getSellerReviews(
   sellerId: string,
   sort: SellerReviewsSort = "newest"
 ): Promise<SellerReview[]> {
-  // На бэке отзывов о продавце нет — пока только моки
-  if (!USE_MOCKS) return [];
-
-  const list = [...(mockSellerReviews[sellerId] ?? [])];
+  const list = [...(await fetchSellerReviews(sellerId))];
   if (sort === "highest") list.sort((a, b) => reviewAverage(b) - reviewAverage(a));
   else if (sort === "lowest") list.sort((a, b) => reviewAverage(a) - reviewAverage(b));
   else list.sort((a, b) => b.date.localeCompare(a.date));
-
-  return delay(list);
+  return list;
 }
 
 /** Количество отзывов — для счётчика на вкладке «Відгуки». */
 export async function getSellerReviewsCount(sellerId: string): Promise<number> {
-  if (!USE_MOCKS) return 0;
-  return (mockSellerReviews[sellerId] ?? []).length;
+  return (await fetchSellerReviews(sellerId)).length;
 }
