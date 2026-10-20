@@ -27,7 +27,7 @@ export const accountNavItems: AccountNavItem[] = [
     href: "/account/proposals",
   },
   { label: "Кошик", icon: "/icons/cart.svg", href: "/account/cart" },
-  { label: "Списки бажань", icon: "/icons/heart2.svg", href: "/account/wishlist" },
+  { label: "Список бажань", icon: "/icons/heart2.svg", href: "/account/wishlist" },
   {
     label: "Списки порівнянь",
     icon: "/icons/libra.svg",
