@@ -98,6 +98,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div className={styles.rightColumn}>
             <ProductPriceBox
               id={product.id}
+              backendId={product.backendId}
               title={product.title}
               image={product.image}
               price={product.price}
