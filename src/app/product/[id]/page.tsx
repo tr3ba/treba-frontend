@@ -38,7 +38,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     getRelatedProducts(product.id),
     getSponsoredProducts(product.id),
     getViewedProducts(product.id),
-    getProductReviews(product.id),
+    getProductReviews(product.backendId),
   ]);
 
   const images = product.images && product.images.length > 0
@@ -123,7 +123,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         <div className={styles.descriptionGrid}>
           <ProductDescription title={product.title} description={product.description} />
-          <ProductReviews reviews={reviews} />
+          <ProductReviews reviews={reviews.items} total={reviews.total} />
         </div>
         <ProductCarousel title="Переглянуті товари" products={viewed} />
       </main>
