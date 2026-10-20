@@ -34,6 +34,11 @@ const dateTimeFormatter = new Intl.DateTimeFormat("uk-UA", {
   minute: "2-digit",
 });
 
+const monthGenitiveFormatter = new Intl.DateTimeFormat("uk-UA", {
+  day: "numeric",
+  month: "long",
+});
+
 // "2026-10-15" -> "15 жовтня 2026 р."
 export function formatDate(iso: string): string {
   return dateFormatter.format(new Date(iso));
@@ -42,4 +47,12 @@ export function formatDate(iso: string): string {
 // "2026-10-15T08:12:00" -> "15 жовтня о 08:12"
 export function formatDateTime(iso: string): string {
   return dateTimeFormatter.format(new Date(iso));
+}
+
+// "2024-10-08" -> "жовтня 2024" (для «На TREBA з жовтня 2024»)
+export function formatSinceMonth(iso: string): string {
+  const date = new Date(iso);
+  // Месяц в родительном падеже бывает только вместе с днём — день потом отбрасываем
+  const month = monthGenitiveFormatter.formatToParts(date).find((part) => part.type === "month")?.value ?? "";
+  return `${month} ${date.getFullYear()}`;
 }

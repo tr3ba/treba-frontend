@@ -1,12 +1,12 @@
 .wrapper {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    gap: 8px;
     padding: 12px 16px;
     border: 1px solid #e5e3dd;
     border-radius: 12px;
-    text-decoration: none;
-    color: inherit;
+    background: #fff;
+    font-family: "Montserrat", sans-serif;
     transition: border-color 0.15s ease;
 }
 
@@ -14,11 +14,20 @@
     border-color: #ff6e2a;
 }
 
+/* ---------- Логотип + название (ссылка на страницу продавца) ---------- */
+
+.head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: inherit;
+}
+
 .logoWrap {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     flex-shrink: 0;
-    border-radius: 6px;
+    border-radius: 9px;
     overflow: hidden;
     background: #f7f7f5;
     display: flex;
@@ -30,25 +39,85 @@
     object-fit: contain;
 }
 
+.initials {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #fff1e8 0%, #ffe0cc 100%);
+    color: #ff6e2a;
+    font-size: 14px;
+    font-weight: 700;
+}
+
 .textBlock {
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
+}
+
+.label {
+    font-size: 11px;
+    color: #8a8578;
 }
 
 .name {
     font-weight: 600;
     font-size: 14px;
     color: #28251d;
+    overflow-wrap: anywhere;
+    transition: color 0.15s ease;
 }
 
-.link {
-    font-size: 12px;
-    color: #8a8578;
+.head:hover .name {
+    color: #ff6e2a;
 }
 
 .arrow {
     margin-left: auto;
     color: #8a8578;
     font-size: 20px;
+}
+
+/* ---------- Рейтинг ---------- */
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    font-size: 13px;
+}
+
+.star {
+    color: #ffc700;
+}
+
+.ratingValue {
+    font-weight: 700;
+    color: #28251d;
+}
+
+.ratingCount {
+    color: #8a8578;
+}
+
+/* ---------- Ссылки ---------- */
+
+.links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+}
+
+.link {
+    font-size: 12px;
+    font-weight: 600;
+    color: #ff6e2a;
+}
+
+.link:hover {
+    text-decoration: underline;
 }

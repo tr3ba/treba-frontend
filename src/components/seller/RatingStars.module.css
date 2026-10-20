@@ -1,0 +1,33 @@
+.stars {
+    position: relative;
+    display: inline-block;
+    line-height: 1;
+    letter-spacing: 2px;
+    white-space: nowrap;
+}
+
+.empty {
+    color: #e5e3dd;
+}
+
+.filled {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    color: #ffc700;
+}
+
+.sm {
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+.md {
+    font-size: 16px;
+}
+
+.lg {
+    font-size: 22px;
+    letter-spacing: 3px;
+}

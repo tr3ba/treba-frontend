@@ -2,6 +2,7 @@ import { cache } from "react";
 import type { Product } from "../../types/product";
 import type { ApiCatalogProduct, ApiCategoryTree, ApiPagedResponse } from "../../types/api";
 import { bestOffersProducts, recommendedProducts } from "../../data/products";
+import { mockSellerProducts, mockSellers } from "../../data/sellers";
 import { apiFetch } from "./client";
 import { buildRootCategorySlugMap, mapCatalogProduct } from "./mappers";
 import { USE_MOCKS } from "./mode";
@@ -12,7 +13,38 @@ function delay<T>(value: T): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(value), FAKE_DELAY_MS));
 }
 
-const mockProducts = (): Product[] => [...bestOffersProducts, ...recommendedProducts];
+// ---------- Моки ----------
+
+// Карта «id товара -> продавец и категория» из data/sellers.ts
+const mockLinks = new Map<string, { sellerId: string; categoryId: string }>();
+for (const [sellerId, links] of Object.entries(mockSellerProducts)) {
+  for (const link of links) {
+    mockLinks.set(link.productId, { sellerId, categoryId: link.categoryId });
+  }
+}
+
+/** Дописывает к mock-товару продавца и категорию (в data/products.ts их нет). */
+function withMockSeller(product: Product): Product {
+  const link = mockLinks.get(product.id);
+  const seller = link ? mockSellers.find((item) => item.id === link.sellerId) : undefined;
+  if (!link || !seller) return product;
+
+  return {
+    ...product,
+    categoryId: product.categoryId ?? link.categoryId,
+    seller: {
+      id: seller.id,
+      name: seller.name,
+      logo: seller.logo,
+      rating: seller.rating?.average,
+      ratingCount: seller.rating?.count,
+    },
+  };
+}
+
+const withSellers = (list: Product[]): Product[] => list.map(withMockSeller);
+
+const mockProducts = (): Product[] => withSellers([...bestOffersProducts, ...recommendedProducts]);
 
 // ---------- Работа с бэком ----------
 // Временные решения, пока на бэке нет нужных эндпоинтов:
@@ -45,14 +77,20 @@ const getAllProducts = cache(() => fetchCatalog());
 
 // ---------- Публичные функции ----------
 
+/** Все товары каталога (до 100 с бэка) — для страницы продавца и других выборок. */
+export async function getCatalogProducts(): Promise<Product[]> {
+  if (USE_MOCKS) return delay(mockProducts());
+  return getAllProducts();
+}
+
 export async function getBestOffersProducts(): Promise<Product[]> {
-  if (USE_MOCKS) return delay(bestOffersProducts);
+  if (USE_MOCKS) return delay(withSellers(bestOffersProducts));
   const all = await getAllProducts();
   return all.slice(0, BEST_OFFERS_COUNT);
 }
 
 export async function getRecommendedProducts(): Promise<Product[]> {
-  if (USE_MOCKS) return delay(recommendedProducts);
+  if (USE_MOCKS) return delay(withSellers(recommendedProducts));
   const all = await getAllProducts();
   return all.slice(BEST_OFFERS_COUNT);
 }

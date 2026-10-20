@@ -1,0 +1,179 @@
+.layout {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+    font-family: "Montserrat", sans-serif;
+    color: #28251d;
+}
+
+/* Если левой колонки нет — рейтинг на всю ширину */
+.layout>.main:only-child {
+    grid-column: 1 / -1;
+}
+
+.side,
+.main {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.card {
+    padding: 20px;
+    border: 1px solid #e5e3dd;
+    border-radius: 16px;
+    background: #fff;
+}
+
+.cardTitle {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0 0 12px;
+}
+
+.description {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.company {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 14px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid #e5e3dd;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.companyLabel {
+    font-size: 12px;
+    font-weight: 500;
+    color: #8a8578;
+}
+
+/* ---------- График работы ---------- */
+
+.schedule {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+}
+
+.scheduleRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+}
+
+.scheduleDays {
+    color: #8a8578;
+}
+
+.scheduleHours {
+    margin: 0;
+    font-weight: 600;
+}
+
+.scheduleOff {
+    margin: 0;
+    color: #8a8578;
+}
+
+/* ---------- Минимальная сумма заказа ---------- */
+
+.notice {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 20px;
+    border: 1px solid #ffd2bb;
+    border-radius: 16px;
+    background: #fff5ef;
+}
+
+.noticeLabel {
+    font-size: 13px;
+    color: #8a8578;
+}
+
+.noticeValue {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ff6e2a;
+}
+
+/* ---------- Без рейтинга ---------- */
+
+.noRating {
+    padding: 24px;
+    border: 1px dashed #e5e3dd;
+    border-radius: 16px;
+}
+
+.noRatingText {
+    margin: 0;
+    font-size: 14px;
+    color: #8a8578;
+}
+
+/* ---------- Показатели ---------- */
+
+.indicators {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.indicator {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 16px;
+    border: 1px solid #e5e3dd;
+    border-radius: 12px;
+    background: #faf9f7;
+}
+
+.indicatorLabel {
+    font-size: 12px;
+    color: #8a8578;
+}
+
+.indicatorValue {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* ---------- Адаптив ---------- */
+
+@media (max-width: 900px) {
+    .layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* На планшете/телефоне рейтинг важнее — показываем его первым */
+    .main {
+        order: -1;
+    }
+}
+
+@media (max-width: 600px) {
+    .card {
+        padding: 16px;
+    }
+
+    .indicators {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+}

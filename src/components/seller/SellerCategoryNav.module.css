@@ -1,0 +1,116 @@
+.nav {
+    font-family: "Montserrat", sans-serif;
+    position: sticky;
+    top: 24px;
+}
+
+.title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #28251d;
+    margin: 0 0 12px;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #28251d;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.item:hover {
+    background: #f6f5f2;
+}
+
+.itemActive,
+.itemActive:hover {
+    background: #fff1e8;
+    color: #ff6e2a;
+    font-weight: 600;
+}
+
+.label {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.count {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 500;
+    color: #8a8578;
+}
+
+.itemActive .count {
+    color: #ff6e2a;
+}
+
+/* ---------- ≤900px: чипсы с горизонтальной прокруткой ---------- */
+
+@media (max-width: 900px) {
+    .nav {
+        position: static;
+        margin: 0 -24px;
+    }
+
+    .title {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+
+    .list {
+        flex-direction: row;
+        gap: 8px;
+        padding: 0 24px 4px;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .list::-webkit-scrollbar {
+        display: none;
+    }
+
+    .item {
+        flex-shrink: 0;
+        gap: 6px;
+        padding: 8px 14px;
+        border: 1px solid #e5e3dd;
+        border-radius: 999px;
+        white-space: nowrap;
+        font-size: 13px;
+    }
+
+    .itemActive,
+    .itemActive:hover {
+        border-color: #ff6e2a;
+    }
+}
+
+@media (max-width: 600px) {
+    .nav {
+        margin: 0 -16px;
+    }
+
+    .list {
+        padding: 0 16px 4px;
+    }
+}

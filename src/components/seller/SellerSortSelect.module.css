@@ -1,0 +1,57 @@
+.wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "Montserrat", sans-serif;
+    transition: opacity 0.15s ease;
+}
+
+.pending {
+    opacity: 0.6;
+}
+
+.label {
+    font-size: 13px;
+    color: #8a8578;
+    white-space: nowrap;
+}
+
+.select {
+    appearance: none;
+    min-width: 220px;
+    padding: 9px 36px 9px 14px;
+    border: 1px solid #e5e3dd;
+    border-radius: 10px;
+    background-color: #fff;
+    /* стрелка вниз */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%238a8578' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: #28251d;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+}
+
+.select:hover,
+.select:focus-visible {
+    border-color: #ff6e2a;
+    outline: none;
+}
+
+@media (max-width: 600px) {
+    .wrapper {
+        width: 100%;
+    }
+
+    .label {
+        display: none;
+    }
+
+    .select {
+        width: 100%;
+        min-width: 0;
+    }
+}

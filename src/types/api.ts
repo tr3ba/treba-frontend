@@ -9,7 +9,6 @@ export type ApiPagedResponse<T> = {
   totalPages: number;
 };
 
-
 export type ApiErrorBody = {
   title?: string;
   message?: string;
@@ -52,11 +51,17 @@ export type ApiCatalogProduct = {
   description: string;
   sku: string;
   price: number;
+  /** Цена до скидки; null — скидки нет. */
+  oldPrice: number | null;
   stockQuantity: number;
   warrantyMonths: number;
   countryOfOrigin: string;
   createdAt: string;
   images: ApiCatalogProductImage[];
+  /** Название магазина — это и есть «продавец» на витрине. */
+  storeName: string;
+  /** Юридическое название компании-владельца магазина. */
+  sellerName: string;
 };
 
 // ---------- Категории ----------

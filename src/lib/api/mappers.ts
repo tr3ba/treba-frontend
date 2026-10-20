@@ -86,17 +86,26 @@ export function mapCatalogProduct(
     .map((image) => resolveMediaUrl(image.imageUrl))
     .filter((url): url is string => Boolean(url));
 
+  // Старая цена имеет смысл, только если она больше текущей
+  const oldPrice = dto.oldPrice ?? 0;
+  const hasDiscount = oldPrice > dto.price;
+
   return {
     id: dto.slug,
     title: dto.name,
     price: formatPrice(dto.price),
-    oldPrice: null, // бэк пока не отдаёт старую цену в каталоге
+    oldPrice: hasDiscount ? formatPrice(oldPrice) : null,
+    isPromo: hasDiscount,
     image: images[0],
     images,
     categoryId: rootSlugByCategoryId?.get(dto.categoryId) ?? dto.categoryId,
     inStock: dto.stockQuantity > 0,
     code: dto.sku,
     description: dto.description || dto.shortDescription,
-    seller: { id: dto.brandId, name: dto.brandName },
+    // Продавец = магазин (Store), а не бренд
+    seller: {
+      id: dto.storeId,
+      name: dto.storeName || dto.sellerName || "Продавець TREBA",
+    },
   };
 }

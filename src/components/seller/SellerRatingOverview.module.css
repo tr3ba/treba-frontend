@@ -1,0 +1,270 @@
+.card {
+    padding: 24px;
+    border: 1px solid #e5e3dd;
+    border-radius: 16px;
+    background: #fff;
+    font-family: "Montserrat", sans-serif;
+    color: #28251d;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    margin-bottom: 24px;
+}
+
+.title {
+    font-size: 19px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* ---------- Переключатель периода ---------- */
+
+.periods {
+    display: inline-flex;
+    padding: 4px;
+    border-radius: 12px;
+    background: #f3f1ec;
+}
+
+.period {
+    padding: 7px 14px;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: #8a8578;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.period:hover {
+    color: #28251d;
+}
+
+.periodActive,
+.periodActive:hover {
+    background: #fff;
+    color: #ff6e2a;
+    box-shadow: 0 1px 3px rgba(40, 37, 29, 0.12);
+}
+
+/* ---------- Итог + распределение + критерии ---------- */
+
+.body {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 32px;
+    align-items: start;
+}
+
+.total {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.average {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+}
+
+.averageValue {
+    font-size: 52px;
+    font-weight: 700;
+    line-height: 1;
+    color: #ff6e2a;
+}
+
+.averageMax {
+    font-size: 18px;
+    font-weight: 600;
+    color: #8a8578;
+}
+
+.totalCount {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #8a8578;
+}
+
+.distribution {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 36px;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+}
+
+.rowStar {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.rowStar span {
+    color: #ffc700;
+}
+
+.rowCount {
+    text-align: right;
+    color: #8a8578;
+}
+
+.bar {
+    display: block;
+    height: 8px;
+    border-radius: 999px;
+    background: #f3f1ec;
+    overflow: hidden;
+}
+
+.barFill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: #ffc700;
+    transition: width 0.3s ease;
+}
+
+.criteria {
+    padding-left: 32px;
+    border-left: 1px solid #e5e3dd;
+}
+
+.criteriaTitle {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 14px;
+}
+
+.criteriaList {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.criterion {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.criterionHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+}
+
+.criterionLabel {
+    color: #28251d;
+}
+
+.criterionValue {
+    flex-shrink: 0;
+    font-weight: 700;
+}
+
+.criterionStar {
+    color: #ffc700;
+    margin-right: 4px;
+}
+
+.criterion .barFill {
+    background: #ff6e2a;
+}
+
+/* ---------- «Як розраховується рейтинг?» ---------- */
+
+.howTo {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e3dd;
+}
+
+.howToSummary {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #ff6e2a;
+    cursor: pointer;
+    list-style: none;
+}
+
+.howToSummary::-webkit-details-marker {
+    display: none;
+}
+
+.howToSummary:hover {
+    text-decoration: underline;
+}
+
+.howToText {
+    max-width: 720px;
+    margin: 10px 0 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #8a8578;
+}
+
+/* ---------- Адаптив ---------- */
+
+@media (max-width: 1100px) {
+    .body {
+        grid-template-columns: 170px minmax(0, 1fr);
+    }
+
+    .criteria {
+        grid-column: 1 / -1;
+        padding: 20px 0 0;
+        border-left: none;
+        border-top: 1px solid #e5e3dd;
+    }
+}
+
+@media (max-width: 600px) {
+    .card {
+        padding: 18px 16px;
+    }
+
+    .periods {
+        width: 100%;
+    }
+
+    .period {
+        flex: 1;
+        padding: 7px 8px;
+    }
+
+    .body {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+    }
+
+    .averageValue {
+        font-size: 44px;
+    }
+}

@@ -13,11 +13,14 @@ export type ProductVariant = {
   available: boolean;
 };
 
-// Продавець / бренд товару
+// Продавец товара = магазин (не бренд). Полный профиль — SellerProfile в types/seller.ts
 export type Seller = {
   id: string;
   name: string;
   logo?: string;
+  /** Рейтинг продавца (за всё время) — для блока на странице товара. */
+  rating?: number;
+  ratingCount?: number;
 };
 
 // Супутній товар-аксесуар 
