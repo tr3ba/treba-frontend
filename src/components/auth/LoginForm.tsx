@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
-import Link from "next/link";
+import { useEffect, useState, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth, type LoginChallenge } from "../../context/AuthContext";
 import { buildAuthHref, getSafeNextPath } from "../../lib/redirect";
@@ -25,6 +24,9 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   // Куда вернуть после входа (?next=/sell#apply)
   const nextParam = searchParams.get("next");
   const nextPath = getSafeNextPath(nextParam);
+  useEffect(() => {
+    if (nextParam && nextParam !== nextPath) window.history.replaceState(null, "", buildAuthHref("/login", nextPath));
+  }, [nextParam, nextPath]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -63,10 +65,12 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         const next = await login(email, password, rememberMe);
         if (next) { setChallenge(next); setMethod(next.methods[0]); setPassword(""); return; }
       }
-      if (onSuccess) {
+      if (nextParam) {
+        window.location.replace(nextPath);
+      } else if (onSuccess) {
         onSuccess();
       } else {
-        router.push(nextPath);
+        router.replace(nextPath);
       }
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Помилка входу");
@@ -154,14 +158,12 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         </form>
 
         <p className={styles.switchText}>
-          {/* replace: в истории не копится «вхід → реєстрація», back() вернёт на исходную страницу */}
-          <Link
+          <a
             href={buildAuthHref("/register", nextParam ? nextPath : undefined)}
-            replace
             className={styles.switchLink}
           >
             Зареєструватися
-          </Link>
+          </a>
         </p>
       </div>
 

@@ -120,7 +120,7 @@ function Inbox() {
   }
   const current = details?.summary;
   return <AccountPageShell><PageTitle>Повідомлення та підтримка</PageTitle>
-    <p className={styles.intro}>Особистий чат з TREBA та відповіді на ваші запитання. Переписку бачите лише ви та команда підтримки.</p>
+    <p className={styles.intro}>У чаті з TREBA відповідає команда підтримки. На питання про товар — лише його продавець. Кожна переписка приватна.</p>
     {error && <div className={styles.error} role="alert">{error} <button onClick={() => window.location.reload()}>Оновити</button></div>}
     <div className={styles.chatWrap}>
       <aside className={styles.threadList} aria-label="Ваші переписки">
@@ -128,21 +128,21 @@ function Inbox() {
         {loading && <p className={styles.empty}>Завантажуємо переписки…</p>}
         {!loading && threads.length === 0 && <p className={styles.empty}>Тут зберігатимуться ваші звернення та відповіді.</p>}
         {threads.map(thread => <button key={thread.id} type="button" className={`${styles.threadItem} ${thread.id === activeId ? styles.selected : ""}`} onClick={() => choose(thread.id)} aria-current={thread.id === activeId ? "true" : undefined}>
-          <span className={styles.kind}>{kindLabel[thread.kind]}</span><strong>{thread.subject}</strong>
+          <span className={styles.kind}>{thread.productId ? "Питання продавцю" : kindLabel[thread.kind]}</span><strong>{thread.subject}</strong>
           <span className={styles.preview}>{thread.lastMessage}</span><span className={styles.threadMeta}><time>{new Date(thread.updatedAt).toLocaleDateString("uk-UA")}</time>{thread.unreadCount > 0 && <b className={styles.badge} aria-label={`${thread.unreadCount} непрочитаних`}>{thread.unreadCount}</b>}</span>
         </button>)}
         {page < totalPages && <button className={styles.more} onClick={moreThreads}>Ще переписки</button>}
       </aside>
-      <section className={styles.chatPanel} aria-label="Переписка з підтримкою">
-        <header className={styles.chatHeader}><span className={styles.avatar}>T</span><div><h2>{current?.subject ?? title}</h2><p>{current ? statusLabel[current.status] : "Напишіть нам — відповідь з’явиться тут"}</p>
+      <section className={styles.chatPanel} aria-label={current?.productId || productId ? "Переписка з продавцем" : "Переписка з підтримкою"}>
+        <header className={styles.chatHeader}><span className={styles.avatar}>{current?.productId || productId ? "П" : "T"}</span><div><h2>{current?.subject ?? title}</h2><p>{current?.productId || productId ? "Продавець товару" : "Підтримка TREBA"} · {current ? statusLabel[current.status] : "Відповідь з’явиться тут"}</p>
           {(current?.productSlug ?? productSlug) && <Link href={`/product/${encodeURIComponent(current?.productSlug ?? productSlug ?? "")}`}>{current?.productName ?? "Перейти до товару"} ↗</Link>}
           {current?.orderNumber && <span>Замовлення {current.orderNumber}</span>}</div></header>
         <div className={styles.messages} role="log" aria-live="polite" aria-label="Історія повідомлень">
           {activeId && !details && <p className={styles.empty}>Завантажуємо повідомлення…</p>}
-          {!activeId && <div className={styles.welcome}><span>✉</span><h3>{productId ? "Запитайте про товар" : "Чим можемо допомогти?"}</h3><p>Опишіть своє питання. Команда TREBA відповість у цій переписці.</p></div>}
+          {!activeId && <div className={styles.welcome}><span>✉</span><h3>{productId ? "Запитайте про товар" : "Чим можемо допомогти?"}</h3><p>{productId ? "Опишіть своє питання. Продавець товару відповість у цій переписці." : "Опишіть своє питання. Команда TREBA відповість у цій переписці."}</p></div>}
           {details?.hasEarlierMessages && <button className={styles.more} disabled={olderBusy} onClick={earlier}>Попередні повідомлення</button>}
           {details?.messages.map(message => <article key={message.id} className={`${styles.bubble} ${message.authorRole === "Customer" ? styles.own : styles.staff}`}>
-            <strong>{message.authorRole === "Customer" ? "Ви" : "Підтримка TREBA"}</strong><p>{message.message}</p><time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleString("uk-UA", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</time>
+            <strong>{message.authorRole === "Customer" ? "Ви" : message.authorRole === "Seller" ? "Продавець товару" : "Підтримка TREBA"}</strong><p>{message.message}</p><time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleString("uk-UA", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</time>
           </article>)}<div ref={end} />
         </div>
         {current?.status === "CLOSED" ? <div className={styles.closed}>Переписку завершено. <Link href="/account/messages?new=chat">Створити нове звернення</Link></div>
