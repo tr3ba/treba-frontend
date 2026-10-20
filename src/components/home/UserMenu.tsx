@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "../../context/AuthContext";
 import styles from "./UserMenu.module.css";
+import { adminOrigin, canOpenAdmin } from "../../lib/admin";
 
 export default function UserMenu() {
   const { user, isLoading, logout } = useAuth();
@@ -76,6 +77,7 @@ export default function UserMenu() {
           >
             Стати продавцем
           </Link>
+          {canOpenAdmin(user.role) && <a href={adminOrigin + "/site-login/start"} className={styles.accountLink}>Адмін-панель</a>}
           <button
             className={styles.logoutButton}
             onClick={() => {

@@ -4,7 +4,7 @@ import { authenticated, backend, clearSession, json, sameOrigin, saveSession } f
 export const runtime = "nodejs";
 function profile(data: Record<string, unknown>) {
   return { id: data.id ?? data.userId, email: data.email, firstName: data.firstName, lastName: data.lastName,
-    name: `${data.firstName ?? ""} ${data.lastName ?? ""}`.trim(), phone: data.phone };
+    name: `${data.firstName ?? ""} ${data.lastName ?? ""}`.trim(), phone: data.phone, role: data.role ?? data.roleName };
 }
 export async function GET(request: NextRequest) {
   try {
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   let input;
   try { const text = await request.text(); if (text.length > 12000) return json({}, 413); input = JSON.parse(text); } catch { return json({}, 400); }
   if (!input || typeof input !== "object" || Array.isArray(input)) return json({}, 400);
-  const routes: Record<string, string> = { login: "/api/auth/login", register: "/api/auth/register", verify: "/api/auth/2fa/verify", email: "/api/auth/2fa/email/send" };
+  const routes: Record<string, string> = { login: "/api/auth/login", register: "/api/auth/register", verify: "/api/auth/2fa/verify", email: "/api/auth/2fa/email/send", "guard-start": "/api/telegram/guard", "guard-status": "/api/telegram/guard/status", "guard-complete": "/api/telegram/guard/complete" };
   try {
     if (input.action === "logout") {
       const session = await authenticated(request);
@@ -35,11 +35,15 @@ export async function POST(request: NextRequest) {
     const body = input.action === "register" ? { email: input.email, password: input.password, firstName: input.firstName, lastName: input.lastName, phoneNumber: input.phone, roleName: "Customer" }
       : input.action === "login" ? { email: input.email, password: input.password }
       : input.action === "email" ? { challengeId: input.challengeId }
+      : input.action === "guard-start" ? { deviceName: "Вхід із сайту TREBA", loginChallengeId: input.challengeId }
+      : input.action === "guard-status" || input.action === "guard-complete" ? { id: input.id, browserSecret: input.browserSecret }
       : { challengeId: input.challengeId, method: input.method, code: input.code };
+    if (input.action === "guard-start" && typeof input.challengeId !== "string") return json({}, 400);
     const result = await backend(path, { method: "POST", body: JSON.stringify(body) });
     if (!result.ok) return json({ message: result.status === 401 ? "Невірні дані входу або код підтвердження." : "Не вдалося виконати запит. Перевірте дані та спробуйте ще раз." }, result.status);
     if (result.status === 204) return json({ ok: true });
     const data = await result.json();
+    if (input.action === "guard-start" || input.action === "guard-status") return json(data);
     if (data.challenge) return json({ challenge: data.challenge });
     const authentication = data.authentication ?? data;
     if (!authentication.accessToken || !authentication.refreshToken) return json({}, 502);
