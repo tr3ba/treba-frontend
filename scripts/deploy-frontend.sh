@@ -75,11 +75,17 @@ wait_for() {
     echo "Frontend check failed: $path (expected $expected_status, received $status)"
     return 1
 }
+check_login_redirect() {
+    local location
+    location=$(curl -sS --max-time 5 -o /dev/null -D - "$1/shop-api/admin-entry?state=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" | tr -d '\r' | sed -n 's/^[Ll]ocation: //p')
+    [[ "$location" == /login\?next=* ]] || { echo 'Anonymous admin entry must stay on the public website origin.'; return 1; }
+}
 run_frontend "$candidate" '127.0.0.1:'
 address=$(docker port "$candidate" 3000/tcp)
 wait_for "http://$address" / 200
 wait_for "http://$address" /shop-api/session 401
 wait_for "http://$address" /shop-api/admin-entry 400
+check_login_redirect "http://$address"
 docker rm -f "$candidate" >/dev/null
 
 docker stop treba-frontend >/dev/null
@@ -90,6 +96,7 @@ run_frontend treba-frontend 80
 [[ "$(docker inspect --format '{{.Image}}' treba-frontend)" == "$expected" ]]
 wait_for http://127.0.0.1 / 200
 wait_for https://treba.duckdns.org /shop-api/admin-entry 400
+check_login_redirect https://treba.duckdns.org
 wait_for https://treba.duckdns.org / 200
 completed=1
 echo "Frontend deployment passed. Revision: $revision"
