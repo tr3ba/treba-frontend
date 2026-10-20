@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { getAccountLoginHref } from "../../lib/redirect";
 import { useAuth } from "../../context/AuthContext";
 import Header from "../layout/Header";
 import Footer from "../home/Footer";
@@ -24,13 +24,14 @@ export default function AccountPageShell({
   navLabel,
 }: AccountPageShellProps) {
   const { user, isLoading } = useAuth();
-  const router = useRouter();
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.replace("/login?next=" + encodeURIComponent(window.location.pathname + window.location.search));
+      const href = getAccountLoginHref(window.location.pathname + window.location.search + window.location.hash);
+      // Leave the protected tree completely so Next does not retain it behind an intercepted modal.
+      if (href) window.location.replace(href);
     }
-  }, [isLoading, user, router]);
+  }, [isLoading, user]);
 
   if (isLoading || !user) {
     return (
