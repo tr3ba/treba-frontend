@@ -8,6 +8,7 @@ import { buildRootCategorySlugMap, mapCatalogProduct } from "./mappers";
 // - фильтра по slug категории нет -> берём страницу каталога и фильтруем на фронте;
 // - признаков «акція / рекомендація» нет -> делим общий список.
 // Бэк отдаёт максимум 100 товаров за запрос — для учебной базы этого хватает.
+// «Переглянуті товари» — история в браузере, см. lib/api/viewed.ts.
 
 const CATALOG_MAX_SIZE = 100;
 const BEST_OFFERS_COUNT = 11;
@@ -81,11 +82,4 @@ export async function getSponsoredProducts(excludeId: string, limit = 6): Promis
 export async function getProductsByCategory(categoryId: string, limit = 12): Promise<Product[]> {
   const all = await getAllProducts();
   return all.filter((p) => p.categoryId === categoryId).slice(0, limit);
-}
-
-// TODO (шаг 3): заменить на настоящую историю просмотров
-export async function getViewedProducts(excludeId: string, limit = 6): Promise<Product[]> {
-  const all = await getAllProducts();
-  const shuffled = all.filter((p) => p.id !== excludeId).sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, limit);
 }

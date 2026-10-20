@@ -15,7 +15,9 @@ import ProductCarousel from "../../../components/product/ProductCarousel";
 import ProductBundle from "../../../components/product/ProductBundle";
 import ProductDescription from "../../../components/product/ProductDescription";
 import ProductReviews from "../../../components/product/ProductReviews";
-import { getProductById, getRelatedProducts, getSponsoredProducts, getViewedProducts } from "../../../lib/api/products";
+import ViewedProductTracker from "../../../components/product/ViewedProductTracker";
+import ViewedProductsCarousel from "../../../components/product/ViewedProductsCarousel";
+import { getProductById, getRelatedProducts, getSponsoredProducts } from "../../../lib/api/products";
 import { getProductReviews } from "../../../lib/api/reviews";
 import ProductTabs from "../../../components/product/ProductTabs";
 import ProductAccessories from "../../../components/product/ProductAccessories";
@@ -34,10 +36,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  const [related, sponsored, viewed, reviews] = await Promise.all([
+  const [related, sponsored, reviews] = await Promise.all([
     getRelatedProducts(product.id),
     getSponsoredProducts(product.id),
-    getViewedProducts(product.id),
     getProductReviews(product.backendId),
   ]);
 
@@ -50,6 +51,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <>
       <Header />
+
+      <ViewedProductTracker
+        id={product.id}
+        backendId={product.backendId}
+        title={product.title}
+        price={product.price}
+        oldPrice={product.oldPrice}
+        image={product.image}
+        rating={product.rating}
+        isPromo={product.isPromo}
+      />
 
       <main className={styles.page}>
         <ProductBreadcrumbs categoryId={product.categoryId} />
@@ -125,7 +137,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <ProductDescription title={product.title} description={product.description} />
           <ProductReviews reviews={reviews.items} total={reviews.total} />
         </div>
-        <ProductCarousel title="Переглянуті товари" products={viewed} />
+        <ViewedProductsCarousel excludeId={product.id} />
       </main>
 
       <Footer />
