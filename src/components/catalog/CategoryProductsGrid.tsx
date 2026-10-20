@@ -19,6 +19,7 @@ export default function CategoryProductsGrid({ title, products }: CategoryProduc
           <ProductCard
             key={product.id}
             id={product.id}
+            backendId={product.backendId}
             title={product.title}
             price={product.price}
             oldPrice={product.oldPrice}
