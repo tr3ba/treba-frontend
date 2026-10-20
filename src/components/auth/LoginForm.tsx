@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, FormEvent } from "react";
-import Link from "next/link";
+import { useEffect, useState, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth, type LoginChallenge } from "../../context/AuthContext";
 import { buildAuthHref, getSafeNextPath } from "../../lib/redirect";
 import { EyeIcon, EyeOffIcon, GoogleIcon } from "./Icons";
 import styles from "./AuthForm.module.css";
+import GuardVerification from "./GuardVerification";
 
 type LoginFormProps = {
   /** Если задан (модалка), вызывается после входа вместо перехода по ?next */
@@ -18,13 +18,16 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   const searchParams = useSearchParams();
   const { login, verify, sendEmailCode } = useAuth();
   const [challenge, setChallenge] = useState<LoginChallenge | null>(null);
-  const [method, setMethod] = useState("authenticator");
+  const [method, setMethod] = useState("");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
 
   // Куда вернуть после входа (?next=/sell#apply)
   const nextParam = searchParams.get("next");
   const nextPath = getSafeNextPath(nextParam);
+  useEffect(() => {
+    if (nextParam && nextParam !== nextPath) window.history.replaceState(null, "", buildAuthHref("/login", nextPath));
+  }, [nextParam, nextPath]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,6 +37,15 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
     {}
   );
   const [formError, setFormError] = useState("");
+  useEffect(() => {
+    if (!challenge) return;
+    const remaining = Date.parse(challenge.expiresAt) - Date.now();
+    const timer = setTimeout(() => {
+      setChallenge(null); setMethod(""); setCode("");
+      setFormError("Час підтвердження минув. Введіть пароль і спробуйте ще раз.");
+    }, Number.isFinite(remaining) ? Math.max(0, remaining) : 0);
+    return () => clearTimeout(timer);
+  }, [challenge]);
 
   function validate() {
     const nextErrors: { email?: string; password?: string } = {};
@@ -61,16 +73,25 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       if (challenge) await verify(challenge.challengeId, method, code, rememberMe);
       else {
         const next = await login(email, password, rememberMe);
-        if (next) { setChallenge(next); setMethod(next.methods[0]); setPassword(""); return; }
+        if (next) { setChallenge(next); setMethod(""); setPassword(""); return; }
       }
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        router.push(nextPath);
-      }
+      finishLogin();
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Помилка входу");
     } finally { setBusy(false); }
+  }
+
+  function finishLogin() {
+    if (nextParam) window.location.replace(nextPath);
+    else if (onSuccess) onSuccess();
+    else router.replace(nextPath);
+  }
+  async function chooseMethod(value: string) {
+    if (busy || !challenge) return;
+    setBusy(true); setFormError(""); setCode("");
+    try { if (value === "email") await sendEmailCode(challenge.challengeId); setMethod(value); }
+    catch (error) { setFormError(error instanceof Error ? error.message : "Не вдалося надіслати код."); }
+    finally { setBusy(false); }
   }
 
   function handleSocialClick() {
@@ -84,12 +105,20 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
           {challenge ? <>
-            <p>Підтвердьте вхід до акаунта.</p>
-            <select aria-label="Спосіб підтвердження" className={styles.input} value={method} onChange={event => setMethod(event.target.value)}>
-              {challenge.methods.map(value => <option key={value} value={value}>{value === "email" ? `Код на ${challenge.maskedEmail}` : "Застосунок автентифікації"}</option>)}
-            </select>
-            {method === "email" && <button type="button" disabled={busy} onClick={async () => { setBusy(true); setFormError(""); try { await sendEmailCode(challenge.challengeId); } catch (error) { setFormError(error instanceof Error ? error.message : "Не вдалося надіслати код"); } finally { setBusy(false); } }}>Надіслати код</button>}
-            <input className={styles.input} aria-label="Код підтвердження" autoComplete="one-time-code" inputMode="numeric" maxLength={6} value={code} onChange={event => setCode(event.target.value)} />
+            {!method ? <>
+              <h2>Підтвердьте вхід</h2><p>Оберіть один із підключених способів.</p>
+              <div className={styles.verificationMethods}>{challenge.methods.map(value => <button key={value} type="button" disabled={busy} onClick={() => chooseMethod(value)}>
+                <strong>{value === "telegram" ? "Telegram Guard" : value === "email" ? "Код на пошту" : "Google Authenticator"}</strong>
+                <span>{value === "telegram" ? "Підтвердьте вхід у Telegram" : value === "email" ? challenge.maskedEmail : "Введіть код із застосунку"}</span>
+              </button>)}</div>
+            </> : <>
+              <button type="button" className={styles.textLink} onClick={() => { setMethod(""); setFormError(""); }} disabled={busy}>← Обрати інший спосіб</button>
+              {method === "telegram" ? <GuardVerification key={challenge.challengeId} challengeId={challenge.challengeId} remember={rememberMe} onVerified={finishLogin} /> : <>
+                <p>{method === "email" ? `Код надіслано на ${challenge.maskedEmail}` : "Введіть код із Google Authenticator."}</p>
+                <input className={styles.input} aria-label="Код підтвердження" autoComplete="one-time-code" inputMode="numeric" maxLength={6} value={code} onChange={event => setCode(event.target.value.replace(/\D/g, ""))} />
+                {method === "email" && <button type="button" className={styles.textLink} disabled={busy} onClick={() => chooseMethod("email")}>Надіслати код ще раз</button>}
+              </>}
+            </>}
           </> : <>
           <label className={styles.field}>
             <input
@@ -148,30 +177,28 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
           </>}
           {formError && <p className={styles.formError} role="alert">{formError}</p>}
 
-          <button type="submit" className={styles.submitButton} disabled={busy}>
+          {(!challenge || !!method && method !== "telegram") && <button type="submit" className={styles.submitButton} disabled={busy || !!challenge && code.length !== 6}>
             {busy ? "Перевіряємо…" : challenge ? "Підтвердити вхід" : "Увійти"}
-          </button>
+          </button>}
         </form>
 
-        <p className={styles.switchText}>
-          {/* replace: в истории не копится «вхід → реєстрація», back() вернёт на исходную страницу */}
-          <Link
+        {!challenge && <p className={styles.switchText}>
+          <a
             href={buildAuthHref("/register", nextParam ? nextPath : undefined)}
-            replace
             className={styles.switchLink}
           >
             Зареєструватися
-          </Link>
-        </p>
+          </a>
+        </p>}
       </div>
 
-      <div className={styles.divider}>
+      {!challenge && <div className={styles.divider}>
         <span className={styles.dividerLine} />
         <span className={styles.dividerText}>або</span>
         <span className={styles.dividerLine} />
-      </div>
+      </div>}
 
-      <div className={styles.socialColumn}>
+      {!challenge && <div className={styles.socialColumn}>
         <p className={styles.socialTitle}>Увійти як користувач</p>
 
         <button
@@ -191,7 +218,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
           <GoogleIcon />
           Google
         </button>
-      </div>
+      </div>}
     </>
   );
 }

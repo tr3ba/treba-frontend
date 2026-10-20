@@ -80,6 +80,31 @@
     filter: brightness(0);
 }
 
+/* Сердечко (WishlistButton) — у стилі сусідньої круглої кнопки */
+.iconActions .wishlistButton {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #e5e3dd;
+    background-color: #fff;
+    color: #28251d;
+    transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.iconActions .wishlistButton:hover {
+    border-color: #ff6e2a;
+    background-color: #fff6f0;
+    color: #ff6e2a;
+}
+
+.iconActions .wishlistButton[aria-pressed="true"] {
+    border-color: #ff6e2a;
+}
+
+.iconActions .wishlistButton svg {
+    width: 16px;
+    height: 16px;
+}
+
 .oldPrice {
     color: #8a8578;
     text-decoration: line-through;

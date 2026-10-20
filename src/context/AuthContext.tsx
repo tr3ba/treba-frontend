@@ -8,7 +8,7 @@ export type UserProfile = {
   addressCity?: string; addressStreet?: string; addressBuilding?: string; deliveryMethod?: string; addressBranch?: string;
   additionalInfoOptions?: string;
 };
-type User = { id: string; name: string; email: string } & UserProfile;
+type User = { id: string; name: string; email: string; role?: string } & UserProfile;
 export type LoginChallenge = { challengeId: string; methods: string[]; maskedEmail: string; expiresAt: string };
 type AuthContextValue = {
   user: User | null; isLoading: boolean;
@@ -16,6 +16,7 @@ type AuthContextValue = {
   login: (email: string, password: string, remember?: boolean) => Promise<LoginChallenge | null>;
   verify: (challengeId: string, method: string, code: string, remember?: boolean) => Promise<void>;
   sendEmailCode: (challengeId: string) => Promise<void>;
+  verifyGuard: (id: string, browserSecret: string, remember?: boolean) => Promise<void>;
   logout: () => Promise<void>; updateProfile: (patch: UserProfile) => void;
 };
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -29,7 +30,7 @@ function restorePreferences(user: User | null): User | null {
     return { ...user, ...preferences };
   } catch { return user; }
 }
-async function sessionRequest(body?: unknown) {
+export async function sessionRequest(body?: unknown) {
   const response = await fetch("/shop-api/session", { method: body ? "POST" : "GET", cache: "no-store", headers: body ? { "Content-Type": "application/json" } : {}, body: body ? JSON.stringify(body) : undefined });
   const result = await response.json();
   if (!response.ok) throw new Error(result.message ?? "Не вдалося увійти в акаунт.");
@@ -61,6 +62,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const result = await sessionRequest({ action: "verify", challengeId, method, code, remember }); setUser(restorePreferences(result.user));
   }
   async function sendEmailCode(challengeId: string) { await sessionRequest({ action: "email", challengeId }); }
+  async function verifyGuard(id: string, browserSecret: string, remember = true) {
+    const result = await sessionRequest({ action: "guard-complete", id, browserSecret, remember });
+    if (!result.user) throw new Error("Не вдалося підтвердити вхід.");
+    setUser(restorePreferences(result.user));
+  }
   async function logout() { try { await sessionRequest({ action: "logout" }); } finally { setUser(null); } }
   // Existing account preference fields remain local until their dedicated API is connected.
   function updateProfile(patch: UserProfile) {
@@ -73,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return updated;
     });
   }
-  return <AuthContext.Provider value={{ user, isLoading, register, login, verify, sendEmailCode, logout, updateProfile }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, isLoading, register, login, verify, sendEmailCode, verifyGuard, logout, updateProfile }}>{children}</AuthContext.Provider>;
 }
 export function useAuth() {
   const context = useContext(AuthContext);

@@ -1,10 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import AddToCartButton from "../cart/AddToCartButton";
+import WishlistButton from "../wishlist/WishlistButton";
 import styles from "./ProductCard.module.css";
 
 type ProductCardProps = {
   id: string;
+  /** Guid товара на бэке — нужен списку бажань */
+  backendId?: string;
   title: string;
   price: string;
   image?: string;
@@ -18,6 +21,7 @@ type ProductCardProps = {
 
 export default function ProductCard({
   id,
+  backendId,
   title,
   price,
   image,
@@ -30,7 +34,7 @@ export default function ProductCard({
 
   return (
     <article className={fluid ? `${styles.card} ${styles.cardFluid}` : styles.card}>
-      {/* Посилання розтягнуте на всю картку через ::after, кнопка кошика — поверх нього */}
+      {/* Посилання розтягнуте на всю картку через ::after, кнопки — поверх нього */}
       <Link href={`/product/${id}`} className={styles.cardLink}>
         <div className={styles.imageWrap}>
           {image ? (
@@ -50,6 +54,8 @@ export default function ProductCard({
 
         <h3 className={styles.title}>{title}</h3>
       </Link>
+
+      <WishlistButton product={{ id, backendId }} size="sm" className={styles.wishlist} />
 
       {hasRating && (
         <div className={styles.ratingRow} aria-label={`Рейтинг ${rating} з 5`}>

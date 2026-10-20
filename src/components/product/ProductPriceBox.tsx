@@ -4,11 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../../context/CartContext";
 import { parsePrice } from "../../lib/format";
+import WishlistButton from "../wishlist/WishlistButton";
 import styles from "./ProductPriceBox.module.css";
 import { ProductVariant } from "../../types/product";
 
 type ProductPriceBoxProps = {
   id: string;
+  /** Guid товара на бэке — нужен списку бажань */
+  backendId?: string;
   title: string;
   image?: string;
   price: string;
@@ -20,6 +23,7 @@ type ProductPriceBoxProps = {
 
 export default function ProductPriceBox({
   id,
+  backendId,
   title,
   image,
   price,
@@ -66,9 +70,7 @@ export default function ProductPriceBox({
         )}
 
         <div className={styles.iconActions}>
-          <button type="button" className={styles.iconButton} aria-label="Додати в список бажань">
-            <img src="/icons/heart.svg" alt="" className={styles.iconImg} />
-          </button>
+          <WishlistButton product={{ id, backendId }} className={styles.wishlistButton} />
           <button type="button" className={styles.iconButton} aria-label="Додати до порівняння">
             <img src="/icons/libra.svg" alt="" className={styles.iconImg} />
           </button>

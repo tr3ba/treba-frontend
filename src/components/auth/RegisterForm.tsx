@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
-import Link from "next/link";
+import { useEffect, useState, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 import { buildAuthHref, getSafeNextPath } from "../../lib/redirect";
@@ -30,6 +29,9 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
   // Куда вернуть после регистрации (?next=/sell#apply)
   const nextParam = searchParams.get("next");
   const nextPath = getSafeNextPath(nextParam);
+  useEffect(() => {
+    if (nextParam && nextParam !== nextPath) window.history.replaceState(null, "", buildAuthHref("/register", nextPath));
+  }, [nextParam, nextPath]);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -97,10 +99,12 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
         }
       );
 
-      if (onSuccess) {
+      if (nextParam) {
+        window.location.replace(nextPath);
+      } else if (onSuccess) {
         onSuccess();
       } else {
-        router.push(nextPath);
+        router.replace(nextPath);
       }
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Помилка реєстрації");
@@ -231,13 +235,12 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
         <p className={styles.switchText}>
           {/* replace: в истории не копится «реєстрація → вхід», back() вернёт на исходную страницу */}
-          <Link
+          <a
             href={buildAuthHref("/login", nextParam ? nextPath : undefined)}
-            replace
             className={styles.switchLink}
           >
             Я вже зареєстрований
-          </Link>
+          </a>
         </p>
       </div>
 

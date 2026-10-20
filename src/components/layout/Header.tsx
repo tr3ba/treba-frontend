@@ -3,6 +3,7 @@ import CatalogMenu from "../home/CatalogMenu";
 import SearchBar from "../home/SearchBar";
 import UserMenu from "../home/UserMenu";
 import HeaderCartButton from "./HeaderCartButton";
+import HeaderWishlistButton from "./HeaderWishlistButton";
 import MobileCatalog from "./MobileCatalog";
 import styles from "./Header.module.css";
 
@@ -31,16 +32,8 @@ export default function Header() {
           <SearchBar />
 
           <div className={styles.headerActions}>
-            <button
-              type="button"
-              className={`${styles.actionButton} ${styles.wishlistButton}`}
-              aria-label="Список бажань"
-            >
-              <span className={`${styles.iconSwap} ${styles.heartIcon}`}>
-                <img src="/icons/heart.svg" alt="" className={styles.iconOutline} />
-                <img src="/icons/heart1.svg" alt="" className={styles.iconFilled} />
-              </span>
-            </button>
+            {/* на телефоне скрыто классом wishlistButton */}
+            <HeaderWishlistButton className={styles.wishlistButton} />
 
             <UserMenu />
 

@@ -131,6 +131,7 @@ export default async function Home() {
         <React.Fragment key={product.id}>
           <ProductCard
             id={product.id}
+            backendId={product.backendId}
             title={product.title}
             price={product.price}
             oldPrice={product.oldPrice}
@@ -168,6 +169,7 @@ export default async function Home() {
   <ProductCard
     key={product.id}
     id={product.id}
+    backendId={product.backendId}
     title={product.title}
     price={product.price}
     oldPrice={product.oldPrice}
