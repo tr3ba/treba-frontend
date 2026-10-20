@@ -3,7 +3,7 @@
 import { useState, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth, type LoginChallenge } from "../../context/AuthContext";
 import { buildAuthHref, getSafeNextPath } from "../../lib/redirect";
 import { EyeIcon, EyeOffIcon, GoogleIcon } from "./Icons";
 import styles from "./AuthForm.module.css";
@@ -16,7 +16,11 @@ type LoginFormProps = {
 export default function LoginForm({ onSuccess }: LoginFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login } = useAuth();
+  const { login, verify, sendEmailCode } = useAuth();
+  const [challenge, setChallenge] = useState<LoginChallenge | null>(null);
+  const [method, setMethod] = useState("authenticator");
+  const [code, setCode] = useState("");
+  const [busy, setBusy] = useState(false);
 
   // Куда вернуть после входа (?next=/sell#apply)
   const nextParam = searchParams.get("next");
@@ -46,14 +50,19 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
     return Object.keys(nextErrors).length === 0;
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setFormError("");
 
-    if (!validate()) return;
+    if (busy || (!challenge && !validate())) return;
 
     try {
-      login(email, password);
+      setBusy(true);
+      if (challenge) await verify(challenge.challengeId, method, code, rememberMe);
+      else {
+        const next = await login(email, password, rememberMe);
+        if (next) { setChallenge(next); setMethod(next.methods[0]); setPassword(""); return; }
+      }
       if (onSuccess) {
         onSuccess();
       } else {
@@ -61,7 +70,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       }
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Помилка входу");
-    }
+    } finally { setBusy(false); }
   }
 
   function handleSocialClick() {
@@ -74,6 +83,14 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         <h1 className={styles.title}>Вхід</h1>
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
+          {challenge ? <>
+            <p>Підтвердьте вхід до акаунта.</p>
+            <select aria-label="Спосіб підтвердження" className={styles.input} value={method} onChange={event => setMethod(event.target.value)}>
+              {challenge.methods.map(value => <option key={value} value={value}>{value === "email" ? `Код на ${challenge.maskedEmail}` : "Застосунок автентифікації"}</option>)}
+            </select>
+            {method === "email" && <button type="button" disabled={busy} onClick={async () => { setBusy(true); setFormError(""); try { await sendEmailCode(challenge.challengeId); } catch (error) { setFormError(error instanceof Error ? error.message : "Не вдалося надіслати код"); } finally { setBusy(false); } }}>Надіслати код</button>}
+            <input className={styles.input} aria-label="Код підтвердження" autoComplete="one-time-code" inputMode="numeric" maxLength={6} value={code} onChange={event => setCode(event.target.value)} />
+          </> : <>
           <label className={styles.field}>
             <input
               type="text"
@@ -128,10 +145,11 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
             </button>
           </div>
 
-          {formError && <p className={styles.formError}>{formError}</p>}
+          </>}
+          {formError && <p className={styles.formError} role="alert">{formError}</p>}
 
-          <button type="submit" className={styles.submitButton}>
-            Увійти
+          <button type="submit" className={styles.submitButton} disabled={busy}>
+            {busy ? "Перевіряємо…" : challenge ? "Підтвердити вхід" : "Увійти"}
           </button>
         </form>
 

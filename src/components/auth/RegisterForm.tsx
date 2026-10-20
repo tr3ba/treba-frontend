@@ -40,10 +40,11 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
   const [agree, setAgree] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [formError, setFormError] = useState("");
+  const [busy, setBusy] = useState(false);
 
   function isPasswordValid(value: string) {
     return (
-      value.length >= 6 &&
+      value.length >= 8 && value.length <= 72 &&
       /[0-9]/.test(value) &&
       /[a-z]/.test(value) &&
       /[A-Z]/.test(value)
@@ -77,14 +78,15 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
     return Object.keys(nextErrors).length === 0;
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setFormError("");
 
-    if (!validate()) return;
+    if (busy || !validate()) return;
 
     try {
-      register(
+      setBusy(true);
+      await register(
         `${firstName.trim()} ${lastName.trim()}`.trim(),
         email,
         password,
@@ -102,7 +104,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       }
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Помилка реєстрації");
-    }
+    } finally { setBusy(false); }
   }
 
   function handleSocialClick() {
@@ -194,7 +196,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
               <span className={styles.errorText}>{errors.password}</span>
             ) : (
               <span className={styles.hintText}>
-                Пароль повинен складатися з не менш ніж 6 символів, містити
+                Пароль повинен складатися з 8–72 символів, містити
                 цифри та латинські літери, у тому числі велику, і не повинен
                 збігатися з ім&apos;ям та ел. поштою
               </span>
@@ -222,8 +224,8 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
           {formError && <p className={styles.formError}>{formError}</p>}
 
-          <button type="submit" className={styles.submitButton}>
-            Зареєструватися
+          <button type="submit" className={styles.submitButton} disabled={busy}>
+            {busy ? "Реєструємо…" : "Зареєструватися"}
           </button>
         </form>
 

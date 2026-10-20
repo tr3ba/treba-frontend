@@ -136,7 +136,14 @@ Product and category modules currently contain local demonstration data.
 
 ### Authentication
 
-The current frontend authentication flow uses local client-side state.
+Login and registration use the Treba Backend API through the Next.js session endpoint.
+Optional email/authenticator verification is supported. Tokens remain in HttpOnly cookies;
+browser demo identities are retired. See [customer support and sessions](docs/support.md).
+
+### Customer support
+
+The home page chat button and product question button open private conversations.
+The messages inbox shows actual API history and updates replies automatically.
 
 ### Cart
 
@@ -149,14 +156,10 @@ to be replaced or connected to the Treba backend API.
 
 ## 🔐 Security Note
 
-The current client-side authentication implementation is intended only for
-development and demonstration.
-
-Authentication logic that stores or validates credentials on the client
-must **not** be treated as production authentication.
-
-Production authentication should be handled by the Treba Backend API,
-which already contains server-side authentication and authorization functionality.
+Credentials are validated by the Treba Backend API. The Next.js session/proxy endpoints
+keep access and refresh tokens in HttpOnly, SameSite cookies, enforce Origin checks for
+mutations and enable Secure cookies in production. Storefront support responses exclude
+internal staff notes and are scoped to the authenticated customer by the API.
 
 ---
 
@@ -269,7 +272,7 @@ The workflow supports Docker-based delivery through:
 
 - Product data integration with backend API
 - Category data integration
-- Server-side authentication integration
+- Connecting remaining account preferences to the backend
 - Backend-powered cart
 - Removal of temporary client-side demo data/state
 

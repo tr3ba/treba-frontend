@@ -42,6 +42,7 @@ export type ProductService = {
 
 export type Product = {
   id: string;
+  backendId?: string;
   title: string;
   price: string;
   oldPrice?: string | null;

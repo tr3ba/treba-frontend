@@ -35,10 +35,10 @@ export default async function Home() {
   ))}
 
   {}
-  <a className={styles.categoryItem} href="#">
+  <Link className={styles.categoryItem} href="/account/messages?new=chat">
     <img src="/icons/chat.svg" alt="" className={styles.categoryIcon} />
     <span className={styles.categoryText}>Чат з TREBA</span>
-  </a>
+  </Link>
 
   <a className={styles.categoryItem} href="#">
     <img src="/icons/box.svg" alt="" className={styles.categoryIcon} />

@@ -20,6 +20,7 @@ import { getProductReviews } from "../../../lib/api/reviews";
 import ProductTabs from "../../../components/product/ProductTabs";
 import ProductAccessories from "../../../components/product/ProductAccessories";
 import ProductServices from "../../../components/product/ProductServices";
+import ProductQuestion from "../../../components/product/ProductQuestion";
 
 type ProductPageProps = {
   params: Promise<{ id: string }>;
@@ -110,6 +111,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
             <ProductDeliveryInfo />
             <ProductPaymentInfo />
+            <ProductQuestion id={product.backendId} slug={product.id} title={product.title} />
           </div>
         </div>
 

@@ -17,7 +17,7 @@ export const accountNavItems: AccountNavItem[] = [
   { label: "Особисті дані", icon: "/icons/user.svg", href: "/account" },
   { label: "Замовлення", icon: "/icons/box.svg", href: "/account/orders" },
   {
-    label: "Листування з продавцями",
+    label: "Повідомлення та підтримка",
     icon: "/icons/chat1.svg",
     href: "/account/messages",
   },
