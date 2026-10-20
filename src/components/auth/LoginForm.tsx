@@ -37,6 +37,15 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
     {}
   );
   const [formError, setFormError] = useState("");
+  useEffect(() => {
+    if (!challenge) return;
+    const remaining = Date.parse(challenge.expiresAt) - Date.now();
+    const timer = setTimeout(() => {
+      setChallenge(null); setMethod(""); setCode("");
+      setFormError("Час підтвердження минув. Введіть пароль і спробуйте ще раз.");
+    }, Number.isFinite(remaining) ? Math.max(0, remaining) : 0);
+    return () => clearTimeout(timer);
+  }, [challenge]);
 
   function validate() {
     const nextErrors: { email?: string; password?: string } = {};
