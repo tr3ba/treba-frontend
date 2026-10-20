@@ -19,6 +19,7 @@ export default function ProductCarousel({ title, products }: ProductCarouselProp
           <div key={product.id} className={styles.item}>
             <ProductCard
               id={product.id}
+              backendId={product.backendId}
               title={product.title}
               price={product.price}
               oldPrice={product.oldPrice}

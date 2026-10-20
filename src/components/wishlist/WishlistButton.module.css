@@ -1,0 +1,93 @@
+.button {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #8a8578;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.button:hover {
+    color: #ff6e2a;
+    background-color: #fff6f0;
+}
+
+.button:focus-visible {
+    outline: 2px solid #ff6e2a;
+    outline-offset: 2px;
+}
+
+.sm {
+    width: 34px;
+    height: 34px;
+}
+
+.icon {
+    width: 22px;
+    height: 22px;
+    display: block;
+    overflow: visible;
+}
+
+.sm .icon {
+    width: 19px;
+    height: 19px;
+}
+
+/* два слоя: контур и заливка, переключение через opacity */
+.outline {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linejoin: round;
+    transition: opacity 0.2s ease;
+}
+
+.filled {
+    fill: #ff6e2a;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: opacity 0.2s ease;
+}
+
+.active {
+    color: #ff6e2a;
+}
+
+.active .outline {
+    opacity: 0;
+}
+
+.active .filled {
+    opacity: 1;
+    animation: heartPop 0.3s ease;
+}
+
+@keyframes heartPop {
+    0% {
+        transform: scale(0.6);
+    }
+
+    60% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .active .filled {
+        animation: none;
+    }
+}

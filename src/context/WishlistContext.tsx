@@ -19,6 +19,7 @@ import {
   removeFromWishlist,
   WishlistError,
 } from "../lib/api/wishlist";
+import WishlistToast from "../components/wishlist/WishlistToast";
 import type { Product } from "../types/product";
 import type { WishlistItem } from "../types/wishlist";
 
@@ -166,7 +167,12 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     [items, isReady, toggle, remove, error, clearError]
   );
 
-  return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;
+  return (
+    <WishlistContext.Provider value={value}>
+      {children}
+      <WishlistToast message={error} onClose={clearError} />
+    </WishlistContext.Provider>
+  );
 }
 
 export function useWishlist() {
