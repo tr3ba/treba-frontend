@@ -1,5 +1,11 @@
 // Отзывы о товаре. Бэк: GET /api/v1/reviews/products/{guid} (публичный, только опубликованные).
-import type { ApiReview, ApiReviewsPage, Review, ReviewsPage } from "../../types/review";
+import type {
+  ApiReview,
+  ApiReviewsPage,
+  Review,
+  ReviewableProduct,
+  ReviewsPage,
+} from "../../types/review";
 import { formatDate } from "../format";
 import { apiFetch } from "./client";
 
@@ -38,4 +44,12 @@ export async function getProductReviews(productBackendId: string | undefined): P
     console.error("Не вдалося завантажити відгуки:", error);
     return EMPTY_PAGE;
   }
+}
+
+/**
+ * Купленные товары без отзыва — для кабинета («Чекають відгуків»).
+ * Эндпоинта на бэке пока нет -> пустой список; страница уже готова к данным.
+ */
+export async function getProductsAwaitingReview(): Promise<ReviewableProduct[]> {
+  return [];
 }

@@ -1,120 +1,149 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import AccountPageShell from "../../../components/account/AccountPageShell";
 import PageTitle from "../../../components/account/PageTitle";
 import EmptyState from "../../../components/account/EmptyState";
+import { getMyOrders, getOrderStatusLabel, isOrderInactive } from "../../../lib/api/orders";
+import { formatDate } from "../../../lib/format";
+import type { OrderSummary } from "../../../types/order";
 import styles from "./page.module.css";
 
-// Мокові замовлення — просто для візуального наповнення сторінки
-const mockOrders = [
-  {
-    id: "864483246",
-    date: "21 вересня 2026",
-    status: "done" as const,
-    icon: "/icons/box.svg",
-  },
-  {
-    id: "857273822",
-    date: "15 липня 2026",
-    status: "cancelled" as const,
-    icon: "/icons/box.svg",
-  },
-  {
-    id: "841382657",
-    date: "11 лютого 2026",
-    status: "done" as const,
-    icon: "/icons/laptop.svg",
-  },
-  {
-    id: "798640038",
-    date: "11 січня 2026",
-    status: "done" as const,
-    icon: "/icons/clothes.svg",
-  },
-];
+type Period = "all" | "year" | "month";
 
-const statusLabel: Record<string, string> = {
-  done: "Виконано",
-  cancelled: "Скасовано користувачем",
-};
+const PERIOD_DAYS: Record<Exclude<Period, "all">, number> = { year: 365, month: 30 };
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 export default function OrdersPage() {
+  const router = useRouter();
+  const [orders, setOrders] = useState<OrderSummary[] | null>(null);
   const [query, setQuery] = useState("");
+  const [period, setPeriod] = useState<Period>("all");
+  // Граница периода считается в момент выбора — не во время рендера
+  const [since, setSince] = useState<number | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    getMyOrders()
+      .then((list) => {
+        if (active) setOrders(list);
+      })
+      .catch(() => {
+        if (active) setOrders([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  function handlePeriodChange(value: Period) {
+    setPeriod(value);
+    setSince(value === "all" ? null : Date.now() - PERIOD_DAYS[value] * DAY_MS);
+  }
+
+  const visible = useMemo(() => {
+    if (!orders) return [];
+    const q = query.trim().toLowerCase();
+    return orders.filter(
+      (order) =>
+        (!q || order.number.toLowerCase().includes(q)) &&
+        (since === null || Date.parse(order.createdAt) >= since)
+    );
+  }, [orders, query, since]);
 
   return (
     <AccountPageShell>
       <PageTitle>Замовлення</PageTitle>
 
-      <div className={styles.toolbar}>
-        <div className={styles.searchWrap}>
-          <svg
-            className={styles.searchIcon}
-            viewBox="0 0 20 20"
-            width="18"
-            height="18"
-            fill="none"
-            aria-hidden="true"
-          >
-            <circle cx="9" cy="9" r="6" stroke="#898888" strokeWidth="1.6" />
-            <path d="M17 17l-4-4" stroke="#898888" strokeWidth="1.6" strokeLinecap="round" />
-          </svg>
-          <input
-            type="text"
-            className={styles.searchInput}
-            placeholder="Пошук товару або замовлення"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
-        <select className={styles.periodSelect} defaultValue="all">
-          <option value="all">За весь час</option>
-          <option value="year">За рік</option>
-          <option value="month">За місяць</option>
-        </select>
-      </div>
-
-      {mockOrders.length === 0 ? (
+      {orders !== null && orders.length === 0 && (
         <EmptyState
           icon="/icons/box.svg"
           title="Замовлень ще немає"
           subtitle="Тут з’являться усі ваші замовлення після першої покупки"
+          actionLabel="Перейти до покупок"
+          onAction={() => router.push("/")}
         />
-      ) : (
-        <div className={styles.list}>
-          {mockOrders.map((order) => (
-            <div key={order.id} className={styles.orderRow}>
-              <div className={styles.orderInfo}>
-                <p
-                  className={`${styles.orderNumber} ${
-                    order.status === "cancelled" ? styles.orderNumberCancelled : ""
-                  }`}
-                >
-                  № {order.id} від {order.date}
-                </p>
-                <p
-                  className={`${styles.orderStatus} ${
-                    order.status === "cancelled" ? styles.statusCancelled : styles.statusDone
-                  }`}
-                >
-                  {statusLabel[order.status]}
-                </p>
-              </div>
-              <img src={order.icon} alt="" className={styles.orderThumb} />
-              <button type="button" className={styles.expandButton} aria-label="Деталі замовлення">
-                <svg viewBox="0 0 16 16" width="16" height="16" fill="none">
-                  <path
-                    d="M4 6l4 4 4-4"
-                    stroke="#28251d"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
+      )}
+
+      {orders !== null && orders.length > 0 && (
+        <>
+          <div className={styles.toolbar}>
+            <div className={styles.searchWrap}>
+              <svg
+                className={styles.searchIcon}
+                viewBox="0 0 20 20"
+                width="18"
+                height="18"
+                fill="none"
+                aria-hidden="true"
+              >
+                <circle cx="9" cy="9" r="6" stroke="#898888" strokeWidth="1.6" />
+                <path d="M17 17l-4-4" stroke="#898888" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+              <input
+                type="text"
+                className={styles.searchInput}
+                placeholder="Пошук за номером замовлення"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
             </div>
-          ))}
-        </div>
+            <select
+              className={styles.periodSelect}
+              value={period}
+              onChange={(e) => handlePeriodChange(e.target.value as Period)}
+            >
+              <option value="all">За весь час</option>
+              <option value="year">За рік</option>
+              <option value="month">За місяць</option>
+            </select>
+          </div>
+
+          {visible.length === 0 ? (
+            <EmptyState
+              icon="/icons/box.svg"
+              title="Замовлень не знайдено"
+              subtitle="Спробуйте змінити номер або період"
+            />
+          ) : (
+            <div className={styles.list}>
+              {visible.map((order) => {
+                const inactive = isOrderInactive(order.status);
+                return (
+                  <div key={order.id} className={styles.orderRow}>
+                    <div className={styles.orderInfo}>
+                      <p
+                        className={`${styles.orderNumber} ${inactive ? styles.orderNumberCancelled : ""}`}
+                      >
+                        № {order.number} від {formatDate(order.createdAt)}
+                      </p>
+                      <p
+                        className={`${styles.orderStatus} ${
+                          inactive ? styles.statusCancelled : styles.statusDone
+                        }`}
+                      >
+                        {getOrderStatusLabel(order.status)}
+                      </p>
+                    </div>
+                    <img src={order.thumbnail ?? "/icons/box.svg"} alt="" className={styles.orderThumb} />
+                    <button type="button" className={styles.expandButton} aria-label="Деталі замовлення">
+                      <svg viewBox="0 0 16 16" width="16" height="16" fill="none">
+                        <path
+                          d="M4 6l4 4 4-4"
+                          stroke="#28251d"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
       )}
     </AccountPageShell>
   );
