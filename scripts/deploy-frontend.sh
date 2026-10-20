@@ -50,6 +50,8 @@ for image in images:
         removed += result.returncode == 0
 print('Unused published TREBA image references removed:', removed)
 PY
+    # Dangling layers are rebuildable cache. Docker retains layers used by any container.
+    docker image prune -f
 fi
 df -h /var/lib/docker
 aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 019066823315.dkr.ecr.eu-west-1.amazonaws.com >/dev/null
