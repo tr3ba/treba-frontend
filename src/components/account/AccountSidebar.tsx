@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
+import { adminOrigin, canOpenAdmin } from "../../lib/admin";
 import styles from "./AccountSidebar.module.css";
 
 export type AccountNavItem = {
@@ -86,6 +87,13 @@ export default function AccountSidebar({
           <p className={styles.userEmail}>{user.email}</p>
         </div>
       </section>
+
+      {canOpenAdmin(user.role) && (
+        <a href={adminOrigin + "/site-login/start"} className={styles.adminEntry}>
+          Адмін-панель
+          <span aria-hidden="true">↗</span>
+        </a>
+      )}
 
       <button
         type="button"
