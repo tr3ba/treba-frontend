@@ -30,7 +30,7 @@ import {
   writeGuestCart,
 } from "../lib/cartStorage";
 import CartToast from "../components/cart/CartToast";
-import WishlistToast from "../components/wishlist/WishlistToast";
+import ErrorToast from "../components/layout/ErrorToast";
 import type { AddToCartInput, CartItem, ServerCartItem } from "../types/cart";
 
 // Типы остались доступны отсюда — компоненты импортируют их как раньше
@@ -314,7 +314,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     <CartContext.Provider value={value}>
       {children}
       <CartToast key={toast?.key} item={toast?.item ?? null} onClose={hideToast} />
-      <WishlistToast message={error} onClose={clearError} />
+      <ErrorToast message={error} onClose={clearError} />
     </CartContext.Provider>
   );
 }

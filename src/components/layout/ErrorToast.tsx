@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect } from "react";
-import styles from "./WishlistToast.module.css";
+import styles from "./ErrorToast.module.css";
 
-type WishlistToastProps = {
+type ErrorToastProps = {
   message: string | null;
   onClose: () => void;
 };
 
 const TOAST_DURATION = 4000;
 
-// Повідомлення про помилку списку бажань (сама ховається через 4 с)
-export default function WishlistToast({ message, onClose }: WishlistToastProps) {
+// Повідомлення про помилку (кошик, список бажань). Саме ховається через 4 с
+export default function ErrorToast({ message, onClose }: ErrorToastProps) {
   useEffect(() => {
     if (!message) return;
     const timer = setTimeout(onClose, TOAST_DURATION);

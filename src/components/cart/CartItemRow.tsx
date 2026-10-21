@@ -30,6 +30,8 @@ export default function CartItemRow({ item }: CartItemRowProps) {
   const lineOldTotal = item.oldPrice ? item.oldPrice * item.quantity : null;
   // slug неизвестен (товар добавили с другого устройства) — без ссылки
   const href = item.slug ? `/product/${item.slug}` : null;
+  // available приходит только с бэка; у гостя считаем товар доступным
+  const inStock = item.available !== false;
 
   const image = item.image ? (
     <img src={item.image} alt={item.title} className={styles.image} />
@@ -56,9 +58,9 @@ export default function CartItemRow({ item }: CartItemRowProps) {
           <span className={styles.title}>{item.title}</span>
         )}
 
-        <p className={styles.stock}>
+        <p className={`${styles.stock} ${inStock ? "" : styles.stockOut}`}>
           <span className={styles.stockDot} aria-hidden="true" />
-          Є в наявності
+          {inStock ? "Є в наявності" : "Немає в наявності"}
         </p>
 
         <p className={styles.unitPrice}>
