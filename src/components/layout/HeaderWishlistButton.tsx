@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useWishlist } from "../../context/WishlistContext";
 import styles from "./HeaderWishlistButton.module.css";
+import Icon from "../common/Icon";
 
 type HeaderWishlistButtonProps = {
   /** Доп. класс от шапки (напр. скрыть на телефоне) */
@@ -25,8 +26,8 @@ export default function HeaderWishlistButton({ className }: HeaderWishlistButton
       aria-label={hasItems ? `Список бажань, товарів: ${count}` : "Список бажань"}
     >
       <span className={`${styles.iconSwap} ${styles.heartIcon}`}>
-        <img src="/icons/heart.svg" alt="" className={styles.iconOutline} />
-        <img src="/icons/heart1.svg" alt="" className={styles.iconFilled} />
+        <Icon src="/icons/heart.svg" alt="" className={styles.iconOutline} />
+        <Icon src="/icons/heart1.svg" alt="" className={styles.iconFilled} />
       </span>
 
       {hasItems && (

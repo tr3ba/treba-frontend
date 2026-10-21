@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useCategories } from "../../context/CategoriesContext";
 import styles from "./MobileCatalog.module.css";
+import Icon from "../common/Icon";
 
 // Бургер + выезжающая панель каталога для планшета и телефона (≤1024px).
 // На ПК вместо неё работает CatalogMenu (кнопка «Каталог» с меню по наведению).
@@ -48,7 +49,7 @@ export default function MobileCatalog() {
         aria-expanded={isOpen}
         onClick={open}
       >
-        <img src="/icons/menu.svg" alt="" className={styles.burgerIcon} />
+        <Icon src="/icons/menu.svg" alt="" className={styles.burgerIcon} />
       </button>
 
       {isOpen && (
@@ -112,7 +113,7 @@ export default function MobileCatalog() {
 
                   const content = (
                     <>
-                      <img src={category.icon} alt="" className={styles.rowIcon} />
+                      <Icon src={category.icon} alt="" className={styles.rowIcon} />
                       <span className={styles.rowLabel}>{category.label}</span>
                       {hasSubcategories && <ChevronIcon className={styles.rowChevron} />}
                     </>
