@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import { buildAuthHref, getSafeNextPath } from "../../lib/redirect";
 import { EyeIcon, EyeOffIcon, GoogleIcon } from "./Icons";
 import styles from "./AuthForm.module.css";
+import Icon from "../common/Icon";
 
 type FormErrors = {
   firstName?: string;
@@ -258,7 +259,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           className={styles.socialButton}
           onClick={handleSocialClick}
         >
-          <img src="/icons/facebook.svg" alt="" className={styles.socialIcon} />
+          <Icon src="/icons/facebook.svg" alt="" className={styles.socialIcon} />
           Facebook
         </button>
 

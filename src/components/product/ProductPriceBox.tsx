@@ -7,6 +7,7 @@ import { parsePrice } from "../../lib/format";
 import WishlistButton from "../wishlist/WishlistButton";
 import styles from "./ProductPriceBox.module.css";
 import { ProductVariant } from "../../types/product";
+import Icon from "../common/Icon";
 
 type ProductPriceBoxProps = {
   id: string;
@@ -75,7 +76,7 @@ export default function ProductPriceBox({
         <div className={styles.iconActions}>
           <WishlistButton product={{ id, backendId }} className={styles.wishlistButton} />
           <button type="button" className={styles.iconButton} aria-label="Додати до порівняння">
-            <img src="/icons/libra.svg" alt="" className={styles.iconImg} />
+            <Icon src="/icons/libra.svg" alt="" className={styles.iconImg} />
           </button>
         </div>
       </div>

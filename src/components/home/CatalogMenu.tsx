@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import styles from "./CatalogMenu.module.css";
 import { useCategories } from "../../context/CategoriesContext";
+import Icon from "../common/Icon";
 
 const CLOSE_DELAY = 200;
 
@@ -39,7 +40,7 @@ export default function CatalogMenu() {
       onMouseLeave={handleClose}
     >
       <button className={styles.catalogButton} type="button">
-        <img src="/icons/catalog.svg" alt="" className={styles.catalogIcon} />
+        <Icon src="/icons/catalog.svg" alt="" className={styles.catalogIcon} />
         <span className={styles.catalogText}>Каталог</span>
       </button>
 
@@ -55,14 +56,14 @@ export default function CatalogMenu() {
                   className={`${styles.categoryRow} ${isActive ? styles.categoryRowActive : ""}`}
                   onMouseEnter={() => setActiveId(category.id)}
                 >
-                  <img
+                  <Icon
                     src={category.icon}
                     alt=""
                     className={styles.categoryRowIcon}
                   />
                   <span className={styles.categoryRowLabel}>{category.label}</span>
                   {(category.subcategories?.length ?? 0) > 0 && (
-                    <img
+                    <Icon
                       src="/icons/arrow.svg"
                       alt=""
                       className={styles.categoryRowArrow}

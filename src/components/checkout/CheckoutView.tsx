@@ -9,6 +9,7 @@ import { getOrderStatusLabel } from "../../lib/api/orders";
 import type { CheckoutForm as CheckoutFormValues, CreatedOrder } from "../../types/order";
 import CheckoutForm from "./CheckoutForm";
 import styles from "./CheckoutView.module.css";
+import Icon from "../common/Icon";
 
 // Сторінка оформлення: стани (вхід / порожній кошик / успіх) + форма
 export default function CheckoutView() {
@@ -59,7 +60,7 @@ export default function CheckoutView() {
     content = (
       <section className={styles.stateCard}>
         <div className={styles.stateIcon}>
-          <img src="/icons/user.svg" alt="" className={styles.stateIconImg} />
+          <Icon src="/icons/user.svg" alt="" className={styles.stateIconImg} />
         </div>
         <h2 className={styles.stateTitle}>Увійдіть, щоб оформити замовлення</h2>
         <p className={styles.stateText}>
@@ -79,7 +80,7 @@ export default function CheckoutView() {
     content = (
       <section className={styles.stateCard}>
         <div className={styles.stateIcon}>
-          <img src="/icons/shop.svg" alt="" className={styles.stateIconImg} />
+          <Icon src="/icons/shop.svg" alt="" className={styles.stateIconImg} />
         </div>
         <h2 className={styles.stateTitle}>Кошик порожній</h2>
         <p className={styles.stateText}>Додайте товари до кошика, щоб оформити замовлення.</p>

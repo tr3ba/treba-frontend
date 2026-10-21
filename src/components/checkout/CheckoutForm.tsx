@@ -1,11 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import { FormEvent, useState } from "react";
 import type { CartItem } from "../../types/cart";
 import type { CheckoutForm as CheckoutFormValues, CreatedOrder } from "../../types/order";
 import { createOrder, OrderError } from "../../lib/api/orders";
 import { formatPrice, pluralize } from "../../lib/format";
 import { DELIVERY_PRICE } from "../../lib/delivery";
+import Icon from "../common/Icon";
 import styles from "./CheckoutForm.module.css";
 
 type CheckoutFormProps = {
@@ -190,11 +192,11 @@ export default function CheckoutForm({
           {items.map((item) => (
             <li key={item.id} className={styles.item}>
               <div className={styles.itemImageWrap}>
-                <img
-                  src={item.image ?? "/icons/catalog.svg"}
-                  alt=""
-                  className={item.image ? styles.itemImage : styles.itemPlaceholder}
-                />
+                {item.image ? (
+                  <Image src={item.image} alt="" width={52} height={52} className={styles.itemImage} />
+                ) : (
+                  <Icon src="/icons/catalog.svg" className={styles.itemPlaceholder} />
+                )}
               </div>
               <div className={styles.itemInfo}>
                 <p className={styles.itemTitle}>{item.title}</p>

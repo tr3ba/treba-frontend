@@ -8,6 +8,7 @@ import { pluralize } from "../../lib/format";
 import CartItemRow from "./CartItemRow";
 import CartSummary from "./CartSummary";
 import styles from "./CartView.module.css";
+import Icon from "../common/Icon";
 
 export default function CartView() {
   const router = useRouter();
@@ -39,7 +40,7 @@ export default function CartView() {
     return (
       <section className={styles.stateCard}>
         <div className={styles.stateIcon}>
-          <img src="/icons/shop.svg" alt="" className={styles.stateIconImg} />
+          <Icon src="/icons/shop.svg" alt="" className={styles.stateIconImg} />
         </div>
         <h2 className={styles.stateTitle}>Кошик порожній</h2>
         <p className={styles.stateText}>

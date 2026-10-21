@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { SubcategoryColumn } from "../../types/category";
 import styles from "./CategorySubcategories.module.css";
+import Icon from "../common/Icon";
 
 type CategorySubcategoriesProps = {
   categoryId: string;
@@ -39,7 +40,7 @@ export default function CategorySubcategories({
                 />
               ) : (
                 <div className={styles.cardImagePlaceholder} aria-hidden="true">
-                  <img src="/icons/catalog.svg" alt="" className={styles.cardImagePlaceholderIcon} />
+                  <Icon src="/icons/catalog.svg" alt="" className={styles.cardImagePlaceholderIcon} />
                 </div>
               )}
             </div>
@@ -56,7 +57,7 @@ export default function CategorySubcategories({
 
             <span className={styles.cardLink}>
               Переглянути розділ
-              <img src="/icons/arrow.svg" alt="" className={styles.cardLinkArrow} />
+              <Icon src="/icons/arrow.svg" alt="" className={styles.cardLinkArrow} />
             </span>
           </Link>
         ))}

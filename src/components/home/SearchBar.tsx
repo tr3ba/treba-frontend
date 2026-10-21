@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import styles from "./SearchBar.module.css";
+import Icon from "../common/Icon";
 
 const BLUR_DELAY = 150;
 
@@ -54,7 +55,7 @@ export default function SearchBar() {
           placeholder="Я шукаю..."
           className={styles.searchInput}
         />
-        <img src="/icons/mic.svg" alt="" className={styles.micIcon} />
+        <Icon src="/icons/mic.svg" alt="" className={styles.micIcon} />
       </div>
 
       <button type="button" className={styles.searchButton}>

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { AddToCartInput, useCart } from "../../context/CartContext";
 import styles from "./AddToCartButton.module.css";
+import Icon from "../common/Icon";
 
 type AddToCartButtonProps = {
   product: AddToCartInput;
@@ -35,7 +36,7 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
       aria-label={inCart ? "Товар у кошику — перейти до кошика" : "Додати товар у кошик"}
       title={inCart ? "Вже в кошику" : "Додати в кошик"}
     >
-      <img src="/icons/shop1.svg" alt="" className={styles.icon} />
+      <Icon src="/icons/shop1.svg" alt="" className={styles.icon} />
       {inCart && (
         <span className={styles.check} aria-hidden="true">
           ✓

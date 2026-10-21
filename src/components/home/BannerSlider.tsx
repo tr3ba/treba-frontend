@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import styles from "./BannerSlider.module.css";
+import Icon from "../common/Icon";
 
 const slides = [
   "/banners/main-banner.png",
@@ -13,6 +15,11 @@ const slides = [
 // Клони по краях для безшовного циклу: [останній, ...слайди, перший]
 const extendedSlides = [slides[slides.length - 1], ...slides, slides[0]];
 const LAST_INDEX = extendedSlides.length - 1;
+
+// Розмір банера 1384×230 (як у CSS); sizes — щоб Next віддав картинку потрібної ширини
+const BANNER_WIDTH = 1384;
+const BANNER_HEIGHT = 230;
+const BANNER_SIZES = "(max-width: 1440px) 100vw, 1384px";
 
 const AUTOPLAY_DELAY = 5000;
 const TRANSITION_DURATION = 500;
@@ -138,7 +145,7 @@ export default function BannerSlider() {
         aria-label="Попередній банер"
         onClick={() => handleManualNav(-1)}
       >
-        <img src="/icons/arrow.svg" alt="" />
+        <Icon src="/icons/arrow.svg" />
       </button>
 
       <div className={styles.track}>
@@ -151,7 +158,19 @@ export default function BannerSlider() {
           onTransitionEnd={handleTransitionEnd}
         >
           {extendedSlides.map((src, i) => (
-            <img key={i} src={src} alt="Головний банер" className={styles.mainBannerImage} />
+            <Image
+              key={i}
+              src={src}
+              alt={i === 0 || i === LAST_INDEX ? "" : "Головний банер"}
+              width={BANNER_WIDTH}
+              height={BANNER_HEIGHT}
+              sizes={BANNER_SIZES}
+              /* перший справжній слайд видно одразу — вантажимо пріоритетно,
+                 решту теж одразу (eager), щоб під час гортання не було порожніх кадрів */
+              priority={i === 1}
+              loading={i === 1 ? undefined : "eager"}
+              className={styles.mainBannerImage}
+            />
           ))}
         </div>
       </div>
@@ -161,7 +180,7 @@ export default function BannerSlider() {
         aria-label="Наступний банер"
         onClick={() => handleManualNav(1)}
       >
-        <img src="/icons/arrow.svg" alt="" className={styles.arrowMirrored} />
+        <Icon src="/icons/arrow.svg" className={styles.arrowMirrored} />
       </button>
     </div>
   );

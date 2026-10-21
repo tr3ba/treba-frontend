@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import AccountPageShell from "../../../components/account/AccountPageShell";
 import PageTitle from "../../../components/account/PageTitle";
@@ -7,6 +8,7 @@ import EmptyState from "../../../components/account/EmptyState";
 import { getProductsAwaitingReview } from "../../../lib/api/reviews";
 import type { ReviewableProduct } from "../../../types/review";
 import styles from "./page.module.css";
+import Icon from "../../../components/common/Icon";
 
 type Tab = "products" | "seller";
 type Filter = "waiting" | "mine";
@@ -38,7 +40,7 @@ export default function ReviewsPage() {
       <PageTitle>Відгуки</PageTitle>
 
       <div className={styles.banner}>
-        <img src="/icons/star.svg" alt="" className={styles.bannerIcon} />
+        <Icon src="/icons/star.svg" alt="" className={styles.bannerIcon} />
         <div>
           <p className={styles.bannerTitle}>Поділіться своїм відгуком та допоможіть іншим!</p>
           <p className={styles.bannerText}>
@@ -97,7 +99,11 @@ export default function ReviewsPage() {
             <div className={styles.list}>
               {items.map((item) => (
                 <div key={item.id} className={styles.row}>
-                  <img src={item.image ?? "/icons/box.svg"} alt="" className={styles.thumb} />
+                  {item.image ? (
+                    <Image src={item.image} alt="" width={48} height={48} className={styles.thumb} />
+                  ) : (
+                    <Icon src="/icons/box.svg" className={styles.thumb} />
+                  )}
                   <p className={styles.itemTitle}>{item.title}</p>
                   <button type="button" className={styles.reviewButton}>
                     Залишити відгук

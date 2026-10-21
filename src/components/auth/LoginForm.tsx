@@ -7,6 +7,7 @@ import { buildAuthHref, getSafeNextPath } from "../../lib/redirect";
 import { EyeIcon, EyeOffIcon, GoogleIcon } from "./Icons";
 import styles from "./AuthForm.module.css";
 import GuardVerification from "./GuardVerification";
+import Icon from "../common/Icon";
 
 type LoginFormProps = {
   /** Если задан (модалка), вызывается после входа вместо перехода по ?next */
@@ -206,7 +207,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
           className={styles.socialButton}
           onClick={handleSocialClick}
         >
-          <img src="/icons/facebook.svg" alt="" className={styles.socialIcon} />
+          <Icon src="/icons/facebook.svg" alt="" className={styles.socialIcon} />
           Facebook
         </button>
 
