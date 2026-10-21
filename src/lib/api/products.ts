@@ -6,6 +6,7 @@ import { mockSellerProducts, mockSellers } from "../../data/sellers";
 import { apiFetch } from "./client";
 import { buildRootCategorySlugMap, mapCatalogProduct } from "./mappers";
 import { USE_MOCKS } from "./mode";
+import { getCategoryById } from "./categories";
 
 const FAKE_DELAY_MS = 300;
 
@@ -123,9 +124,15 @@ export async function getProductsByCategory(categoryId: string, limit = 12): Pro
     return delay(result.slice(0, limit));
   }
 
-  // С бэком показываем только товары этой категории (без подмены «всеми товарами»)
-  const all = await getAllProducts();
-  return all.filter((p) => p.categoryId === categoryId).slice(0, limit);
+  const category = await getCategoryById(categoryId);
+  if (!category?.backendId) return [];
+  const [page, roots] = await Promise.all([
+    apiFetch<ApiPagedResponse<ApiCatalogProduct>>("/api/v1/catalog", {
+      query: { page: 1, size: Math.min(100, Math.max(1, limit)), categoryId: category.backendId },
+    }),
+    getRootSlugMap(),
+  ]);
+  return page.content.map((product) => mapCatalogProduct(product, roots));
 }
 
 export async function getViewedProducts(excludeId: string, limit = 6): Promise<Product[]> {

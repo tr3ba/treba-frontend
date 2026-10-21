@@ -3,6 +3,8 @@
 
 export type SubcategoryColumn = {
   title: string;
+  id?: string;
+  itemLinks?: { id: string; label: string }[];
   image?: string;
   items: string[];
 };
@@ -10,6 +12,8 @@ export type SubcategoryColumn = {
 export type Category = {
   id: string; // slug, наприклад "laptops"
   label: string;
+  backendId?: string;
+  path?: { id: string; label: string }[];
   icon: string;
   description?: string;
   subcategories?: SubcategoryColumn[];

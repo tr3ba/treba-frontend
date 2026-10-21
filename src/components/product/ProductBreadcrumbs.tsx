@@ -26,6 +26,12 @@ export default async function ProductBreadcrumbs({ categoryId }: ProductBreadcru
         Головна
       </Link>
       <span className={styles.separator}>/</span>
+      {category?.path?.map((parent) => (
+        <span key={parent.id} className={styles.ancestor}>
+          <Link href={`/catalog/${parent.id}`} className={styles.crumb}>{parent.label}</Link>
+          <span className={styles.separator}>/</span>
+        </span>
+      ))}
       <span className={styles.crumbCurrent}>{category ? category.label : "Каталог"}</span>
     </nav>
   );

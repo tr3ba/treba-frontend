@@ -77,11 +77,11 @@ export default function CatalogMenu() {
             <div className={styles.subcategoriesPanel}>
               {activeCategory.subcategories.map((column) => (
                 <div key={column.title} className={styles.subcatGroup}>
-                  <p className={styles.subcatTitle}>{column.title}</p>
-                  {column.items.map((item) => (
-                    <a key={item} href="#" className={styles.subcatItem}>
-                      {item}
-                    </a>
+                  <Link href={`/catalog/${column.id ?? activeCategory.id}`} className={styles.subcatTitle}>{column.title}</Link>
+                  {(column.itemLinks ?? column.items.map((label) => ({ id: activeCategory.id, label }))).map((item) => (
+                    <Link key={`${item.id}:${item.label}`} href={`/catalog/${item.id}`} className={styles.subcatItem}>
+                      {item.label}
+                    </Link>
                   ))}
                 </div>
               ))}

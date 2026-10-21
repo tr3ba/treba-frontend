@@ -26,18 +26,22 @@ function activeSorted(nodes: ApiCategoryTree[]): ApiCategoryTree[] {
  * Иконки и картинки колонок на бэке пока не хранятся — если их нет,
  * берём из мок-категории с таким же slug (и мок-колонки с таким же названием).
  */
-export function mapCategory(node: ApiCategoryTree): Category {
+export function mapCategory(node: ApiCategoryTree, ancestors: ApiCategoryTree[] = []): Category {
   const mock = mockCategories.find((category) => category.id === node.slug);
 
   return {
     id: node.slug,
     label: node.name,
-    icon: mock?.icon ?? resolveMediaUrl(node.imageUrl) ?? DEFAULT_CATEGORY_ICON,
+    backendId: node.id,
+    path: ancestors.map((parent) => ({ id: parent.slug, label: parent.name })),
+    icon: resolveMediaUrl(node.imageUrl) ?? mock?.icon ?? DEFAULT_CATEGORY_ICON,
     description: node.description ?? undefined,
     subcategories: activeSorted(node.children).map((column) => {
       const mockColumn = mock?.subcategories?.find((item) => item.title === column.name);
       return {
         title: column.name,
+        id: column.slug,
+        itemLinks: activeSorted(column.children).map((item) => ({ id: item.slug, label: item.name })),
         image: resolveMediaUrl(column.imageUrl) ?? mockColumn?.image,
         items: activeSorted(column.children).map((item) => item.name),
       };
@@ -47,7 +51,7 @@ export function mapCategory(node: ApiCategoryTree): Category {
 
 /** Дерево категорий -> список категорий верхнего уровня. */
 export function mapCategoryTree(tree: ApiCategoryTree[]): Category[] {
-  return activeSorted(tree.filter((node) => node.parentId === null)).map(mapCategory);
+  return activeSorted(tree.filter((node) => node.parentId === null)).map((node) => mapCategory(node));
 }
 
 /**

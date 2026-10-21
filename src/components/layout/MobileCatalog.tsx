@@ -89,16 +89,15 @@ export default function MobileCatalog() {
 
                   {activeCategory.subcategories?.map((column) => (
                     <div key={column.title} className={styles.group}>
-                      <p className={styles.groupTitle}>{column.title}</p>
-                      {/* окремих сторінок підкатегорій поки немає — ведемо на сторінку категорії */}
-                      {column.items.map((item) => (
+                      <Link href={`/catalog/${column.id ?? activeCategory.id}`} className={styles.groupTitle} onClick={close}>{column.title}</Link>
+                      {(column.itemLinks ?? column.items.map((label) => ({ id: activeCategory.id, label }))).map((item) => (
                         <Link
-                          key={item}
-                          href={`/catalog/${activeCategory.id}`}
+                          key={`${item.id}:${item.label}`}
+                          href={`/catalog/${item.id}`}
                           className={styles.groupItem}
                           onClick={close}
                         >
-                          {item}
+                          {item.label}
                         </Link>
                       ))}
                     </div>

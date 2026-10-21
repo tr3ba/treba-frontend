@@ -56,6 +56,8 @@
 
 /* Левая колонка со списком категорий */
 .categoryList {
+    max-height: min(720px, calc(100vh - 160px));
+    overflow-y: auto;
     width: 270px;
     background: #ffffff;
     border: 1px solid #dadada;
@@ -85,8 +87,10 @@
 }
 
 .categoryRowIcon {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
+    background: #fff;
+    border-radius: 6px;
     object-fit: contain;
     flex-shrink: 0;
     transition: filter 0.15s ease;
@@ -94,7 +98,7 @@
 
 .categoryRow:hover .categoryRowIcon,
 .categoryRowActive .categoryRowIcon {
-    filter: invert(46%) sepia(97%) saturate(1626%) hue-rotate(360deg) brightness(101%) contrast(101%);
+    opacity: .9;
 }
 
 .categoryRowLabel {
@@ -126,6 +130,11 @@
 
 /* Правая панель с подкатегориями */
 .subcategoriesPanel {
+    max-height: min(720px, calc(100vh - 160px));
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-content: start;
     background: #ffffff;
     border: 1px solid #dadada;
     border-radius: 15px;
@@ -143,6 +152,8 @@
 }
 
 .subcatTitle {
+    display: block;
+    text-decoration: none;
     font-family: "Montserrat", sans-serif;
     font-size: 15px;
     font-weight: 500;
@@ -185,12 +196,12 @@
 
     .subcategoriesPanel {
         width: min(1100px, calc(100vw - 640px));
-        column-count: 3;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 1280px) {
     .subcategoriesPanel {
-        column-count: 2;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
