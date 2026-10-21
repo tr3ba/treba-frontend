@@ -69,7 +69,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     if (!userId) return;
     let active = true;
 
-    getWishlist(userId)
+    getWishlist()
       .then((items) => {
         if (active) setState({ userId, items: [...items].sort(byNewest) });
       })
@@ -115,8 +115,8 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        if (shouldAdd) await addToWishlist(userId, productKey);
-        else await removeFromWishlist(userId, productKey);
+        if (shouldAdd) await addToWishlist(productKey);
+        else await removeFromWishlist(productKey);
       } catch (err) {
         if (shouldAdd) {
           updateItems(userId, (list) => list.filter((item) => item.productKey !== productKey));

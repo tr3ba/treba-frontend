@@ -1,26 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AccountPageShell from "../../../components/account/AccountPageShell";
 import PageTitle from "../../../components/account/PageTitle";
 import EmptyState from "../../../components/account/EmptyState";
+import { getProductsAwaitingReview } from "../../../lib/api/reviews";
+import type { ReviewableProduct } from "../../../types/review";
 import styles from "./page.module.css";
 
 type Tab = "products" | "seller";
 type Filter = "waiting" | "mine";
 
-// Мокові товари, що очікують відгук
-const mockWaitingReview = [
-  { id: 1, title: "Маршрутизатор TP-LINK Archer AX1800 WiFi 6", image: "/products/13.png" },
-  { id: 2, title: "Карта пам'яті Kingston Canvas Go! Plus microSDXC 128GB", image: "/products/15.png" },
-  { id: 3, title: "Бездротові навушники QCY T13 Bluetooth 5.3", image: "/products/16.png" },
-];
-
 export default function ReviewsPage() {
   const [tab, setTab] = useState<Tab>("products");
   const [filter, setFilter] = useState<Filter>("waiting");
+  const [waiting, setWaiting] = useState<ReviewableProduct[]>([]);
 
-  const items = filter === "waiting" ? mockWaitingReview : [];
+  useEffect(() => {
+    let active = true;
+    getProductsAwaitingReview()
+      .then((list) => {
+        if (active) setWaiting(list);
+      })
+      .catch(() => {
+        // не загрузили — остаётся пустой список
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // «Мої відгуки» — эндпоинта на бэке пока нет
+  const items = filter === "waiting" ? waiting : [];
 
   return (
     <AccountPageShell>
@@ -86,7 +97,7 @@ export default function ReviewsPage() {
             <div className={styles.list}>
               {items.map((item) => (
                 <div key={item.id} className={styles.row}>
-                  <img src={item.image} alt="" className={styles.thumb} />
+                  <img src={item.image ?? "/icons/box.svg"} alt="" className={styles.thumb} />
                   <p className={styles.itemTitle}>{item.title}</p>
                   <button type="button" className={styles.reviewButton}>
                     Залишити відгук

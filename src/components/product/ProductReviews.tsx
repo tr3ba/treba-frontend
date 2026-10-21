@@ -3,14 +3,16 @@ import { Review } from "../../types/review";
 
 type ProductReviewsProps = {
   reviews: Review[];
+  /** Всего отзывов (на странице показываем только первые) */
+  total: number;
 };
 
-export default function ProductReviews({ reviews }: ProductReviewsProps) {
+export default function ProductReviews({ reviews, total }: ProductReviewsProps) {
   return (
     <section id="reviews" className={styles.section}>
       <div className={styles.header}>
         <h2 className={styles.title}>
-          Відгуки покупців <span className={styles.count}>{reviews.length}</span>
+          Відгуки покупців <span className={styles.count}>{total}</span>
         </h2>
         <button type="button" className={styles.writeButton}>
           Написати відгук
@@ -24,7 +26,12 @@ export default function ProductReviews({ reviews }: ProductReviewsProps) {
           {reviews.map((review) => (
             <article key={review.id} className={styles.card}>
               <div className={styles.cardHeader}>
-                <span className={styles.author}>{review.author}</span>
+                <span className={styles.author}>
+                  {review.author}
+                  {review.verifiedPurchase && (
+                    <span className={styles.verified}>✓ Перевірена покупка</span>
+                  )}
+                </span>
                 <span className={styles.date}>{review.date}</span>
               </div>
 
@@ -39,6 +46,7 @@ export default function ProductReviews({ reviews }: ProductReviewsProps) {
                 ))}
               </div>
 
+              {review.title && <h3 className={styles.reviewTitle}>{review.title}</h3>}
               <p className={styles.text}>{review.text}</p>
             </article>
           ))}
