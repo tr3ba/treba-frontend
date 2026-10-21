@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import type { CartItem } from "../../context/CartContext";
 import styles from "./CartToast.module.css";
+import Icon from "../common/Icon";
 
 type CartToastProps = {
   item: CartItem | null;
@@ -17,9 +19,9 @@ export default function CartToast({ item, onClose }: CartToastProps) {
     <div className={styles.toast} role="status" aria-live="polite">
       <div className={styles.imageWrap}>
         {item.image ? (
-          <img src={item.image} alt="" className={styles.image} />
+          <Image src={item.image} alt="" width={56} height={56} className={styles.image} />
         ) : (
-          <img src="/icons/catalog.svg" alt="" className={styles.placeholder} />
+          <Icon src="/icons/catalog.svg" alt="" className={styles.placeholder} />
         )}
       </div>
 

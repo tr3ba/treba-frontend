@@ -3,6 +3,7 @@ import Link from "next/link";
 import AddToCartButton from "../cart/AddToCartButton";
 import WishlistButton from "../wishlist/WishlistButton";
 import styles from "./ProductCard.module.css";
+import Icon from "../common/Icon";
 
 type ProductCardProps = {
   id: string;
@@ -50,7 +51,7 @@ export default function ProductCard({
             />
           ) : (
             <div className={styles.imagePlaceholder} aria-hidden="true">
-              <img src="/icons/catalog.svg" alt="" className={styles.imagePlaceholderIcon} />
+              <Icon src="/icons/catalog.svg" alt="" className={styles.imagePlaceholderIcon} />
             </div>
           )}
         </div>

@@ -3,6 +3,7 @@
 import { formatPrice, pluralize } from "../../lib/format";
 import { DELIVERY_PRICE } from "../../lib/delivery";
 import styles from "./CartSummary.module.css";
+import Icon from "../common/Icon";
 
 type CartSummaryProps = {
   totalCount: number;
@@ -75,7 +76,7 @@ export default function CartSummary({
       <ul className={styles.perks}>
         {perks.map((perk) => (
           <li key={perk.text} className={styles.perk}>
-            <img src={perk.icon} alt="" className={styles.perkIcon} />
+            <Icon src={perk.icon} alt="" className={styles.perkIcon} />
             {perk.text}
           </li>
         ))}

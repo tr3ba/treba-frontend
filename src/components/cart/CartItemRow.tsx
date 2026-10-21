@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import Link from "next/link";
 import { CartItem, MAX_QUANTITY, useCart } from "../../context/CartContext";
 import { formatPrice } from "../../lib/format";
 import styles from "./CartItemRow.module.css";
+import Icon from "../common/Icon";
 
 type CartItemRowProps = {
   item: CartItem;
@@ -34,9 +36,9 @@ export default function CartItemRow({ item }: CartItemRowProps) {
   const inStock = item.available !== false;
 
   const image = item.image ? (
-    <img src={item.image} alt={item.title} className={styles.image} />
+    <Image src={item.image} alt={item.title} width={96} height={96} className={styles.image} />
   ) : (
-    <img src="/icons/catalog.svg" alt="" className={styles.placeholder} />
+    <Icon src="/icons/catalog.svg" alt="" className={styles.placeholder} />
   );
 
   return (

@@ -1,4 +1,5 @@
 import styles from "./ProductDeliveryInfo.module.css";
+import Icon from "../common/Icon";
 
 export default function ProductDeliveryInfo() {
   return (
@@ -11,7 +12,7 @@ export default function ProductDeliveryInfo() {
       </p>
 
       <div className={styles.row}>
-        <img src="/icons/box.svg" alt="" className={styles.icon} />
+        <Icon src="/icons/box.svg" alt="" className={styles.icon} />
         <div className={styles.rowText}>
           <span className={styles.rowTitle}>Самовивіз з відділень</span>
           <span className={styles.rowSubtitle}>Найближчим часом після оформлення</span>
@@ -19,7 +20,7 @@ export default function ProductDeliveryInfo() {
       </div>
 
       <div className={styles.row}>
-        <img src="/icons/delivery.svg" alt="" className={styles.icon} />
+        <Icon src="/icons/delivery.svg" alt="" className={styles.icon} />
         <div className={styles.rowText}>
           <span className={styles.rowTitle}>Доставка кур&apos;єром</span>
           <span className={styles.rowSubtitle}>За тарифами перевізника</span>
