@@ -28,21 +28,33 @@ export default function CartItemRow({ item }: CartItemRowProps) {
 
   const lineTotal = item.price * item.quantity;
   const lineOldTotal = item.oldPrice ? item.oldPrice * item.quantity : null;
+  // slug неизвестен (товар добавили с другого устройства) — без ссылки
+  const href = item.slug ? `/product/${item.slug}` : null;
+
+  const image = item.image ? (
+    <img src={item.image} alt={item.title} className={styles.image} />
+  ) : (
+    <img src="/icons/catalog.svg" alt="" className={styles.placeholder} />
+  );
 
   return (
     <li className={styles.row}>
-      <Link href={`/product/${item.id}`} className={styles.imageWrap}>
-        {item.image ? (
-          <img src={item.image} alt={item.title} className={styles.image} />
-        ) : (
-          <img src="/icons/catalog.svg" alt="" className={styles.placeholder} />
-        )}
-      </Link>
+      {href ? (
+        <Link href={href} className={styles.imageWrap}>
+          {image}
+        </Link>
+      ) : (
+        <div className={styles.imageWrap}>{image}</div>
+      )}
 
       <div className={styles.info}>
-        <Link href={`/product/${item.id}`} className={styles.title}>
-          {item.title}
-        </Link>
+        {href ? (
+          <Link href={href} className={styles.title}>
+            {item.title}
+          </Link>
+        ) : (
+          <span className={styles.title}>{item.title}</span>
+        )}
 
         <p className={styles.stock}>
           <span className={styles.stockDot} aria-hidden="true" />
