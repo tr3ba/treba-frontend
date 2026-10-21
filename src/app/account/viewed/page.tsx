@@ -37,6 +37,7 @@ export default function ViewedPage() {
             <ProductCard
               key={product.id}
               id={product.id}
+              backendId={product.backendId}
               title={product.title}
               price={product.price}
               oldPrice={product.oldPrice}
