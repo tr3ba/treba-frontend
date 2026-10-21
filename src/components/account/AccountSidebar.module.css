@@ -37,6 +37,29 @@
     min-width: 0;
 }
 
+.adminEntry {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: 10px;
+    background: #ff6e2a;
+    color: #fff;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.adminEntry:hover {
+    background: #e85c1b;
+}
+
+.adminEntry:focus-visible {
+    outline: 3px solid #1d20fc;
+    outline-offset: 3px;
+}
+
 .userName {
     margin: 0;
     font-family: "Montserrat", sans-serif;

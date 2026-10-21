@@ -72,7 +72,12 @@ test("support session uses real server authentication without exposing credentia
   await t.test("admin entry checks the staff role and only redirects with a temporary code", async () => {
     const state = "A".repeat(64); const path = "/shop-api/admin-entry?state=" + state;
     assert.equal((await fetch(origin + "/shop-api/admin-entry", { redirect: "manual" })).status, 400);
-    const anonymous = await fetch(origin + path, { redirect: "manual" }); assert.equal(anonymous.status, 307); assert.equal(new URL(anonymous.headers.get("location")).pathname, "/login");
+    const anonymous = await fetch(origin + path, { redirect: "manual", headers: { "X-Forwarded-Host": "treba.duckdns.org", "X-Forwarded-Proto": "https" } });
+    assert.equal(anonymous.status, 307);
+    const anonymousLocation = anonymous.headers.get("location"); assert.ok(anonymousLocation.startsWith("/login?"));
+    const publicLogin = new URL(anonymousLocation, "https://treba.duckdns.org");
+    assert.equal(publicLogin.origin, "https://treba.duckdns.org"); assert.equal(publicLogin.pathname, "/login");
+    assert.equal(publicLogin.searchParams.get("next"), path); assert.match(anonymous.headers.get("cache-control"), /no-store/);
     assert.equal((await fetch(origin + path, { headers: { Cookie: cookie }, redirect: "manual" })).status, 403);
     const login = await post("/shop-api/session", { action: "login", email: "staff@example.test", password: "fixture-only" }); const staff = cookieJar(login);
     const profile = await fetch(origin + "/shop-api/session", { headers: { Cookie: staff } }); assert.equal((await profile.json()).user.role, "Manager");
