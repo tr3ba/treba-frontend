@@ -132,6 +132,7 @@ export default async function Home() {
           <ProductCard
             id={product.id}
             backendId={product.backendId}
+            variantId={product.variantId}
             title={product.title}
             price={product.price}
             oldPrice={product.oldPrice}
@@ -170,6 +171,7 @@ export default async function Home() {
     key={product.id}
     id={product.id}
     backendId={product.backendId}
+    variantId={product.variantId}
     title={product.title}
     price={product.price}
     oldPrice={product.oldPrice}

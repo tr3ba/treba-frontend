@@ -4,10 +4,10 @@ export type ProductCharacteristic = {
   value: string;
 };
 
-// Варіант товару 
+// Варіант товару
 export type ProductVariant = {
   id: string;
-  label: string; 
+  label: string;
   image: string;
   colorHex?: string;
   available: boolean;
@@ -23,7 +23,7 @@ export type Seller = {
   ratingCount?: number;
 };
 
-// Супутній товар-аксесуар 
+// Супутній товар-аксесуар
 export type ProductAccessory = {
   id: string;
   title: string;
@@ -32,7 +32,7 @@ export type ProductAccessory = {
   oldPrice?: string | null;
 };
 
-// Додаткова послуга 
+// Додаткова послуга
 export type ProductService = {
   id: string;
   title: string;
@@ -43,6 +43,8 @@ export type ProductService = {
 export type Product = {
   id: string;
   backendId?: string;
+  /** Guid варианта по умолчанию — нужен корзине и заказу на бэке */
+  variantId?: string;
   title: string;
   price: string;
   oldPrice?: string | null;

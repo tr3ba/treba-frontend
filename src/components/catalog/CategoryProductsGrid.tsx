@@ -20,6 +20,7 @@ export default function CategoryProductsGrid({ title, products }: CategoryProduc
             key={product.id}
             id={product.id}
             backendId={product.backendId}
+            variantId={product.variantId}
             title={product.title}
             price={product.price}
             oldPrice={product.oldPrice}

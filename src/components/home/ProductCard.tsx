@@ -8,6 +8,8 @@ type ProductCardProps = {
   id: string;
   /** Guid товара на бэке — нужен списку бажань */
   backendId?: string;
+  /** Guid варианта по умолчанию — нужен корзине на бэке */
+  variantId?: string;
   title: string;
   price: string;
   image?: string;
@@ -22,6 +24,7 @@ type ProductCardProps = {
 export default function ProductCard({
   id,
   backendId,
+  variantId,
   title,
   price,
   image,
@@ -77,6 +80,7 @@ export default function ProductCard({
         <AddToCartButton
           product={{
             id,
+            variantId,
             title,
             price,
             image,

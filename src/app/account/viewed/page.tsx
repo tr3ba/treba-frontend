@@ -38,6 +38,7 @@ export default function ViewedPage() {
               key={product.id}
               id={product.id}
               backendId={product.backendId}
+              variantId={product.variantId}
               title={product.title}
               price={product.price}
               oldPrice={product.oldPrice}

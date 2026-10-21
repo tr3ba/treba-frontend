@@ -1,7 +1,7 @@
 import type { Product } from "./product";
 
 // Елемент списку бажань (обраного).
-// productKey — backendId товару (Guid) при роботі з бэком, id (slug) — на моках.
+// productKey — Guid товару на бэке (Product.backendId).
 // Получать ключ из товара — только через getWishlistKey() из lib/api/wishlist.ts.
 export type WishlistItem = {
   productKey: string;
@@ -12,7 +12,7 @@ export type WishlistItem = {
 /** Данные товара для карточки на странице списка бажань (без описания и характеристик). */
 export type WishlistCardProduct = Pick<
   Product,
-  "id" | "backendId" | "title" | "price" | "oldPrice" | "image" | "rating" | "isPromo"
+  "id" | "backendId" | "variantId" | "title" | "price" | "oldPrice" | "image" | "rating" | "isPromo"
 >;
 
 // ---------- DTO бэка: GET /api/v1/wishlist ----------

@@ -6,6 +6,7 @@ import { addViewedProduct } from "../../lib/api/viewed";
 type ViewedProductTrackerProps = {
   id: string;
   backendId?: string;
+  variantId?: string;
   title: string;
   price: string;
   oldPrice?: string | null;
@@ -18,6 +19,7 @@ type ViewedProductTrackerProps = {
 export default function ViewedProductTracker({
   id,
   backendId,
+  variantId,
   title,
   price,
   oldPrice,
@@ -26,8 +28,8 @@ export default function ViewedProductTracker({
   isPromo,
 }: ViewedProductTrackerProps) {
   useEffect(() => {
-    addViewedProduct({ id, backendId, title, price, oldPrice, image, rating, isPromo });
-  }, [id, backendId, title, price, oldPrice, image, rating, isPromo]);
+    addViewedProduct({ id, backendId, variantId, title, price, oldPrice, image, rating, isPromo });
+  }, [id, backendId, variantId, title, price, oldPrice, image, rating, isPromo]);
 
   return null;
 }
