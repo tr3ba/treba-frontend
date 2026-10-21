@@ -3,14 +3,18 @@ import Link from "next/link";
 import AddToCartButton from "../cart/AddToCartButton";
 import WishlistButton from "../wishlist/WishlistButton";
 import styles from "./ProductCard.module.css";
+import Icon from "../common/Icon";
 
 type ProductCardProps = {
   id: string;
   /** Guid товара на бэке — нужен списку бажань */
   backendId?: string;
+  /** Guid варианта по умолчанию — нужен корзине на бэке */
+  variantId?: string;
   title: string;
   price: string;
   image?: string;
+  /** Середня оцінка; немає даних — рядок рейтингу не показується */
   rating?: number;
   oldPrice?: string | null;
   isPromo?: boolean;
@@ -21,14 +25,17 @@ type ProductCardProps = {
 export default function ProductCard({
   id,
   backendId,
+  variantId,
   title,
   price,
   image,
-  rating = 4.5,
+  rating,
   oldPrice = null,
   isPromo = false,
   fluid = false,
 }: ProductCardProps) {
+  const hasRating = typeof rating === "number" && rating > 0;
+
   return (
     <article className={fluid ? `${styles.card} ${styles.cardFluid}` : styles.card}>
       {/* Посилання розтягнуте на всю картку через ::after, кнопки — поверх нього */}
@@ -44,7 +51,7 @@ export default function ProductCard({
             />
           ) : (
             <div className={styles.imagePlaceholder} aria-hidden="true">
-              <img src="/icons/catalog.svg" alt="" className={styles.imagePlaceholderIcon} />
+              <Icon src="/icons/catalog.svg" alt="" className={styles.imagePlaceholderIcon} />
             </div>
           )}
         </div>
@@ -54,10 +61,12 @@ export default function ProductCard({
 
       <WishlistButton product={{ id, backendId }} size="sm" className={styles.wishlist} />
 
-      <div className={styles.ratingRow}>
-        <span className={styles.star}>★</span>
-        <span className={styles.rating}>{rating}</span>
-      </div>
+      {hasRating && (
+        <div className={styles.ratingRow} aria-label={`Рейтинг ${rating} з 5`}>
+          <span className={styles.star}>★</span>
+          <span className={styles.rating}>{rating}</span>
+        </div>
+      )}
 
       <div className={styles.bottomRow}>
         <div className={styles.priceBlock}>
@@ -72,6 +81,7 @@ export default function ProductCard({
         <AddToCartButton
           product={{
             id,
+            variantId,
             title,
             price,
             image,

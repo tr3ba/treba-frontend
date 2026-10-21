@@ -4,6 +4,7 @@ import AccountPageShell from "../../../components/account/AccountPageShell";
 import PageTitle from "../../../components/account/PageTitle";
 import InlineCheckRow from "../../../components/account/InlineCheckRow";
 import styles from "./page.module.css";
+import Icon from "../../../components/common/Icon";
 
 export default function ParcelsPage() {
   return (
@@ -22,7 +23,7 @@ export default function ParcelsPage() {
       <div className={styles.infoGrid}>
         <div className={styles.infoCard}>
           <span className={styles.infoIconWrap}>
-            <img src="/icons/shop.svg" alt="" className={styles.infoIcon} />
+            <Icon src="/icons/shop.svg" alt="" className={styles.infoIcon} />
           </span>
           <div>
             <p className={styles.infoTitle}>Магазини TREBA по всій Україні</p>
@@ -34,7 +35,7 @@ export default function ParcelsPage() {
 
         <div className={styles.infoCard}>
           <span className={styles.infoIconWrap}>
-            <img src="/icons/delivery.svg" alt="" className={styles.infoIcon} />
+            <Icon src="/icons/delivery.svg" alt="" className={styles.infoIcon} />
           </span>
           <div>
             <p className={styles.infoTitle}>Найкращий сервіс</p>

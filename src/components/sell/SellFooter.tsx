@@ -1,5 +1,6 @@
 import Link from "next/link";
 import styles from "./SellFooter.module.css";
+import Icon from "../common/Icon";
 
 // Короткий футер лендинга
 export default function SellFooter() {
@@ -8,7 +9,7 @@ export default function SellFooter() {
       <div className={styles.inner}>
         <div className={styles.brand}>
           <Link href="/" aria-label="TREBA — на головну">
-            <img src="/logo/MainLogo.svg" alt="TREBA" className={styles.logo} />
+            <Icon src="/logo/MainLogo.svg" alt="TREBA" className={styles.logo} />
           </Link>
           <p className={styles.tagline}>
             Український маркетплейс. Продавайте разом із нами.

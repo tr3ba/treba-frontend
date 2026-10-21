@@ -42,6 +42,8 @@ export type ApiCatalogProduct = {
   storeId: string;
   categoryId: string;
   brandId: string;
+  /** Вариант по умолчанию — его кладём в корзину и заказ. Нет — у товара нет активного варианта (или старый бэк). */
+  productVariantId?: string | null;
   name: string;
   slug: string;
   categoryName: string;

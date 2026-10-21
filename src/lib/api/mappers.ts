@@ -4,7 +4,7 @@
 import type { ApiCatalogProduct, ApiCategoryTree } from "../../types/api";
 import type { Category } from "../../types/category";
 import type { Product } from "../../types/product";
-import { categories as mockCategories } from "../../data/categories";
+import { categories as staticCategories } from "../../data/categories";
 import { formatPrice } from "../format";
 import { resolveMediaUrl } from "./client";
 
@@ -21,28 +21,26 @@ function activeSorted(nodes: ApiCategoryTree[]): ApiCategoryTree[] {
 // ---------- Категории ----------
 
 /**
- * Узел верхнего уровня -> наша Category.
- * Уровень 2 (children) -> колонки subcategories, уровень 3 -> пункты колонок.
- * Иконки и картинки колонок на бэке пока не хранятся — если их нет,
- * берём из мок-категории с таким же slug (и мок-колонки с таким же названием).
+ * Узел любого уровня -> Category с прямыми потомками и хлебными крошками.
+ * Изображения из API имеют приоритет; локальные иконки — запасной вариант.
  */
 export function mapCategory(node: ApiCategoryTree, ancestors: ApiCategoryTree[] = []): Category {
-  const mock = mockCategories.find((category) => category.id === node.slug);
+  const local = staticCategories.find((category) => category.id === node.slug);
 
   return {
     id: node.slug,
     label: node.name,
     backendId: node.id,
     path: ancestors.map((parent) => ({ id: parent.slug, label: parent.name })),
-    icon: resolveMediaUrl(node.imageUrl) ?? mock?.icon ?? DEFAULT_CATEGORY_ICON,
+    icon: resolveMediaUrl(node.imageUrl) ?? local?.icon ?? DEFAULT_CATEGORY_ICON,
     description: node.description ?? undefined,
     subcategories: activeSorted(node.children).map((column) => {
-      const mockColumn = mock?.subcategories?.find((item) => item.title === column.name);
+      const localColumn = local?.subcategories?.find((item) => item.title === column.name);
       return {
         title: column.name,
         id: column.slug,
         itemLinks: activeSorted(column.children).map((item) => ({ id: item.slug, label: item.name })),
-        image: resolveMediaUrl(column.imageUrl) ?? mockColumn?.image,
+        image: resolveMediaUrl(column.imageUrl) ?? localColumn?.image,
         items: activeSorted(column.children).map((item) => item.name),
       };
     }),
@@ -97,6 +95,7 @@ export function mapCatalogProduct(
   return {
     id: dto.slug,
     backendId: dto.id,
+    variantId: dto.productVariantId ?? undefined,
     title: dto.name,
     price: formatPrice(dto.price),
     oldPrice: hasDiscount ? formatPrice(oldPrice) : null,

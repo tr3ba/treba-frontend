@@ -1,5 +1,6 @@
 import Link from "next/link";
 import styles from "./Footer.module.css";
+import Icon from "../common/Icon";
 
 type FooterLink = {
   label: string;
@@ -66,7 +67,7 @@ export default function Footer() {
                   className={styles.socialIcon}
                   aria-label={social.name}
                 >
-                  <img src={social.icon} alt={social.name} />
+                  <Icon src={social.icon} alt={social.name} />
                 </a>
               ))}
             </div>

@@ -1,14 +1,13 @@
-
 import { notFound } from "next/navigation";
 import styles from "./page.module.css";
 import Header from "../../../components/layout/Header";
 import Footer from "../../../components/home/Footer";
 import ProductBreadcrumbs from "../../../components/product/ProductBreadcrumbs";
-import ProductCarousel from "../../../components/product/ProductCarousel";
+import ViewedProductsCarousel from "../../../components/product/ViewedProductsCarousel";
 import CategorySubcategories from "../../../components/catalog/CategorySubcategories";
 import CategoryProductsGrid from "../../../components/catalog/CategoryProductsGrid";
 import { getCategoryById } from "../../../lib/api/categories";
-import { getProductsByCategory, getViewedProducts } from "../../../lib/api/products";
+import { getProductsByCategory } from "../../../lib/api/products";
 
 type CategoryPageProps = {
   params: Promise<{ categoryId: string }>;
@@ -22,10 +21,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound();
   }
 
-  const [products, viewed] = await Promise.all([
-    getProductsByCategory(category.id, 12),
-    getViewedProducts(""),
-  ]);
+  const products = await getProductsByCategory(category.id, 12);
 
   return (
     <>
@@ -45,7 +41,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
         <CategoryProductsGrid title="Популярні товари" products={products} />
 
-        <ProductCarousel title="Переглянуті товари" products={viewed} />
+        <ViewedProductsCarousel />
       </main>
 
       <Footer />

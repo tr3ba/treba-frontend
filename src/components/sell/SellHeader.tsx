@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import styles from "./SellHeader.module.css";
+import Icon from "../common/Icon";
 
 const NAV_LINKS = [
   { href: "#advantages", label: "Переваги" },
@@ -28,7 +29,7 @@ export default function SellHeader() {
     <header className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}>
       <div className={styles.inner}>
         <Link href="/" className={styles.logoLink} aria-label="TREBA — на головну">
-          <img src="/logo/MainLogo.svg" alt="TREBA" className={styles.logo} />
+          <Icon src="/logo/MainLogo.svg" alt="TREBA" className={styles.logo} />
           <span className={styles.logoTag}>для продавців</span>
         </Link>
 

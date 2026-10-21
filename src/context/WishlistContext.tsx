@@ -19,7 +19,7 @@ import {
   removeFromWishlist,
   WishlistError,
 } from "../lib/api/wishlist";
-import WishlistToast from "../components/wishlist/WishlistToast";
+import ErrorToast from "../components/layout/ErrorToast";
 import type { Product } from "../types/product";
 import type { WishlistItem } from "../types/wishlist";
 
@@ -69,7 +69,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     if (!userId) return;
     let active = true;
 
-    getWishlist(userId)
+    getWishlist()
       .then((items) => {
         if (active) setState({ userId, items: [...items].sort(byNewest) });
       })
@@ -115,8 +115,8 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        if (shouldAdd) await addToWishlist(userId, productKey);
-        else await removeFromWishlist(userId, productKey);
+        if (shouldAdd) await addToWishlist(productKey);
+        else await removeFromWishlist(productKey);
       } catch (err) {
         if (shouldAdd) {
           updateItems(userId, (list) => list.filter((item) => item.productKey !== productKey));
@@ -170,7 +170,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   return (
     <WishlistContext.Provider value={value}>
       {children}
-      <WishlistToast message={error} onClose={clearError} />
+      <ErrorToast message={error} onClose={clearError} />
     </WishlistContext.Provider>
   );
 }

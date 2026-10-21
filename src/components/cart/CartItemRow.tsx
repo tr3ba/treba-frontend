@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import Link from "next/link";
 import { CartItem, MAX_QUANTITY, useCart } from "../../context/CartContext";
 import { formatPrice } from "../../lib/format";
 import styles from "./CartItemRow.module.css";
+import Icon from "../common/Icon";
 
 type CartItemRowProps = {
   item: CartItem;
@@ -28,25 +30,39 @@ export default function CartItemRow({ item }: CartItemRowProps) {
 
   const lineTotal = item.price * item.quantity;
   const lineOldTotal = item.oldPrice ? item.oldPrice * item.quantity : null;
+  // slug неизвестен (товар добавили с другого устройства) — без ссылки
+  const href = item.slug ? `/product/${item.slug}` : null;
+  // available приходит только с бэка; у гостя считаем товар доступным
+  const inStock = item.available !== false;
+
+  const image = item.image ? (
+    <Image src={item.image} alt={item.title} width={96} height={96} className={styles.image} />
+  ) : (
+    <Icon src="/icons/catalog.svg" alt="" className={styles.placeholder} />
+  );
 
   return (
     <li className={styles.row}>
-      <Link href={`/product/${item.id}`} className={styles.imageWrap}>
-        {item.image ? (
-          <img src={item.image} alt={item.title} className={styles.image} />
-        ) : (
-          <img src="/icons/catalog.svg" alt="" className={styles.placeholder} />
-        )}
-      </Link>
+      {href ? (
+        <Link href={href} className={styles.imageWrap}>
+          {image}
+        </Link>
+      ) : (
+        <div className={styles.imageWrap}>{image}</div>
+      )}
 
       <div className={styles.info}>
-        <Link href={`/product/${item.id}`} className={styles.title}>
-          {item.title}
-        </Link>
+        {href ? (
+          <Link href={href} className={styles.title}>
+            {item.title}
+          </Link>
+        ) : (
+          <span className={styles.title}>{item.title}</span>
+        )}
 
-        <p className={styles.stock}>
+        <p className={`${styles.stock} ${inStock ? "" : styles.stockOut}`}>
           <span className={styles.stockDot} aria-hidden="true" />
-          Є в наявності
+          {inStock ? "Є в наявності" : "Немає в наявності"}
         </p>
 
         <p className={styles.unitPrice}>

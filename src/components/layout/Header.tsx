@@ -6,6 +6,7 @@ import HeaderCartButton from "./HeaderCartButton";
 import HeaderWishlistButton from "./HeaderWishlistButton";
 import MobileCatalog from "./MobileCatalog";
 import styles from "./Header.module.css";
+import Icon from "../common/Icon";
 
 // Синій header + верхня промо-плашка
 export default function Header() {
@@ -21,7 +22,7 @@ export default function Header() {
           <MobileCatalog />
 
           <Link href="/" className={styles.logoLink}>
-            <img src="/logo/MainLogo.svg" alt="Treba" className={styles.logo} />
+            <Icon src="/logo/MainLogo.svg" alt="Treba" className={styles.logo} />
           </Link>
 
           {/* на планшете и телефоне каталог открывается через бургер */}

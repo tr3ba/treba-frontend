@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuth } from "../../context/AuthContext";
 import styles from "./UserMenu.module.css";
 import { adminOrigin, canOpenAdmin } from "../../lib/admin";
+import Icon from "../common/Icon";
 
 export default function UserMenu() {
   const { user, isLoading, logout } = useAuth();
@@ -28,8 +29,8 @@ export default function UserMenu() {
     return (
       <button className={styles.actionButton} aria-label="Профіль">
         <span className={`${styles.iconSwap} ${styles.userIcon}`}>
-          <img src="/icons/user.svg" alt="" className={styles.iconOutline} />
-          <img src="/icons/user1.svg" alt="" className={styles.iconFilled} />
+          <Icon src="/icons/user.svg" alt="" className={styles.iconOutline} />
+          <Icon src="/icons/user1.svg" alt="" className={styles.iconFilled} />
         </span>
       </button>
     );
@@ -39,8 +40,8 @@ export default function UserMenu() {
     return (
       <Link href="/login" className={styles.actionButton} aria-label="Увійти">
         <span className={`${styles.iconSwap} ${styles.userIcon}`}>
-          <img src="/icons/user.svg" alt="" className={styles.iconOutline} />
-          <img src="/icons/user1.svg" alt="" className={styles.iconFilled} />
+          <Icon src="/icons/user.svg" alt="" className={styles.iconOutline} />
+          <Icon src="/icons/user1.svg" alt="" className={styles.iconFilled} />
         </span>
       </Link>
     );
@@ -54,8 +55,8 @@ export default function UserMenu() {
         onClick={() => setIsOpen((prev) => !prev)}
       >
         <span className={`${styles.iconSwap} ${styles.userIcon}`}>
-          <img src="/icons/user.svg" alt="" className={styles.iconOutline} />
-          <img src="/icons/user1.svg" alt="" className={styles.iconFilled} />
+          <Icon src="/icons/user.svg" alt="" className={styles.iconOutline} />
+          <Icon src="/icons/user1.svg" alt="" className={styles.iconFilled} />
         </span>
       </button>
 

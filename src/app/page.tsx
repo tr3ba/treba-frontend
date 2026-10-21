@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import styles from "./page.module.css";
 import ProductCard from "../components/home/ProductCard";
@@ -5,6 +6,7 @@ import BannerSlider from "../components/home/BannerSlider";
 import FooterAbout from "../components/home/FooterAbout";
 import Footer from "../components/home/Footer";
 import Header from "../components/layout/Header";
+import Icon from "../components/common/Icon";
 import { getBestOffersProducts, getRecommendedProducts } from "../lib/api/products";
 import { getCategories } from "../lib/api/categories";
 import React from "react";
@@ -29,19 +31,19 @@ export default async function Home() {
             <nav className={styles.categoryNav} aria-label="Категорії">
   {categories.map((category) => (
     <Link key={category.id} className={styles.categoryItem} href={`/catalog/${category.id}`}>
-      <img src={category.icon} alt="" className={styles.categoryIcon} />
+      <Icon src={category.icon} alt="" className={styles.categoryIcon} />
       <span className={styles.categoryText}>{category.label}</span>
     </Link>
   ))}
 
   {}
   <Link className={styles.categoryItem} href="/account/messages?new=chat">
-    <img src="/icons/chat.svg" alt="" className={styles.categoryIcon} />
+    <Icon src="/icons/chat.svg" alt="" className={styles.categoryIcon} />
     <span className={styles.categoryText}>Чат з TREBA</span>
   </Link>
 
   <a className={styles.categoryItem} href="#">
-    <img src="/icons/box.svg" alt="" className={styles.categoryIcon} />
+    <Icon src="/icons/box.svg" alt="" className={styles.categoryIcon} />
     <span className={styles.categoryText}>Відстежити посилку</span>
   </a>
 </nav>
@@ -63,16 +65,16 @@ export default async function Home() {
               <p className={styles.socialTitle}>Ми в соціальних мережах</p>
               <div className={styles.socialIconsRow}>
                 <a href="#" className={styles.socialIcon}>
-                  <img src="/icons/facebook.svg" alt="Facebook" />
+                  <Icon src="/icons/facebook.svg" alt="Facebook" />
                 </a>
                 <a href="#" className={styles.socialIcon}>
-                  <img src="/icons/instagram.svg" alt="Instagram" />
+                  <Icon src="/icons/instagram.svg" alt="Instagram" />
                 </a>
                 <a href="#" className={styles.socialIcon}>
-                  <img src="/icons/youtube.svg" alt="YouTube" />
+                  <Icon src="/icons/youtube.svg" alt="YouTube" />
                 </a>
                 <a href="#" className={styles.socialIcon}>
-                  <img src="/icons/TikTok.svg" alt="TikTok" />
+                  <Icon src="/icons/TikTok.svg" alt="TikTok" />
                 </a>
               </div>
             </section>
@@ -88,7 +90,7 @@ export default async function Home() {
 <section className={styles.bannerBadges}>
   <div className={styles.bannerBadge}>
     <div className={styles.badgeIconWrapper}>
-      <img src="/icons/track.svg" alt="" className={styles.badgeIcon} />
+      <Icon src="/icons/track.svg" alt="" className={styles.badgeIcon} />
     </div>
     <div className={styles.badgeTextWrapper}>
       <p className={styles.badgeTitle}>Доставка</p>
@@ -98,7 +100,7 @@ export default async function Home() {
 
   <div className={styles.bannerBadge}>
     <div className={styles.badgeIconWrapper}>
-      <img src="/icons/return.svg" alt="" className={styles.badgeIcon} />
+      <Icon src="/icons/return.svg" alt="" className={styles.badgeIcon} />
     </div>
     <div className={styles.badgeTextWrapper}>
       <p className={styles.badgeTitle}>Повернення</p>
@@ -108,7 +110,7 @@ export default async function Home() {
 
   <div className={styles.bannerBadge}>
     <div className={styles.badgeIconWrapper}>
-      <img src="/icons/warranty.svg" alt="" className={styles.badgeIcon} />
+      <Icon src="/icons/warranty.svg" alt="" className={styles.badgeIcon} />
     </div>
     <div className={styles.badgeTextWrapper}>
       <p className={styles.badgeTitle}>Гарантія</p>
@@ -132,6 +134,7 @@ export default async function Home() {
           <ProductCard
             id={product.id}
             backendId={product.backendId}
+            variantId={product.variantId}
             title={product.title}
             price={product.price}
             oldPrice={product.oldPrice}
@@ -142,7 +145,14 @@ export default async function Home() {
           />
           {index === 4 && (
             <div className={styles.promoCard}>
-              <img src="/banners/card-banner.png" alt="Літній чіназес" className={styles.promoCardImage} />
+              <Image
+                src="/banners/card-banner.png"
+                alt="Літній чіназес"
+                width={434}
+                height={560}
+                sizes="(max-width: 768px) 50vw, 217px"
+                className={styles.promoCardImage}
+              />
             </div>
           )}
         </React.Fragment>
@@ -151,9 +161,12 @@ export default async function Home() {
   )}
 </section>
           <section className={styles.secondBannerSection}>
-  <img
+  <Image
     src="/banners/second-banner.png"
     alt="Другий банер"
+    width={1384}
+    height={184}
+    sizes="(max-width: 1440px) 100vw, 1384px"
     className={styles.secondBanner}
   />
           </section>
@@ -170,6 +183,7 @@ export default async function Home() {
     key={product.id}
     id={product.id}
     backendId={product.backendId}
+    variantId={product.variantId}
     title={product.title}
     price={product.price}
     oldPrice={product.oldPrice}

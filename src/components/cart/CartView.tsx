@@ -1,49 +1,32 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import { pluralize } from "../../lib/format";
 import CartItemRow from "./CartItemRow";
 import CartSummary from "./CartSummary";
 import styles from "./CartView.module.css";
-
-const FAKE_CHECKOUT_DELAY = 900;
-
-// Імітація номера замовлення, доки немає бекенду
-function generateOrderNumber() {
-  return String(Math.floor(100000000 + Math.random() * 900000000));
-}
+import Icon from "../common/Icon";
 
 export default function CartView() {
+  const router = useRouter();
+  const { user } = useAuth();
   const { items, isReady, totalCount, totalPrice, totalOldPrice, clearCart } = useCart();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [orderNumber, setOrderNumber] = useState<string | null>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
-
+  // Оформлення — лише для тих, хто увійшов; гостя ведемо на вхід і назад на /checkout
   function handleCheckout() {
-    setIsSubmitting(true);
-    timerRef.current = setTimeout(() => {
-      setOrderNumber(generateOrderNumber());
-      clearCart();
-      setIsSubmitting(false);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }, FAKE_CHECKOUT_DELAY);
+    router.push(user ? "/checkout" : "/login?next=/checkout");
   }
 
   function handleClear() {
     if (window.confirm("Видалити всі товари з кошика?")) {
-      clearCart();
+      void clearCart();
     }
   }
 
-  // Поки кошик читається з localStorage — заглушка, щоб не блимав порожній стан
+  // Поки кошик завантажується — заглушка, щоб не блимав порожній стан
   if (!isReady) {
     return (
       <div className={styles.layout} aria-busy="true">
@@ -53,32 +36,11 @@ export default function CartView() {
     );
   }
 
-  if (orderNumber) {
-    return (
-      <section className={styles.stateCard}>
-        <div className={`${styles.stateIcon} ${styles.stateIconSuccess}`}>✓</div>
-        <h2 className={styles.stateTitle}>Дякуємо за замовлення!</h2>
-        <p className={styles.stateText}>
-          Замовлення <strong>№ {orderNumber}</strong> прийнято. Ми надішлемо підтвердження та
-          інформацію про доставку найближчим часом.
-        </p>
-        <div className={styles.stateActions}>
-          <Link href="/" className={styles.primaryButton}>
-            Продовжити покупки
-          </Link>
-          <Link href="/account/orders" className={styles.secondaryButton}>
-            Мої замовлення
-          </Link>
-        </div>
-      </section>
-    );
-  }
-
   if (items.length === 0) {
     return (
       <section className={styles.stateCard}>
         <div className={styles.stateIcon}>
-          <img src="/icons/shop.svg" alt="" className={styles.stateIconImg} />
+          <Icon src="/icons/shop.svg" alt="" className={styles.stateIconImg} />
         </div>
         <h2 className={styles.stateTitle}>Кошик порожній</h2>
         <p className={styles.stateText}>
@@ -116,7 +78,6 @@ export default function CartView() {
         totalCount={totalCount}
         totalPrice={totalPrice}
         totalOldPrice={totalOldPrice}
-        isSubmitting={isSubmitting}
         onCheckout={handleCheckout}
       />
     </div>

@@ -1,31 +1,32 @@
 "use client";
 
 import { formatPrice, pluralize } from "../../lib/format";
+import { DELIVERY_PRICE } from "../../lib/delivery";
 import styles from "./CartSummary.module.css";
+import Icon from "../common/Icon";
 
 type CartSummaryProps = {
   totalCount: number;
   totalPrice: number;
   totalOldPrice: number;
-  isSubmitting: boolean;
   onCheckout: () => void;
 };
 
 const perks = [
-  { icon: "/icons/delivery.svg", text: "Безкоштовна доставка першого замовлення" },
+  { icon: "/icons/delivery.svg", text: "Доставка по всій Україні" },
   { icon: "/icons/return.svg", text: "14 днів на повернення товару" },
   { icon: "/icons/warranty.svg", text: "Офіційна гарантія від продавця" },
 ];
 
-// Підсумок замовлення (права колонка)
+// Підсумок замовлення (права колонка). Точну суму рахує бекенд під час оформлення.
 export default function CartSummary({
   totalCount,
   totalPrice,
   totalOldPrice,
-  isSubmitting,
   onCheckout,
 }: CartSummaryProps) {
   const discount = Math.max(0, totalOldPrice - totalPrice);
+  const total = totalPrice + DELIVERY_PRICE;
   const bonus = Math.round(totalPrice * 0.02);
 
   return (
@@ -49,27 +50,22 @@ export default function CartSummary({
 
         <div className={styles.row}>
           <dt>Доставка</dt>
-          <dd className={styles.free}>Безкоштовно</dd>
+          <dd>{formatPrice(DELIVERY_PRICE)} ₴</dd>
         </div>
       </dl>
 
       <div className={styles.totalRow}>
         <span className={styles.totalLabel}>До сплати</span>
         <span className={styles.totalValue}>
-          {formatPrice(totalPrice)}
+          {formatPrice(total)}
           <span className={styles.currency}>₴</span>
         </span>
       </div>
 
       {bonus > 0 && <p className={styles.bonus}>+ {bonus} бонусних ₴ на рахунок після покупки</p>}
 
-      <button
-        type="button"
-        className={styles.checkout}
-        onClick={onCheckout}
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? "Оформлюємо…" : "Оформити замовлення"}
+      <button type="button" className={styles.checkout} onClick={onCheckout}>
+        Оформити замовлення
       </button>
 
       <p className={styles.terms}>
@@ -80,7 +76,7 @@ export default function CartSummary({
       <ul className={styles.perks}>
         {perks.map((perk) => (
           <li key={perk.text} className={styles.perk}>
-            <img src={perk.icon} alt="" className={styles.perkIcon} />
+            <Icon src={perk.icon} alt="" className={styles.perkIcon} />
             {perk.text}
           </li>
         ))}

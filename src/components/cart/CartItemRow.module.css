@@ -31,7 +31,7 @@
     transition: transform 0.2s ease;
 }
 
-.imageWrap:hover .image {
+a.imageWrap:hover .image {
     transform: scale(1.06);
 }
 
@@ -60,7 +60,8 @@
     transition: color 0.15s ease;
 }
 
-.title:hover {
+/* лише назва-посилання підсвічується */
+a.title:hover {
     color: #ff6e2a;
 }
 
@@ -78,6 +79,15 @@
     height: 7px;
     border-radius: 50%;
     background: #47d328;
+}
+
+/* товар знято з продажу */
+.stockOut {
+    color: #8a8578;
+}
+
+.stockOut .stockDot {
+    background: #cfcac0;
 }
 
 .unitPrice {

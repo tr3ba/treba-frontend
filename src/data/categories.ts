@@ -1,7 +1,7 @@
 import type { Category } from "../types/category";
 
-// Мок-данные категорий: используются при NEXT_PUBLIC_USE_MOCKS=true,
-// а также как источник иконок и картинок колонок для данных с бэка.
+   // Статичные иконки и картинки категорий: бэк их не хранит,
+   // mappers.ts подставляет их по slug категории.
 export const categories: Category[] = [
   {
     id: "laptops",

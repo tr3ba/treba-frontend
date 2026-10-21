@@ -1,4 +1,5 @@
 import styles from "./EmptyState.module.css";
+import Icon from "../common/Icon";
 
 type EmptyStateProps = {
   icon: string;
@@ -19,7 +20,7 @@ export default function EmptyState({
   return (
     <section className={styles.wrapper}>
       <div className={styles.iconCircle}>
-        <img src={icon} alt="" className={styles.icon} />
+        <Icon src={icon} alt="" className={styles.icon} />
       </div>
       <h2 className={styles.title}>{title}</h2>
       <p className={styles.subtitle}>{subtitle}</p>
