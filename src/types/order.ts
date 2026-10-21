@@ -47,6 +47,8 @@ export type CheckoutForm = {
 export type CheckoutItem = {
   variantId: string;
   quantity: number;
+  /** Название — бэк требует его в запросе, хотя берёт данные из базы */
+  title: string;
 };
 
 /** Созданный заказ — для экрана «Замовлення оформлено». */
@@ -77,7 +79,25 @@ export type ApiOrder = {
   createdAt: string;
 };
 
-/** POST /api/v1/orders. Бэк берёт из позиций только variantId и quantity. */
+/** Позиция в POST /api/v1/orders (CreateOrderItemDto). */
+export type ApiCreateOrderItem = {
+  productId: string;
+  variantId: string;
+  sellerId: string;
+  productName: string;
+  variantName: string;
+  sku: string;
+  quantity: number;
+  unitPrice: number;
+  discountAmount: number;
+  productSnapshot: string | null;
+};
+
+/**
+ * POST /api/v1/orders.
+ * Бэк использует из позиций только variantId и quantity (цены, продавца, названия берёт из базы),
+ * но строковые поля без `?` в C# проходят проверку как обязательные — поэтому заполняем их.
+ */
 export type ApiCreateOrderRequest = {
   /** Пустой Guid — бэк подставит текущего пользователя */
   customerId: string;
@@ -96,6 +116,6 @@ export type ApiCreateOrderRequest = {
     recipientName: string;
     recipientPhone: string;
   };
-  items: { variantId: string; quantity: number }[];
+  items: ApiCreateOrderItem[];
   couponCode: string | null;
 };

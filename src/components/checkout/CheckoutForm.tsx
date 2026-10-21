@@ -95,7 +95,9 @@ export default function CheckoutForm({
     try {
       const order = await createOrder(
         { ...values, phone: normalizePhone(values.phone) ?? values.phone },
-        items.flatMap((item) => (item.variantId ? [{ variantId: item.variantId, quantity: item.quantity }] : []))
+        items.flatMap((item) =>
+          item.variantId ? [{ variantId: item.variantId, quantity: item.quantity, title: item.title }] : []
+        )
       );
       await onSuccess(order);
     } catch (error) {

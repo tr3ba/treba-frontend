@@ -16,6 +16,10 @@ import type {
 const ORDERS_PROXY_URL = "/shop-api/orders";
 const EMPTY_GUID = "00000000-0000-0000-0000-000000000000";
 const COUNTRY = "Україна";
+// Обязательные для проверки бэка, но им не используемые поля (данные берутся из базы)
+const NO_COMMENT = "Без коментаря";
+const DEFAULT_VARIANT_NAME = "Основний";
+const UNKNOWN_SKU = "—";
 
 const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   CREATED: "Оформлено",
@@ -98,7 +102,7 @@ function toRequest(form: CheckoutForm, items: CheckoutItem[]): ApiCreateOrderReq
   const phone = form.phone.trim();
   return {
     customerId: EMPTY_GUID,
-    customerComment: form.comment.trim(),
+    customerComment: form.comment.trim() || NO_COMMENT,
     recipientName,
     recipientPhone: phone,
     recipientEmail: form.email.trim(),
@@ -113,18 +117,40 @@ function toRequest(form: CheckoutForm, items: CheckoutItem[]): ApiCreateOrderReq
       recipientName,
       recipientPhone: phone,
     },
-    items: items.map((item) => ({ variantId: item.variantId, quantity: item.quantity })),
+    items: items.map((item) => ({
+      productId: EMPTY_GUID,
+      variantId: item.variantId,
+      sellerId: EMPTY_GUID,
+      productName: item.title,
+      variantName: DEFAULT_VARIANT_NAME,
+      sku: UNKNOWN_SKU,
+      quantity: item.quantity,
+      unitPrice: 0,
+      discountAmount: 0,
+      productSnapshot: null,
+    })),
     couponCode: null,
   };
 }
 
+// Текст ошибки бэка: { message } из контроллера или ProblemDetails (title / detail / errors)
 async function readBackendMessage(response: Response): Promise<string> {
   try {
     const body: unknown = await response.json();
     if (typeof body === "object" && body !== null) {
       const record = body as Record<string, unknown>;
-      const message = record.message ?? record.title ?? record.detail;
-      if (typeof message === "string") return message;
+      const parts: string[] = [];
+      for (const key of ["message", "title", "detail"]) {
+        if (typeof record[key] === "string") parts.push(record[key] as string);
+      }
+      if (typeof record.errors === "object" && record.errors !== null) {
+        parts.push(JSON.stringify(record.errors));
+      }
+      if (parts.length > 0) {
+        // В консоли браузера видно, что именно не понравилось бэку
+        console.warn("Помилка оформлення замовлення:", body);
+        return parts.join(" ");
+      }
     }
   } catch {
     // тело не JSON
