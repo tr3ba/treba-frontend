@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import AccountPageShell from "../../../components/account/AccountPageShell";
@@ -9,6 +10,7 @@ import { getMyOrders, getOrderStatusLabel, isOrderInactive } from "../../../lib/
 import { formatDate } from "../../../lib/format";
 import type { OrderSummary } from "../../../types/order";
 import styles from "./page.module.css";
+import Icon from "../../../components/common/Icon";
 
 type Period = "all" | "year" | "month";
 
@@ -126,7 +128,11 @@ export default function OrdersPage() {
                         {getOrderStatusLabel(order.status)}
                       </p>
                     </div>
-                    <img src={order.thumbnail ?? "/icons/box.svg"} alt="" className={styles.orderThumb} />
+                    {order.thumbnail ? (
+                      <Image src={order.thumbnail} alt="" width={36} height={36} className={styles.orderThumb} />
+                    ) : (
+                      <Icon src="/icons/box.svg" className={styles.orderThumb} />
+                    )}
                     <button type="button" className={styles.expandButton} aria-label="Деталі замовлення">
                       <svg viewBox="0 0 16 16" width="16" height="16" fill="none">
                         <path

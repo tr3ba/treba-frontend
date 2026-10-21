@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { sessionRequest, useAuth } from "../../context/AuthContext";
 import styles from "./AuthForm.module.css";
@@ -39,7 +40,7 @@ export default function GuardVerification({ challengeId, remember, onVerified }:
   }, [guard, remember]);
   return <div className={styles.guardPanel}>
     <h2>Telegram Guard</h2><p>Відкрийте Guard у Telegram та відскануйте QR-код. Підтверджуйте лише вхід у свій акаунт.</p>
-    {guard ? <><img src={guard.qrCodeDataUrl} width={220} height={220} alt="QR-код підтвердження входу" /><p>Код на обох пристроях: <strong>{guard.displayCode}</strong></p><p role="status">Очікуємо підтвердження…</p></> : <p>Готуємо QR-код…</p>}
+    {guard ? <><Image src={guard.qrCodeDataUrl} width={220} height={220} unoptimized alt="QR-код підтвердження входу" /><p>Код на обох пристроях: <strong>{guard.displayCode}</strong></p><p role="status">Очікуємо підтвердження…</p></> : <p>Готуємо QR-код…</p>}
     {error && <p className={styles.formError} role="alert">{error}</p>}
   </div>;
 }

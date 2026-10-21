@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 import { adminOrigin, canOpenAdmin } from "../../lib/admin";
 import styles from "./AccountSidebar.module.css";
+import Icon from "../common/Icon";
 
 export type AccountNavItem = {
   label: string;
@@ -80,7 +81,7 @@ export default function AccountSidebar({
     <aside className={styles.sidebar}>
       <section className={styles.userCard}>
         <span className={styles.userIconWrap}>
-          <img src="/icons/user1.svg" alt="" className={styles.userIcon} />
+          <Icon src="/icons/user1.svg" alt="" className={styles.userIcon} />
         </span>
         <div className={styles.userInfo}>
           <p className={styles.userName}>{user.name || "Без імені"}</p>
@@ -102,7 +103,7 @@ export default function AccountSidebar({
         aria-controls="account-sections"
         onClick={() => setIsMenuOpen((prev) => !prev)}
       >
-        <img src={currentItem.icon} alt="" className={styles.toggleIcon} />
+        <Icon src={currentItem.icon} alt="" className={styles.toggleIcon} />
         <span className={styles.toggleText}>
           <span className={styles.toggleHint}>{toggleHint}</span>
           <span className={styles.toggleLabel}>{currentItem.label}</span>
@@ -140,7 +141,7 @@ export default function AccountSidebar({
               aria-current={isActive ? "page" : undefined}
               onClick={() => setIsMenuOpen(false)}
             >
-              <img src={item.icon} alt="" className={styles.navIcon} />
+              <Icon src={item.icon} alt="" className={styles.navIcon} />
               <span className={styles.navText}>{item.label}</span>
             </Link>
           );
