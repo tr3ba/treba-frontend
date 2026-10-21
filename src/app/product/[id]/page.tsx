@@ -55,6 +55,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <ViewedProductTracker
         id={product.id}
         backendId={product.backendId}
+        variantId={product.variantId}
         title={product.title}
         price={product.price}
         oldPrice={product.oldPrice}
@@ -111,6 +112,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <ProductPriceBox
               id={product.id}
               backendId={product.backendId}
+              variantId={product.variantId}
               title={product.title}
               image={product.image}
               price={product.price}

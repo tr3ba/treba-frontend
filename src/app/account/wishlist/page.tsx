@@ -9,9 +9,10 @@ import type { WishlistCardProduct } from "../../../types/wishlist";
 async function loadProducts(): Promise<WishlistCardProduct[]> {
   try {
     const products = await getCatalogProducts();
-    return products.map(({ id, backendId, title, price, oldPrice, image, rating, isPromo }) => ({
+    return products.map(({ id, backendId, variantId, title, price, oldPrice, image, rating, isPromo }) => ({
       id,
       backendId,
+      variantId,
       title,
       price,
       oldPrice,

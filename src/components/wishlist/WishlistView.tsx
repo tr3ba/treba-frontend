@@ -48,6 +48,7 @@ export default function WishlistView({ products }: WishlistViewProps) {
       addItem(
         {
           id: product.id,
+          variantId: product.variantId,
           title: product.title,
           price: product.price,
           image: product.image,
@@ -116,6 +117,7 @@ export default function WishlistView({ products }: WishlistViewProps) {
                 key={product.id}
                 id={product.id}
                 backendId={product.backendId}
+                variantId={product.variantId}
                 title={product.title}
                 price={product.price}
                 oldPrice={product.oldPrice}

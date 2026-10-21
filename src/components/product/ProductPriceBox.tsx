@@ -12,6 +12,8 @@ type ProductPriceBoxProps = {
   id: string;
   /** Guid товара на бэке — нужен списку бажань */
   backendId?: string;
+  /** Guid варианта по умолчанию — нужен корзине на бэке */
+  variantId?: string;
   title: string;
   image?: string;
   price: string;
@@ -24,6 +26,7 @@ type ProductPriceBoxProps = {
 export default function ProductPriceBox({
   id,
   backendId,
+  variantId,
   title,
   image,
   price,
@@ -41,7 +44,7 @@ export default function ProductPriceBox({
 
   function handleBuy() {
     if (!inCart) {
-      addItem({ id, title, image, price, oldPrice: isPromo ? oldPrice : null }, { silent: true });
+      addItem({ id, variantId, title, image, price, oldPrice: isPromo ? oldPrice : null }, { silent: true });
     }
     router.push("/cart");
   }
