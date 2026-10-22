@@ -9,6 +9,11 @@ import { formatPrice } from "../format";
 import { resolveMediaUrl } from "./client";
 
 const DEFAULT_CATEGORY_ICON = "/icons/catalog.svg";
+const ADDITIONAL_CATEGORY_ICONS: Record<string, string> = {
+  "rz-c80260": "/icons/certificates.svg",
+  "rz-c83850": "/icons/discount.svg",
+  "rz-c4630262": "/icons/warranty.svg",
+};
 
 function bySortOrder(a: ApiCategoryTree, b: ApiCategoryTree): number {
   return a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, "uk");
@@ -22,7 +27,7 @@ function activeSorted(nodes: ApiCategoryTree[]): ApiCategoryTree[] {
 
 /**
  * Узел любого уровня -> Category с прямыми потомками и хлебными крошками.
- * Изображения из API имеют приоритет; локальные иконки — запасной вариант.
+ * В меню используем локальные иконки; фотографии API остаются в карточках подразделов.
  */
 export function mapCategory(node: ApiCategoryTree, ancestors: ApiCategoryTree[] = []): Category {
   const local = staticCategories.find((category) => category.id === node.slug);
@@ -32,7 +37,7 @@ export function mapCategory(node: ApiCategoryTree, ancestors: ApiCategoryTree[] 
     label: node.name,
     backendId: node.id,
     path: ancestors.map((parent) => ({ id: parent.slug, label: parent.name })),
-    icon: resolveMediaUrl(node.imageUrl) ?? local?.icon ?? DEFAULT_CATEGORY_ICON,
+    icon: local?.icon ?? ADDITIONAL_CATEGORY_ICONS[node.slug] ?? DEFAULT_CATEGORY_ICON,
     description: node.description ?? undefined,
     subcategories: activeSorted(node.children).map((column) => {
       const localColumn = local?.subcategories?.find((item) => item.title === column.name);
