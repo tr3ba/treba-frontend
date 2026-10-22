@@ -25,7 +25,9 @@ def disposable_changes(changes):
         if len(line) < 3 or line[0] not in "ACD":
             return False
         path = line[2:]
-        if path in parents and line[0] == "C":
+        if path in parents and line[0] in "AC":
+            continue
+        if path == "/root/.npm/_update-notifier-last-checked":
             continue
         if not any(path == prefix or path.startswith(prefix + "/")
                    for prefix in ("/tmp", "/app/.next/cache", "/root/.npm/_logs")):

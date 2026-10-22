@@ -29,6 +29,7 @@ class RetentionTests(unittest.TestCase):
     def test_only_empty_or_disposable_writable_layers_are_allowed(self):
         self.assertTrue(retention.disposable_changes(""))
         self.assertTrue(retention.disposable_changes("C /app\nC /app/.next\nA /app/.next/cache/images/a.webp\nC /root\nA /tmp/temp"))
+        self.assertTrue(retention.disposable_changes("A /root/.npm\nA /root/.npm/_logs\nA /root/.npm/_logs/startup.log\nA /root/.npm/_update-notifier-last-checked"))
         for changes in ("A /app/uploads/photo.jpg", "C /app/data.db", "A /root/.npmrc", "D /app/server.js", "A /tmp-backup/file", "unexpected"):
             self.assertFalse(retention.disposable_changes(changes), changes)
 
