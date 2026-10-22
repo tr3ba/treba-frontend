@@ -1,4 +1,5 @@
 .breadcrumbs {
+    flex-wrap: wrap;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -6,6 +7,7 @@
     color: #8a8578;
     margin-bottom: 14px;
 }
+.ancestor { display: inline-flex; align-items: center; gap: 8px; }
 
 .crumb {
     color: #8a8578;

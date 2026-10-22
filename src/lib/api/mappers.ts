@@ -21,23 +21,25 @@ function activeSorted(nodes: ApiCategoryTree[]): ApiCategoryTree[] {
 // ---------- Категории ----------
 
 /**
- * Узел верхнего уровня -> наша Category.
- * Уровень 2 (children) -> колонки subcategories, уровень 3 -> пункты колонок.
- * Иконки и картинки колонок бэк не хранит — берём из data/categories.ts
- * по slug категории (и по названию колонки).
+ * Узел любого уровня -> Category с прямыми потомками и хлебными крошками.
+ * Изображения из API имеют приоритет; локальные иконки — запасной вариант.
  */
-export function mapCategory(node: ApiCategoryTree): Category {
+export function mapCategory(node: ApiCategoryTree, ancestors: ApiCategoryTree[] = []): Category {
   const local = staticCategories.find((category) => category.id === node.slug);
 
   return {
     id: node.slug,
     label: node.name,
-    icon: local?.icon ?? resolveMediaUrl(node.imageUrl) ?? DEFAULT_CATEGORY_ICON,
+    backendId: node.id,
+    path: ancestors.map((parent) => ({ id: parent.slug, label: parent.name })),
+    icon: resolveMediaUrl(node.imageUrl) ?? local?.icon ?? DEFAULT_CATEGORY_ICON,
     description: node.description ?? undefined,
     subcategories: activeSorted(node.children).map((column) => {
       const localColumn = local?.subcategories?.find((item) => item.title === column.name);
       return {
         title: column.name,
+        id: column.slug,
+        itemLinks: activeSorted(column.children).map((item) => ({ id: item.slug, label: item.name })),
         image: resolveMediaUrl(column.imageUrl) ?? localColumn?.image,
         items: activeSorted(column.children).map((item) => item.name),
       };
@@ -47,7 +49,7 @@ export function mapCategory(node: ApiCategoryTree): Category {
 
 /** Дерево категорий -> список категорий верхнего уровня. */
 export function mapCategoryTree(tree: ApiCategoryTree[]): Category[] {
-  return activeSorted(tree.filter((node) => node.parentId === null)).map(mapCategory);
+  return activeSorted(tree.filter((node) => node.parentId === null)).map((node) => mapCategory(node));
 }
 
 /**

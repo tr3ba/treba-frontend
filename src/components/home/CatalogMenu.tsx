@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import styles from "./CatalogMenu.module.css";
 import { useCategories } from "../../context/CategoriesContext";
@@ -56,9 +57,12 @@ export default function CatalogMenu() {
                   className={`${styles.categoryRow} ${isActive ? styles.categoryRowActive : ""}`}
                   onMouseEnter={() => setActiveId(category.id)}
                 >
-                  <Icon
+                  <Image
                     src={category.icon}
                     alt=""
+                    width={30}
+                    height={30}
+                    unoptimized
                     className={styles.categoryRowIcon}
                   />
                   <span className={styles.categoryRowLabel}>{category.label}</span>
@@ -78,11 +82,11 @@ export default function CatalogMenu() {
             <div className={styles.subcategoriesPanel}>
               {activeCategory.subcategories.map((column) => (
                 <div key={column.title} className={styles.subcatGroup}>
-                  <p className={styles.subcatTitle}>{column.title}</p>
-                  {column.items.map((item) => (
-                    <a key={item} href="#" className={styles.subcatItem}>
-                      {item}
-                    </a>
+                  <Link href={`/catalog/${column.id ?? activeCategory.id}`} className={styles.subcatTitle}>{column.title}</Link>
+                  {(column.itemLinks ?? column.items.map((label) => ({ id: activeCategory.id, label }))).map((item) => (
+                    <Link key={`${item.id}:${item.label}`} href={`/catalog/${item.id}`} className={styles.subcatItem}>
+                      {item.label}
+                    </Link>
                   ))}
                 </div>
               ))}

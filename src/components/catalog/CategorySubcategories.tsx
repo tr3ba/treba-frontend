@@ -13,7 +13,7 @@ export default function CategorySubcategories({
   categoryId,
   subcategories,
 }: CategorySubcategoriesProps) {
-  const groups = subcategories.filter((group) => group.items.length > 0);
+  const groups = subcategories;
 
   if (groups.length === 0) return null;
 
@@ -25,7 +25,7 @@ export default function CategorySubcategories({
         {groups.map((group) => (
           <Link
             key={group.title}
-            href={`/catalog/${categoryId}?section=${encodeURIComponent(group.title)}`}
+            href={group.id ? `/catalog/${group.id}` : `/catalog/${categoryId}?section=${encodeURIComponent(group.title)}`}
             className={styles.card}
           >
             <div className={styles.cardImageWrap}>
@@ -47,7 +47,7 @@ export default function CategorySubcategories({
 
             <div className={styles.cardHead}>
               <span className={styles.cardTitle}>{group.title}</span>
-              <span className={styles.cardCount}>{group.items.length}</span>
+              {group.items.length > 0 && <span className={styles.cardCount}>{group.items.length}</span>}
             </div>
 
             <p className={styles.cardItems}>

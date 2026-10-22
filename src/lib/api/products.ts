@@ -1,11 +1,11 @@
 import { cache } from "react";
 import type { Product } from "../../types/product";
-import type { ApiCatalogProduct, ApiCategoryTree, ApiPagedResponse } from "../../types/api";
+import type { ApiCatalogProduct, ApiPagedResponse } from "../../types/api";
 import { ApiError, apiFetch } from "./client";
 import { buildRootCategorySlugMap, mapCatalogProduct } from "./mappers";
+import { getCategoryById, getCategoryTree } from "./categories";
 
 // Временные решения, пока на бэке нет нужных эндпоинтов:
-// - фильтра по slug категории нет -> берём страницу каталога и фильтруем на фронте;
 // - признаков «акція / рекомендація» нет -> делим общий список.
 // Бэк отдаёт максимум 100 товаров за запрос — для учебной базы этого хватает.
 // «Переглянуті товари» — история в браузере, см. lib/api/viewed.ts.
@@ -15,7 +15,7 @@ const BEST_OFFERS_COUNT = 11;
 
 // cache() — один запрос дерева категорий на один рендер страницы
 const getRootSlugMap = cache(async (): Promise<Map<string, string>> => {
-  const tree = await apiFetch<ApiCategoryTree[]>("/api/v1/categories");
+  const tree = await getCategoryTree();
   return buildRootCategorySlugMap(tree);
 });
 
@@ -80,6 +80,13 @@ export async function getSponsoredProducts(excludeId: string, limit = 6): Promis
 }
 
 export async function getProductsByCategory(categoryId: string, limit = 12): Promise<Product[]> {
-  const all = await getAllProducts();
-  return all.filter((p) => p.categoryId === categoryId).slice(0, limit);
+  const category = await getCategoryById(categoryId);
+  if (!category?.backendId) return [];
+  const [page, roots] = await Promise.all([
+    apiFetch<ApiPagedResponse<ApiCatalogProduct>>("/api/v1/catalog", {
+      query: { page: 1, size: Math.min(100, Math.max(1, limit)), categoryId: category.backendId },
+    }),
+    getRootSlugMap(),
+  ]);
+  return page.content.map((product) => mapCatalogProduct(product, roots));
 }

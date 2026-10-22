@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useCategories } from "../../context/CategoriesContext";
 import styles from "./MobileCatalog.module.css";
@@ -90,16 +91,15 @@ export default function MobileCatalog() {
 
                   {activeCategory.subcategories?.map((column) => (
                     <div key={column.title} className={styles.group}>
-                      <p className={styles.groupTitle}>{column.title}</p>
-                      {/* окремих сторінок підкатегорій поки немає — ведемо на сторінку категорії */}
-                      {column.items.map((item) => (
+                      <Link href={`/catalog/${column.id ?? activeCategory.id}`} className={styles.groupTitle} onClick={close}>{column.title}</Link>
+                      {(column.itemLinks ?? column.items.map((label) => ({ id: activeCategory.id, label }))).map((item) => (
                         <Link
-                          key={item}
-                          href={`/catalog/${activeCategory.id}`}
+                          key={`${item.id}:${item.label}`}
+                          href={`/catalog/${item.id}`}
                           className={styles.groupItem}
                           onClick={close}
                         >
-                          {item}
+                          {item.label}
                         </Link>
                       ))}
                     </div>
@@ -113,7 +113,7 @@ export default function MobileCatalog() {
 
                   const content = (
                     <>
-                      <Icon src={category.icon} alt="" className={styles.rowIcon} />
+                      <Image src={category.icon} alt="" width={24} height={24} unoptimized className={styles.rowIcon} />
                       <span className={styles.rowLabel}>{category.label}</span>
                       {hasSubcategories && <ChevronIcon className={styles.rowChevron} />}
                     </>
