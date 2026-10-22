@@ -57,7 +57,9 @@ jobs:
           revision = os.environ['IMAGE_REVISION']
           image = os.environ['ECR_REGISTRY'] + '/' + os.environ['ECR_REPOSITORY'] + ':' + revision
           script = Path('scripts/deploy-frontend.sh').read_text()
-          command = 'bash -s -- ' + image + ' ' + revision + " <<'TREBA_FRONTEND'\n" + script + '\nTREBA_FRONTEND'
+          maintenance = Path('scripts/retain-frontend-rollbacks.py').read_text()
+          command = "set -e\npython3 <<'TREBA_ROLLBACK_RETENTION'\n" + maintenance + "\nTREBA_ROLLBACK_RETENTION\n"
+          command += 'bash -s -- ' + image + ' ' + revision + " <<'TREBA_FRONTEND'\n" + script + '\nTREBA_FRONTEND'
           Path('ssm-parameters.json').write_text(json.dumps({'commands': [command], 'executionTimeout': ['600']}))
           PY
           COMMAND_ID=$(aws ssm send-command \
