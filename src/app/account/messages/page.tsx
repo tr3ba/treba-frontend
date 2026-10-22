@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import AccountPageShell from "../../../components/account/AccountPageShell";
 import PageTitle from "../../../components/account/PageTitle";
 import { useAuth } from "../../../context/AuthContext";
-import { support, type Conversation, type ConversationDetails, type ConversationPage, type Message } from "../../../lib/api/support";
+import { support, SupportError, type Conversation, type ConversationDetails, type ConversationPage, type Message } from "../../../lib/api/support";
 import styles from "./page.module.css";
 
 const kindLabel = { CHAT: "Особиста підтримка", QUESTION: "Питання про товар або замовлення", RETURN: "Повернення" };
@@ -39,9 +39,21 @@ function Inbox() {
   const end = useRef<HTMLDivElement>(null);
   const pending = useRef<{ id: string; text: string; target: string } | null>(null);
   const lastRead = useRef("");
+  const loadedPages = useRef(1);
+  const threadRevision = useRef(0);
+  const moreBusy = useRef(false);
   const refreshThreads = useCallback(async () => {
+    const revision = threadRevision.current;
     const result = await support<ConversationPage>();
-    setThreads(previous => [...result.content, ...previous.filter(item => !result.content.some(fresh => fresh.id === item.id))]);
+    const lastPage = Math.min(loadedPages.current, Math.max(1, result.totalPages));
+    const pages = [result];
+    for (let first = 2; first <= lastPage; first += 4) {
+      pages.push(...await Promise.all(Array.from({ length: Math.min(4, lastPage - first + 1) }, (_, index) => support<ConversationPage>("?page=" + (first + index)))));
+    }
+    if (revision !== threadRevision.current) return;
+    // Replace the loaded pages so deleted conversations cannot survive in the previous client snapshot.
+    setThreads([...new Map(pages.flatMap(page => page.content).map(thread => [thread.id, thread])).values()]);
+    loadedPages.current = lastPage; setPage(lastPage);
     setTotalPages(result.totalPages);
   }, []);
   useEffect(() => {
@@ -51,7 +63,7 @@ function Inbox() {
       const result = await support<ConversationPage>();
       if (!alive) return;
       setError("");
-      setThreads(result.content); setPage(1); setTotalPages(result.totalPages);
+      setThreads(result.content); loadedPages.current = 1; threadRevision.current++; setPage(1); setTotalPages(result.totalPages);
       if (!requestedId && startNew) {
         const query = new URLSearchParams({ kind: productId || orderId ? "QUESTION" : "CHAT", view: "open" });
         if (productId) query.set("productId", productId);
@@ -78,14 +90,22 @@ function Inbox() {
           if (messageId && lastRead.current !== messageId) { await support(`/${activeId}/read`, { messageId }); lastRead.current = messageId; }
         }
         if (alive) setError("");
-      } catch (error) { if (alive) setError(error instanceof Error ? error.message : "Помилка з’єднання"); }
+      } catch (error) {
+        if (!alive) return;
+        if (error instanceof SupportError && error.status === 404 && activeId) {
+          setThreads(previous => previous.filter(thread => thread.id !== activeId));
+          setDetails(null); setActiveId(null); setDraft(""); pending.current = null;
+          router.replace("/account/messages", { scroll: false });
+        }
+        setError(error instanceof Error ? error.message : "Помилка з’єднання");
+      }
       finally { running = false; }
     }
     void refresh();
     const timer = window.setInterval(refresh, 5000);
     document.addEventListener("visibilitychange", refresh);
     return () => { alive = false; clearInterval(timer); document.removeEventListener("visibilitychange", refresh); };
-  }, [userId, activeId, refreshThreads]);
+  }, [userId, activeId, refreshThreads, router]);
   const latestId = details?.messages.at(-1)?.id;
   useEffect(() => { end.current?.scrollIntoView({ block: "nearest" }); }, [latestId]);
   function choose(id: string) { setDetails(null); setDraft(""); setActiveId(id); router.replace("/account/messages?ticket=" + id, { scroll: false }); }
@@ -117,8 +137,11 @@ function Inbox() {
     finally { setOlderBusy(false); }
   }
   async function moreThreads() {
-    try { const result = await support<ConversationPage>("?page=" + (page + 1)); setThreads(previous => [...new Map([...previous, ...result.content].map(item => [item.id, item])).values()]); setPage(result.page); }
+    if (moreBusy.current) return;
+    moreBusy.current = true; threadRevision.current++;
+    try { const result = await support<ConversationPage>("?page=" + (loadedPages.current + 1)); threadRevision.current++; loadedPages.current = result.page; setThreads(previous => [...new Map([...previous, ...result.content].map(item => [item.id, item])).values()]); setPage(result.page); setTotalPages(result.totalPages); }
     catch (error) { setError(error instanceof Error ? error.message : "Не вдалося завантажити переписки"); }
+    finally { moreBusy.current = false; }
   }
   const current = details?.summary;
   return <AccountPageShell><PageTitle>Повідомлення та підтримка</PageTitle>
