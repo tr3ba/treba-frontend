@@ -1,0 +1,266 @@
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 24px;
+    border: 1px solid #e5e3dd;
+    border-radius: 12px;
+    background: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    border-color: #d6d3cb;
+    box-shadow: 0 6px 18px rgba(40, 37, 29, 0.06);
+}
+
+/* ---------- верх: назва + дії ---------- */
+.head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #28251d;
+}
+
+.titleLink {
+    color: inherit;
+    transition: color 0.15s ease;
+}
+
+.titleLink:hover {
+    color: #ff6e2a;
+}
+
+.count {
+    margin: 0;
+    font-size: 13px;
+    color: #8a8578;
+}
+
+.hint {
+    color: #8a8578;
+}
+
+.actions,
+.confirm {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.confirmText {
+    font-size: 13px;
+    font-weight: 600;
+    color: #28251d;
+    margin-right: 4px;
+}
+
+.primaryButton,
+.secondaryButton,
+.dangerButton,
+.ghostButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    padding: 0 18px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.primaryButton {
+    border: none;
+    background: #ff6e2a;
+    color: #ffffff;
+}
+
+.primaryButton:hover {
+    background: #e8611f;
+}
+
+.secondaryButton {
+    border: 1.5px solid #ff6e2a;
+    background: #ffffff;
+    color: #ff6e2a;
+}
+
+.secondaryButton:hover {
+    background: #fff6f0;
+}
+
+.dangerButton {
+    border: none;
+    background: #e5484d;
+    color: #ffffff;
+}
+
+.dangerButton:hover {
+    background: #cf3a3f;
+}
+
+.ghostButton {
+    border: 1px solid #e5e3dd;
+    background: #ffffff;
+    color: #28251d;
+}
+
+.ghostButton:hover {
+    border-color: #8a8578;
+}
+
+.iconButton {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid #e5e3dd;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #8a8578;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.iconButton:hover {
+    border-color: #e5484d;
+    color: #e5484d;
+    background: #fff5f5;
+}
+
+.trash {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.primaryButton:focus-visible,
+.secondaryButton:focus-visible,
+.dangerButton:focus-visible,
+.ghostButton:focus-visible,
+.iconButton:focus-visible,
+.thumb:focus-visible,
+.addTile:focus-visible {
+    outline: 2px solid #ff6e2a;
+    outline-offset: 2px;
+}
+
+/* ---------- мініатюри ---------- */
+.thumbs {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.thumb,
+.addTile {
+    width: 76px;
+    height: 76px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.thumb {
+    border: 1px solid #e5e3dd;
+    background: #ffffff;
+    transition: border-color 0.15s ease;
+}
+
+.thumb:hover {
+    border-color: #ff6e2a;
+}
+
+.thumbImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 6px;
+}
+
+.placeholder {
+    width: 26px;
+    height: 26px;
+    opacity: 0.35;
+}
+
+.addTile {
+    border: 1.5px dashed #d6d3cb;
+    color: #8a8578;
+    transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.addTile:hover {
+    border-color: #ff6e2a;
+    color: #ff6e2a;
+    background: #fff6f0;
+}
+
+.plus {
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+/* ---------- телефон ---------- */
+@media (max-width: 768px) {
+    .card {
+        padding: 16px;
+    }
+
+    .head {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .actions,
+    .confirm {
+        flex-wrap: wrap;
+    }
+
+    .primaryButton,
+    .secondaryButton {
+        flex: 1;
+    }
+
+    .confirmText {
+        width: 100%;
+    }
+
+    .thumb,
+    .addTile {
+        width: 64px;
+        height: 64px;
+    }
+}
