@@ -50,7 +50,7 @@
     object-fit: contain;
 }
 
-/* иконки справа: избранное, профиль, корзина (стили иконок — в их компонентах) */
+/* иконки справа (размер, hover и бейджи — в HeaderIcon.module.css) */
 .headerActions {
     display: flex;
     align-items: center;
@@ -161,7 +161,8 @@
         height: 19px;
     }
 
-    /* избранное на телефоне переедет в нижнюю панель */
+    /* порівняння и избранное на телефоне переедут в нижнюю панель */
+    .compareButton,
     .wishlistButton {
         display: none;
     }
