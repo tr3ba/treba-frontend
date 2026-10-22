@@ -44,10 +44,11 @@ const product = {
   oldPrice: null, stockQuantity: 1, storeId: "store-guid", storeName: "Store",
 };
 
-test("category navigation keeps API photos, deep links and ancestor breadcrumbs", async t => {
+test("category navigation keeps menu icons, section photos, deep links and ancestor breadcrumbs", async t => {
   t.mock.method(globalThis, "fetch", async () => Response.json(tree));
   const [root] = await categories.getCategories();
-  assert.equal(root.icon, tree[0].imageUrl);
+  assert.equal(root.icon, "/icons/laptop.svg");
+  assert.equal(root.subcategories[0].image, group.imageUrl);
   assert.deepEqual(root.subcategories.map(item => item.id), ["group"]);
   assert.deepEqual(root.subcategories[0].itemLinks, [{ id: leaf.slug, label: leaf.name }]);
   const found = await categories.getCategoryById(leaf.slug);
