@@ -7,6 +7,7 @@ import HeaderWishlistButton from "./HeaderWishlistButton";
 import MobileCatalog from "./MobileCatalog";
 import styles from "./Header.module.css";
 import Icon from "../common/Icon";
+import Notifications from "../account/Notifications";
 
 // Синій header + верхня промо-плашка
 export default function Header() {
@@ -33,6 +34,7 @@ export default function Header() {
           <SearchBar />
 
           <div className={styles.headerActions}>
+            <Notifications />
             {/* на телефоне скрыто классом wishlistButton */}
             <HeaderWishlistButton className={styles.wishlistButton} />
 

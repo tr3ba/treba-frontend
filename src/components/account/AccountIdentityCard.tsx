@@ -8,6 +8,8 @@ import styles from "./AccountIdentityCard.module.css";
 export default function AccountIdentityCard() {
   const { user, updateProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [draft, setDraft] = useState({
     phone: user?.phone ?? "",
     lastName: user?.lastName ?? "",
@@ -18,6 +20,7 @@ export default function AccountIdentityCard() {
   if (!user) return null;
 
   function startEditing() {
+    setSaveError("");
     setDraft({
       phone: user!.phone ?? "",
       lastName: user!.lastName ?? "",
@@ -27,10 +30,13 @@ export default function AccountIdentityCard() {
     setIsEditing(true);
   }
 
-  function save() {
+  async function save() {
+    if (saving) return;
     const patch: UserProfile = { ...draft };
-    updateProfile(patch);
-    setIsEditing(false);
+    setSaving(true); setSaveError("");
+    try { await updateProfile(patch); setIsEditing(false); }
+    catch (error) { setSaveError(error instanceof Error ? error.message : "Не вдалося зберегти профіль."); }
+    finally { setSaving(false); }
   }
 
   return (
@@ -39,13 +45,14 @@ export default function AccountIdentityCard() {
         <h1 className={styles.title}>Мій акаунт TREBA</h1>
         {isEditing ? (
           <div className={styles.actionsRow}>
-            <button type="button" className={styles.saveButton} onClick={save}>
-              Зберегти
+            <button type="button" className={styles.saveButton} onClick={save} disabled={saving}>
+              {saving ? "Зберігаємо…" : "Зберегти"}
             </button>
             <button
               type="button"
               className={styles.cancelButton}
               onClick={() => setIsEditing(false)}
+              disabled={saving}
             >
               Скасувати
             </button>
@@ -56,6 +63,8 @@ export default function AccountIdentityCard() {
           </button>
         )}
       </div>
+
+      {saveError && <p role="alert">{saveError}</p>}
 
       <div className={styles.loginBlock}>
         <span className={styles.fieldLabel}>Логін (email)</span>

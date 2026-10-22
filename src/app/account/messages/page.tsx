@@ -22,9 +22,10 @@ function Inbox() {
   const params = useSearchParams();
   const productId = params.get("product");
   const productSlug = params.get("slug");
-  const title = productId ? (params.get("title") ?? "Питання про товар").slice(0, 190) : "Чат з TREBA";
+  const orderId = productId ? null : params.get("order");
+  const title = productId || orderId ? (params.get("title") ?? (productId ? "Питання про товар" : "Питання про замовлення")).slice(0, 190) : "Чат з TREBA";
   const requestedId = params.get("ticket");
-  const startNew = params.get("new") === "chat" || !!productId;
+  const startNew = params.get("new") === "chat" || !!productId || !!orderId;
   const [threads, setThreads] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(requestedId);
   const [details, setDetails] = useState<ConversationDetails | null>(null);
@@ -52,14 +53,15 @@ function Inbox() {
       setError("");
       setThreads(result.content); setPage(1); setTotalPages(result.totalPages);
       if (!requestedId && startNew) {
-        const query = new URLSearchParams({ kind: productId ? "QUESTION" : "CHAT", view: "open" });
+        const query = new URLSearchParams({ kind: productId || orderId ? "QUESTION" : "CHAT", view: "open" });
         if (productId) query.set("productId", productId);
+        if (orderId) query.set("orderId", orderId);
         const existing = await support<ConversationPage>("?" + query);
         if (alive) setActiveId(existing.content[0]?.id ?? null);
       } else if (!requestedId) setActiveId(result.content[0]?.id ?? null);
     })().catch(error => { if (alive) setError(error.message); }).finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
-  }, [userId, requestedId, productId, startNew]);
+  }, [userId, requestedId, productId, orderId, startNew]);
   useEffect(() => {
     if (!userId) return;
     let alive = true, running = false;
@@ -89,13 +91,13 @@ function Inbox() {
   function choose(id: string) { setDetails(null); setDraft(""); setActiveId(id); router.replace("/account/messages?ticket=" + id, { scroll: false }); }
   async function send(event: FormEvent) {
     event.preventDefault(); if (!draft.trim() || sending) return;
-    const text = draft.trim(), target = activeId ?? productId ?? "chat";
+    const text = draft.trim(), target = activeId ?? productId ?? orderId ?? "chat";
     if (pending.current?.text !== text || pending.current.target !== target) pending.current = { id: crypto.randomUUID(), text, target };
     setSending(true); setError("");
     try {
       if (activeId) await support(`/${activeId}/messages`, { message: text, clientMessageId: pending.current.id });
       else {
-        const created = await support<ConversationDetails>("", { kind: productId ? "QUESTION" : "CHAT", productId, subject: title, message: text, clientRequestId: pending.current.id });
+        const created = await support<ConversationDetails>("", { kind: productId || orderId ? "QUESTION" : "CHAT", productId, orderId, subject: title, message: text, clientRequestId: pending.current.id });
         setActiveId(created.summary.id); setDetails(created);
         router.replace("/account/messages?ticket=" + created.summary.id, { scroll: false });
       }

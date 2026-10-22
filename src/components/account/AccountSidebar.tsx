@@ -16,6 +16,7 @@ export type AccountNavItem = {
 
 // Пункти навігації особистого кабінету покупця (за замовчуванням)
 export const accountNavItems: AccountNavItem[] = [
+  { label: "Сповіщення", icon: "/icons/chat1.svg", href: "/account/notifications" },
   { label: "Особисті дані", icon: "/icons/user.svg", href: "/account" },
   { label: "Замовлення", icon: "/icons/box.svg", href: "/account/orders" },
   {

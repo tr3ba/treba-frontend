@@ -1,7 +1,6 @@
 // Заказы покупателя.
 // - Оформление: POST /api/v1/orders через прокси /shop-api/orders (нужна авторизация).
-// - Список «мои заказы»: на бэке пока нет (есть только GET /api/v1/orders/{id}).
-//   Когда появится — запрос через прокси + mapOrder ниже; страница кабинета не меняется.
+// - Список и детали доступны через защищённый API кабинета покупателя.
 
 import type {
   ApiCreateOrderRequest,
@@ -60,9 +59,11 @@ export function mapOrder(dto: ApiOrder): OrderSummary {
   };
 }
 
-/** Заказы текущего пользователя, новые сверху. Эндпоинта пока нет — пустой список. */
+/** Заказы текущего пользователя, новые сверху. */
 export async function getMyOrders(): Promise<OrderSummary[]> {
-  return [];
+  const { getCustomerOrders } = await import("./account");
+  const page = await getCustomerOrders();
+  return page.content.map(order => ({ id: order.id, number: order.orderNumber, status: order.status, createdAt: order.createdAt, total: order.totalAmount }));
 }
 
 // ---------- Оформление ----------

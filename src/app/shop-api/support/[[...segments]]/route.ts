@@ -23,7 +23,7 @@ async function proxy(request: NextRequest, context: { params: Promise<{ segments
       body = JSON.stringify(input);
     }
     const query = new URLSearchParams();
-    for (const key of ["page", "status", "kind", "productId", "before", "search", "view"]) {
+    for (const key of ["page", "status", "kind", "productId", "orderId", "before", "search", "view"]) {
       const value = request.nextUrl.searchParams.get(key); if (value) query.set(key, value);
     }
     const result = await backend(`/api/v1/support${path ? "/" + path : ""}?${query}`, { method: request.method, body, headers: { Authorization: `Bearer ${session.token}` } });
