@@ -51,11 +51,20 @@ export type Product = {
   image?: string;
   rating?: number;
   isPromo?: boolean;
+  /** Slug категорії ВЕРХНЬОГО рівня (для хлібних крихт і каталогу) */
   categoryId?: string;
+  /** Кінцева категорія товару на бэке (Guid) — за нею групуються списки порівняння */
+  subcategoryId?: string;
+  /** Назва кінцевої категорії: «Веб-камери», «Геймерські крісла» */
+  subcategoryName?: string;
   inStock?: boolean;
 
   // Поля
   code?: string;
+  brand?: string;
+  /** Гарантія в місяцях; немає — не вказана */
+  warrantyMonths?: number;
+  countryOfOrigin?: string;
   description?: string;
   reviewsCount?: number;
   images?: string[];
