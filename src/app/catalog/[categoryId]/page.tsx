@@ -5,15 +5,16 @@ import Footer from "../../../components/home/Footer";
 import ProductBreadcrumbs from "../../../components/product/ProductBreadcrumbs";
 import ViewedProductsCarousel from "../../../components/product/ViewedProductsCarousel";
 import CategorySubcategories from "../../../components/catalog/CategorySubcategories";
-import CategoryProductsGrid from "../../../components/catalog/CategoryProductsGrid";
+import CatalogResults from "../../../components/catalog/CatalogResults";
+import type { SearchValues } from "../../../lib/catalogQuery";
 import { getCategoryById } from "../../../lib/api/categories";
-import { getProductsByCategory } from "../../../lib/api/products";
 
 type CategoryPageProps = {
   params: Promise<{ categoryId: string }>;
+  searchParams: Promise<SearchValues>;
 };
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
   const { categoryId } = await params;
   const category = await getCategoryById(categoryId);
 
@@ -21,7 +22,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound();
   }
 
-  const products = await getProductsByCategory(category.id, 12);
 
   return (
     <>
@@ -39,7 +39,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           <CategorySubcategories categoryId={category.id} subcategories={category.subcategories} />
         )}
 
-        <CategoryProductsGrid title="Популярні товари" products={products} />
+        <CatalogResults values={await searchParams} path={`/catalog/${category.id}`} categoryId={category.backendId} />
 
         <ViewedProductsCarousel />
       </main>

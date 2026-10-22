@@ -27,6 +27,9 @@ async function moduleUrl(url) {
 
 const categories = await import(await moduleUrl(new URL("../src/lib/api/categories.ts", import.meta.url)));
 const products = await import(await moduleUrl(new URL("../src/lib/api/products.ts", import.meta.url)));
+const { readCatalogQuery, catalogHref } = await import(await moduleUrl(new URL("../src/lib/catalogQuery.ts", import.meta.url)));
+const { searchCatalog } = await import(await moduleUrl(new URL("../src/lib/api/search.ts", import.meta.url)));
+const { notificationHref } = await import(await moduleUrl(new URL("../src/lib/notifications.ts", import.meta.url)));
 const node = (id, slug, parentId, children = [], extra = {}) => ({
   id, slug, name: slug, parentId, children, isActive: true, sortOrder: 0,
   imageUrl: "https://content.rozetka.com.ua/categories/fixture.jpg", ...extra,
@@ -85,4 +88,32 @@ test("product details use the slug endpoint introduced on main", async t => {
   const found = await products.getProductById(product.slug);
   assert.deepEqual(requests, ["/api/v1/catalog/fixture-product"]);
   assert.equal(found.variantId, product.productVariantId);
+});
+
+test("catalog search keeps filter values and pagination in the URL and backend request", async t => {
+  const attribute = "11111111-1111-1111-1111-111111111111";
+  const query = readCatalogQuery({ q: "  fixture  ", page: "2", minPrice: "0", maxPrice: "100.50", sort: "priceasc", stock: "available", ["attribute_" + attribute]: "16" });
+  const requests = [];
+  t.mock.method(globalThis, "fetch", async value => {
+    const url = new URL(value); if (url.pathname === "/api/v1/categories") return Response.json(tree);
+    requests.push(url); return Response.json({ content: [product], page: 2, totalElements: 30, totalPages: 2 });
+  });
+  const page = await searchCatalog(query, leaf.id);
+  assert.equal(page.totalElements, 30); assert.equal(page.content[0].variantId, product.productVariantId);
+  assert.equal(requests[0].searchParams.get("search"), "fixture");
+  assert.equal(requests[0].searchParams.get("page"), "2"); assert.equal(requests[0].searchParams.get("size"), "24");
+  assert.equal(requests[0].searchParams.get("categoryId"), leaf.id);
+  assert.equal(requests[0].searchParams.get(`attributes[${attribute}]`), "16");
+  const href = new URL(catalogHref("/search", query, 3), "https://treba.invalid");
+  assert.equal(href.searchParams.get("page"), "3"); assert.equal(href.searchParams.get("attribute_" + attribute), "16");
+  assert.equal(href.searchParams.get("minPrice"), "0");
+  for (const bad of [{ minPrice: "-1" }, { minPrice: "NaN" }, { minPrice: "100", maxPrice: "1" }]) assert.throws(() => readCatalogQuery(bad));
+  assert.equal(readCatalogQuery({ page: "bad", sort: "unsafe" }).page, 1);
+});
+
+test("notification links keep the exact admin destination and reject external paths", () => {
+  const target = notificationHref({ scope: "admin", path: "/orders/fixture" });
+  assert.equal(new URL(target).pathname, "/site-login/start"); assert.equal(new URL(target).searchParams.get("returnUrl"), "/orders/fixture");
+  assert.equal(notificationHref({ scope: "shop", path: "/account/messages?ticket=fixture" }), "/account/messages?ticket=fixture");
+  for (const path of ["//outside.test", "/%2f%2foutside.test", "/\\outside.test", "https://outside.test", "/login?next=%2Flogin"]) assert.equal(notificationHref({ scope: "shop", path }), "/account/notifications");
 });

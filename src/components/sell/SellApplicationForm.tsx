@@ -5,11 +5,14 @@ import { submitSellerApplication } from "../../lib/api/sellerApplication";
 import type { SellerApplication, WebsiteProtocol } from "../../types/sellerApplication";
 import { IconArrowRight, IconCheck } from "./SellIcons";
 import styles from "./SellApplicationForm.module.css";
+import { useAuth } from "../../context/AuthContext";
 
 type Step = 1 | 2;
 
 type FormValues = {
   companyName: string;
+  storeName: string;
+  taxNumber: string;
   protocol: WebsiteProtocol;
   domain: string;
   noWebsite: boolean;
@@ -25,6 +28,8 @@ type FormErrors = Partial<Record<keyof FormValues, string>>;
 
 const INITIAL_VALUES: FormValues = {
   companyName: "",
+  storeName: "",
+  taxNumber: "",
   protocol: "https://",
   domain: "",
   noWebsite: false,
@@ -62,6 +67,8 @@ function validateStep1(values: FormValues): FormErrors {
   if (values.companyName.trim().length < 2) {
     errors.companyName = "Вкажіть назву компанії";
   }
+  if (values.storeName.trim().length < 2) errors.storeName = "Вкажіть назву магазину";
+  if (values.taxNumber.trim().length < 2) errors.taxNumber = "Вкажіть податковий номер або код компанії";
 
   if (!values.noWebsite && !DOMAIN_PATTERN.test(values.domain.trim())) {
     errors.domain = "Вкажіть адресу сайту, наприклад shop.com.ua, або позначте «У мене немає сайту»";
@@ -132,12 +139,13 @@ type SellApplicationFormProps = {
 
 // Заявка в 2 шага, как у Rozetka: компания → контакты
 export default function SellApplicationForm({ onSubmitted }: SellApplicationFormProps) {
+  const { user } = useAuth();
   const baseId = useId();
   const id = (name: string) => `${baseId}-${name}`;
 
   const [step, setStep] = useState<Step>(1);
   const [direction, setDirection] = useState<"forward" | "back">("forward");
-  const [values, setValues] = useState<FormValues>(INITIAL_VALUES);
+  const [values, setValues] = useState<FormValues>(() => ({ ...INITIAL_VALUES, email: user?.email ?? "", contactName: user?.name ?? "", phone: user?.phone ?? "" }));
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -210,6 +218,8 @@ export default function SellApplicationForm({ onSubmitted }: SellApplicationForm
     try {
       const application = await submitSellerApplication({
         companyName: values.companyName.trim(),
+        storeName: values.storeName.trim(),
+        taxNumber: values.taxNumber.trim(),
         website: values.noWebsite ? null : `${values.protocol}${values.domain.trim()}`,
         contactName: values.contactName.trim().replace(/\s+/g, " "),
         position: values.position.trim(),
@@ -272,6 +282,13 @@ export default function SellApplicationForm({ onSubmitted }: SellApplicationForm
                   autoComplete="organization"
                   {...a11y("companyName")}
                 />
+              </Field>
+
+              <Field id={id("storeName")} label="Назва магазину" error={errors.storeName}>
+                <input id={id("storeName")} className={styles.input} value={values.storeName} maxLength={200} onChange={e => update("storeName", e.target.value)} {...a11y("storeName")} />
+              </Field>
+              <Field id={id("taxNumber")} label="Податковий номер / код компанії" error={errors.taxNumber}>
+                <input id={id("taxNumber")} className={styles.input} value={values.taxNumber} maxLength={100} onChange={e => update("taxNumber", e.target.value)} {...a11y("taxNumber")} />
               </Field>
 
               <div className={styles.field}>

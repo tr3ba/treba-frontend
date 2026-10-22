@@ -31,7 +31,7 @@ function formatDateInput(raw: string): string {
 type AccordionSectionProps = {
   title: string;
   fields: SectionField[];
-  onSave: (values: Record<string, string>) => void;
+  onSave: (values: Record<string, string>) => void | Promise<void>;
   defaultOpen?: boolean;
   emptyText?: string;
   readOnly?: boolean;
@@ -63,6 +63,8 @@ export default function AccordionSection({
 }: AccordionSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [draft, setDraft] = useState<Record<string, string>>(() =>
     Object.fromEntries(fields.map((f) => [f.key, f.value]))
   );
@@ -70,6 +72,7 @@ export default function AccordionSection({
   const hasAnyValue = fields.some((f) => f.value.trim().length > 0);
 
   function startEditing() {
+    setSaveError("");
     setDraft(Object.fromEntries(fields.map((f) => [f.key, f.value])));
     setIsEditing(true);
     setIsOpen(true);
@@ -79,9 +82,12 @@ export default function AccordionSection({
     setIsEditing(false);
   }
 
-  function save() {
-    onSave(draft);
-    setIsEditing(false);
+  async function save() {
+    if (saving) return;
+    setSaving(true); setSaveError("");
+    try { await onSave(draft); setIsEditing(false); }
+    catch (error) { setSaveError(error instanceof Error ? error.message : "Не вдалося зберегти профіль."); }
+    finally { setSaving(false); }
   }
 
   function toggleMultiselectValue(fieldKey: string, optionValue: string) {
@@ -205,17 +211,19 @@ export default function AccordionSection({
                 })}
               </div>
               <div className={styles.actionsRow}>
-                <button type="button" className={styles.saveButton} onClick={save}>
-                  Зберегти
+                <button type="button" className={styles.saveButton} onClick={save} disabled={saving}>
+                  {saving ? "Зберігаємо…" : "Зберегти"}
                 </button>
                 <button
                   type="button"
                   className={styles.cancelButton}
                   onClick={cancelEditing}
+                  disabled={saving}
                 >
                   Скасувати
                 </button>
               </div>
+              {saveError && <p role="alert">{saveError}</p>}
             </>
           ) : hasAnyValue ? (
             <>

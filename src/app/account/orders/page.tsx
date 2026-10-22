@@ -1,156 +1,48 @@
 "use client";
-
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../../context/AuthContext";
 import AccountPageShell from "../../../components/account/AccountPageShell";
 import PageTitle from "../../../components/account/PageTitle";
-import EmptyState from "../../../components/account/EmptyState";
-import { getMyOrders, getOrderStatusLabel, isOrderInactive } from "../../../lib/api/orders";
-import { formatDate } from "../../../lib/format";
-import type { OrderSummary } from "../../../types/order";
-import styles from "./page.module.css";
-import Icon from "../../../components/common/Icon";
-
-type Period = "all" | "year" | "month";
-
-const PERIOD_DAYS: Record<Exclude<Period, "all">, number> = { year: 365, month: 30 };
-const DAY_MS = 24 * 60 * 60 * 1000;
+import { getCustomerOrders, type CustomerOrder, type Page } from "../../../lib/api/account";
+import { getOrderStatusLabel } from "../../../lib/api/orders";
+import { resolveMediaUrl } from "../../../lib/api/client";
+import { formatDate, formatPrice } from "../../../lib/format";
+import styles from "../../../components/account/AccountData.module.css";
 
 export default function OrdersPage() {
-  const router = useRouter();
-  const [orders, setOrders] = useState<OrderSummary[] | null>(null);
-  const [query, setQuery] = useState("");
-  const [period, setPeriod] = useState<Period>("all");
-  // Граница периода считается в момент выбора — не во время рендера
-  const [since, setSince] = useState<number | null>(null);
-
+  const { user } = useAuth();
+  const userId = user?.id;
+  const [result, setResult] = useState<Page<CustomerOrder> | null>(null);
+  const [query, setQuery] = useState(""); const [days, setDays] = useState("all"); const [page, setPage] = useState(1);
+  const [error, setError] = useState(""); const [revision, setRevision] = useState(0);
   useEffect(() => {
+    if (!userId) return;
     let active = true;
-    getMyOrders()
-      .then((list) => {
-        if (active) setOrders(list);
-      })
-      .catch(() => {
-        if (active) setOrders([]);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  function handlePeriodChange(value: Period) {
-    setPeriod(value);
-    setSince(value === "all" ? null : Date.now() - PERIOD_DAYS[value] * DAY_MS);
-  }
-
-  const visible = useMemo(() => {
-    if (!orders) return [];
-    const q = query.trim().toLowerCase();
-    return orders.filter(
-      (order) =>
-        (!q || order.number.toLowerCase().includes(q)) &&
-        (since === null || Date.parse(order.createdAt) >= since)
-    );
-  }, [orders, query, since]);
-
-  return (
-    <AccountPageShell>
-      <PageTitle>Замовлення</PageTitle>
-
-      {orders !== null && orders.length === 0 && (
-        <EmptyState
-          icon="/icons/box.svg"
-          title="Замовлень ще немає"
-          subtitle="Тут з’являться усі ваші замовлення після першої покупки"
-          actionLabel="Перейти до покупок"
-          onAction={() => router.push("/")}
-        />
-      )}
-
-      {orders !== null && orders.length > 0 && (
-        <>
-          <div className={styles.toolbar}>
-            <div className={styles.searchWrap}>
-              <svg
-                className={styles.searchIcon}
-                viewBox="0 0 20 20"
-                width="18"
-                height="18"
-                fill="none"
-                aria-hidden="true"
-              >
-                <circle cx="9" cy="9" r="6" stroke="#898888" strokeWidth="1.6" />
-                <path d="M17 17l-4-4" stroke="#898888" strokeWidth="1.6" strokeLinecap="round" />
-              </svg>
-              <input
-                type="text"
-                className={styles.searchInput}
-                placeholder="Пошук за номером замовлення"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-            </div>
-            <select
-              className={styles.periodSelect}
-              value={period}
-              onChange={(e) => handlePeriodChange(e.target.value as Period)}
-            >
-              <option value="all">За весь час</option>
-              <option value="year">За рік</option>
-              <option value="month">За місяць</option>
-            </select>
-          </div>
-
-          {visible.length === 0 ? (
-            <EmptyState
-              icon="/icons/box.svg"
-              title="Замовлень не знайдено"
-              subtitle="Спробуйте змінити номер або період"
-            />
-          ) : (
-            <div className={styles.list}>
-              {visible.map((order) => {
-                const inactive = isOrderInactive(order.status);
-                return (
-                  <div key={order.id} className={styles.orderRow}>
-                    <div className={styles.orderInfo}>
-                      <p
-                        className={`${styles.orderNumber} ${inactive ? styles.orderNumberCancelled : ""}`}
-                      >
-                        № {order.number} від {formatDate(order.createdAt)}
-                      </p>
-                      <p
-                        className={`${styles.orderStatus} ${
-                          inactive ? styles.statusCancelled : styles.statusDone
-                        }`}
-                      >
-                        {getOrderStatusLabel(order.status)}
-                      </p>
-                    </div>
-                    {order.thumbnail ? (
-                      <Image src={order.thumbnail} alt="" width={36} height={36} className={styles.orderThumb} />
-                    ) : (
-                      <Icon src="/icons/box.svg" className={styles.orderThumb} />
-                    )}
-                    <button type="button" className={styles.expandButton} aria-label="Деталі замовлення">
-                      <svg viewBox="0 0 16 16" width="16" height="16" fill="none">
-                        <path
-                          d="M4 6l4 4 4-4"
-                          stroke="#28251d"
-                          strokeWidth="1.6"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </>
-      )}
-    </AccountPageShell>
-  );
+    const load = () => getCustomerOrders(page, query, days === "all" ? undefined : new Date(Date.now() - Number(days) * 86400000).toISOString())
+      .then(data => { if (active) { setResult(data); setError(""); } }).catch(error => { if (active) setError(error.message); });
+    const debounce = setTimeout(() => void load(), 250);
+    const refresh = setInterval(() => { if (document.visibilityState === "visible") void load(); }, 30000);
+    return () => { active = false; clearTimeout(debounce); clearInterval(refresh); };
+  }, [userId, page, query, days, revision]);
+  return <AccountPageShell><PageTitle>Мої замовлення</PageTitle>
+    <div className={styles.toolbar}>
+      <input aria-label="Номер замовлення" placeholder="Пошук за номером" value={query} onChange={e => { setQuery(e.target.value); setPage(1); }} />
+      <select aria-label="Період" value={days} onChange={e => { setDays(e.target.value); setPage(1); }}><option value="all">За весь час</option><option value="365">За рік</option><option value="30">За місяць</option></select>
+      <button onClick={() => setRevision(x => x + 1)}>Оновити</button>
+    </div>
+    {error ? <div className={styles.card} role="alert">{error}</div> : !result ? <p role="status">Завантажуємо замовлення…</p> : <>
+      <p className={styles.muted}>Знайдено: {result.totalElements}</p>
+      {result.content.length === 0 ? <div className={styles.card}><h2>Замовлень не знайдено</h2><p>Тут з’являться ваші покупки. Якщо ви шукали замовлення, змініть номер або період.</p><Link href="/">До каталогу</Link></div> : result.content.map(order => {
+        const image = resolveMediaUrl(order.items[0]?.imageUrl);
+        return <Link className={`${styles.card} ${styles.order}`} href={`/account/orders/${order.id}`} key={order.id}>
+          {image && <Image src={image} alt="" width={64} height={64} unoptimized className={styles.thumbnail} />}
+          <div className={styles.grow}><strong>№ {order.orderNumber}</strong><p className={styles.muted}>{formatDate(order.createdAt)} · {order.items.length} позицій</p><span className={styles.badge}>{getOrderStatusLabel(order.status)}</span></div>
+          <strong>{formatPrice(order.totalAmount)} ₴</strong><span aria-hidden="true">→</span>
+        </Link>;
+      })}
+      {result.totalPages > 1 && <nav className={styles.toolbar} aria-label="Сторінки замовлень"><button disabled={page === 1} onClick={() => setPage(x => x - 1)}>← Назад</button><span>{page} / {result.totalPages}</span><button disabled={page >= result.totalPages} onClick={() => setPage(x => x + 1)}>Далі →</button></nav>}
+    </>}
+  </AccountPageShell>;
 }

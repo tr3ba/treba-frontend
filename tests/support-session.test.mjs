@@ -7,6 +7,9 @@ import { setTimeout as delay } from "node:timers/promises";
 
 test("support session uses real server authentication without exposing credentials", { timeout: 120000 }, async t => {
   let refreshCount = 0;
+  let preferences = { values: { firstName: "Test", lastName: "Customer", addressCity: "Kyiv" }, version: "preferences-v1" };
+  let application = null;
+  const notification = { key: "message:fixture", title: "Support message", text: "Fixture message", scope: "shop", path: "/account/messages?ticket=fixture", createdAt: new Date().toISOString(), read: false };
   const authentication = (expired = false, role = "Customer") => ({ userId: "fixture-customer", firstName: "Test", lastName: "Customer", email: "customer@example.test", role, accessToken: role !== "Customer" ? "fixture-staff" : "fixture-access", refreshToken: "fixture-refresh", expiresAt: new Date(Date.now() + (expired ? -1000 : 3600000)).toISOString() });
   const backend = http.createServer(async (request, response) => {
     let body = ""; for await (const part of request) body += part;
@@ -32,6 +35,19 @@ test("support session uses real server authentication without exposing credentia
     if (request.url === "/api/auth/admin-entry") { if (request.headers.authorization !== "Bearer fixture-staff") response.writeHead(403); response.end(JSON.stringify({ code: "one-time-admin-code", expiresAt: new Date(Date.now() + 60000).toISOString() })); return; }
     if (request.url === "/api/users/me") { response.end(JSON.stringify({ id: "fixture-customer", firstName: "Test", lastName: "Customer", email: "customer@example.test", phone: "+380000000000", role: request.headers.authorization === "Bearer fixture-staff" ? "Manager" : "Customer" })); return; }
     if (request.url === "/api/auth/logout") { response.writeHead(204); response.end(); return; }
+    if (request.url === "/api/v1/account/preferences") {
+      if (request.method === "PATCH") { const input = JSON.parse(body); assert.equal(input.version, preferences.version); preferences = { values: { ...preferences.values, ...input.values }, version: "preferences-v2" }; }
+      response.end(JSON.stringify(preferences)); return;
+    }
+    if (request.url.startsWith("/api/v1/account/orders")) {
+      response.end(JSON.stringify({ content: [{ id: "fixture-order", orderNumber: "ORDER-1", status: "PAID", items: [] }], page: 1, totalElements: 1, totalPages: 1 })); return;
+    }
+    if (request.url === "/api/v1/account/seller-application") {
+      if (request.method === "POST") { application = { ...JSON.parse(body), id: "fixture-application", status: "pending", createdAt: new Date().toISOString() }; response.end(JSON.stringify(application)); }
+      else response.end(JSON.stringify({ application })); return;
+    }
+    if (request.url === "/api/v1/account/notifications") { response.end(JSON.stringify({ items: [notification], unreadCount: notification.read ? 0 : 1 })); return; }
+    if (request.url === "/api/v1/account/notifications/read") { assert.deepEqual(JSON.parse(body).keys, [notification.key]); notification.read = true; response.writeHead(204); response.end(); return; }
     if (request.url.startsWith("/api/v1/support")) { response.end(JSON.stringify({ content: [], page: 1, totalPages: 0 })); return; }
     response.writeHead(404); response.end("{}");
   });
@@ -68,6 +84,24 @@ test("support session uses real server authentication without exposing credentia
   await t.test("remember-me off uses browser-session cookies", async () => {
     const response = await post("/shop-api/session", { action: "login", email: "customer@example.test", password: "fixture-only", remember: false });
     assert.equal(response.status, 200); assert.ok(response.headers.getSetCookie().every(value => !/Max-Age=/i.test(value)));
+  });
+  await t.test("account proxy keeps preferences, applications and notification receipts on the server", async () => {
+    assert.equal((await fetch(origin + "/shop-api/account/preferences")).status, 401);
+    const request = (path, options = {}) => fetch(origin + "/shop-api/account/" + path, { ...options, headers: { Cookie: cookie, Origin: origin, "Content-Type": "application/json", ...options.headers } });
+    const saved = await request("preferences", { method: "PATCH", body: JSON.stringify({ values: { addressCity: "Lviv" }, version: "preferences-v1" }) });
+    assert.equal(saved.status, 200); assert.match(saved.headers.get("cache-control"), /no-store/);
+    assert.equal((await (await request("preferences")).json()).values.addressCity, "Lviv");
+    const submitted = await request("seller-application", { method: "POST", body: JSON.stringify({ companyName: "Fixture company", storeName: "Fixture store", taxNumber: "12345678" }) });
+    assert.equal((await submitted.json()).status, "pending");
+    assert.equal((await (await request("seller-application")).json()).application.companyName, "Fixture company");
+    assert.equal((await (await request("orders?page=1&search=ORDER")).json()).totalElements, 1);
+    assert.equal((await (await request("notifications")).json()).unreadCount, 1);
+    const read = await request("notifications/read", { method: "POST", body: JSON.stringify({ keys: [notification.key] }) });
+    assert.equal(read.status, 204); assert.equal(await read.text(), "");
+    assert.equal((await (await request("notifications")).json()).unreadCount, 0);
+    assert.equal((await request("preferences", { method: "PATCH", headers: { Origin: "https://outside.test" }, body: "{}" })).status, 403);
+    for (const path of ["users", "orders/not-a-guid", "notifications/read"]) assert.equal((await request(path)).status, 404);
+    assert.equal((await request("orders", { method: "POST", body: "{}" })).status, 404);
   });
   await t.test("login returns every authoritative workspace role without granting a submitted role", async () => {
     for (const role of ["Administrator", "Manager", "Moderator", "Seller"]) {

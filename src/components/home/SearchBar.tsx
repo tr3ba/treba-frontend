@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import styles from "./SearchBar.module.css";
 import Icon from "../common/Icon";
+import { useRouter } from "next/navigation";
 
 const BLUR_DELAY = 150;
 
@@ -22,6 +23,7 @@ const popularQueries = [
 ];
 
 export default function SearchBar() {
+  const router = useRouter();
   const [value, setValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const blurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -41,13 +43,17 @@ export default function SearchBar() {
   const pickQuery = (query: string) => {
     setValue(query);
     setIsOpen(false);
+    router.push("/search?q=" + encodeURIComponent(query));
   };
 
   return (
-    <div className={styles.searchWrapper}>
+    <form action="/search" method="GET" className={styles.searchWrapper} role="search">
       <div className={styles.searchBox}>
         <input
           type="text"
+          name="q"
+          aria-label="Пошук товарів"
+          maxLength={200}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onFocus={openSuggestions}
@@ -58,7 +64,7 @@ export default function SearchBar() {
         <Icon src="/icons/mic.svg" alt="" className={styles.micIcon} />
       </div>
 
-      <button type="button" className={styles.searchButton}>
+      <button type="submit" className={styles.searchButton}>
         Знайти
       </button>
 
@@ -67,7 +73,7 @@ export default function SearchBar() {
           className={styles.suggestions}
           onMouseDown={(e) => e.preventDefault()}
         >
-          <p className={styles.suggestionsTitle}>Популярні запити</p>
+          <p className={styles.suggestionsTitle}>Спробуйте знайти</p>
           <div className={styles.suggestionsList}>
             {popularQueries.map((query) => (
               <button
@@ -82,6 +88,6 @@ export default function SearchBar() {
           </div>
         </div>
       )}
-    </div>
+    </form>
   );
 }
