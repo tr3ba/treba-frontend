@@ -94,6 +94,17 @@
     transition: color 0.2s ease;
 }
 
+.roleBadge {
+    align-self: flex-start;
+    padding: 5px 9px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background: #eef2ff;
+    color: #2339b8;
+    font-size: 12px;
+    font-weight: 600;
+}
+
 .accountLink:hover {
     color: #ff6e2a;
 }

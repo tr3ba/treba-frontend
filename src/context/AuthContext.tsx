@@ -8,15 +8,16 @@ export type UserProfile = {
   addressCity?: string; addressStreet?: string; addressBuilding?: string; deliveryMethod?: string; addressBranch?: string;
   additionalInfoOptions?: string;
 };
-type User = { id: string; name: string; email: string; role?: string } & UserProfile;
+export type User = { id: string; name: string; email: string; role?: string } & UserProfile;
 export type LoginChallenge = { challengeId: string; methods: string[]; maskedEmail: string; expiresAt: string };
+export type LoginResult = { challenge: LoginChallenge; user?: never } | { user: User; challenge?: never };
 type AuthContextValue = {
   user: User | null; isLoading: boolean;
   register: (name: string, email: string, password: string, profile?: UserProfile) => Promise<void>;
-  login: (email: string, password: string, remember?: boolean) => Promise<LoginChallenge | null>;
-  verify: (challengeId: string, method: string, code: string, remember?: boolean) => Promise<void>;
+  login: (email: string, password: string, remember?: boolean) => Promise<LoginResult>;
+  verify: (challengeId: string, method: string, code: string, remember?: boolean) => Promise<User>;
   sendEmailCode: (challengeId: string) => Promise<void>;
-  verifyGuard: (id: string, browserSecret: string, remember?: boolean) => Promise<void>;
+  verifyGuard: (id: string, browserSecret: string, remember?: boolean) => Promise<User>;
   logout: () => Promise<void>; updateProfile: (patch: UserProfile) => void;
 };
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -53,19 +54,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const result = await sessionRequest({ action: "register", email, password, firstName: profile?.firstName ?? name.split(" ")[0], lastName: profile?.lastName ?? name.split(" ").slice(1).join(" "), phone: profile?.phone });
     setUser(restorePreferences(result.user));
   }
-  async function login(email: string, password: string, remember = true) {
+  function acceptUser(value: User | null | undefined): User {
+    if (!value?.id) throw new Error("Не вдалося підтвердити вхід.");
+    const authenticatedUser = restorePreferences(value)!;
+    setUser(authenticatedUser);
+    return authenticatedUser;
+  }
+  async function login(email: string, password: string, remember = true): Promise<LoginResult> {
     const result = await sessionRequest({ action: "login", email, password, remember });
-    if (result.challenge) return result.challenge as LoginChallenge;
-    setUser(restorePreferences(result.user)); return null;
+    if (result.challenge) return { challenge: result.challenge as LoginChallenge };
+    return { user: acceptUser(result.user) };
   }
   async function verify(challengeId: string, method: string, code: string, remember = true) {
-    const result = await sessionRequest({ action: "verify", challengeId, method, code, remember }); setUser(restorePreferences(result.user));
+    const result = await sessionRequest({ action: "verify", challengeId, method, code, remember });
+    return acceptUser(result.user);
   }
   async function sendEmailCode(challengeId: string) { await sessionRequest({ action: "email", challengeId }); }
   async function verifyGuard(id: string, browserSecret: string, remember = true) {
     const result = await sessionRequest({ action: "guard-complete", id, browserSecret, remember });
-    if (!result.user) throw new Error("Не вдалося підтвердити вхід.");
-    setUser(restorePreferences(result.user));
+    return acceptUser(result.user);
   }
   async function logout() { try { await sessionRequest({ action: "logout" }); } finally { setUser(null); } }
   // Existing account preference fields remain local until their dedicated API is connected.

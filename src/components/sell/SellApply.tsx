@@ -7,6 +7,8 @@ import SellSection from "./SellSection";
 import SellApplicationForm from "./SellApplicationForm";
 import { IconCheck } from "./SellIcons";
 import styles from "./SellApply.module.css";
+import { useAuth } from "../../context/AuthContext";
+import { adminOrigin, canOpenAdmin, workspaceLabel } from "../../lib/admin";
 
 const PERKS = [
   "Безкоштовне підключення",
@@ -17,6 +19,22 @@ const PERKS = [
 // Блок заявки на весь экран: слева описание, справа форма или экран успеха
 export default function SellApply() {
   const [submitted, setSubmitted] = useState<SellerApplication | null>(null);
+  const { user, isLoading } = useAuth();
+
+  if (user && canOpenAdmin(user.role)) return (
+    <SellSection id="apply" ariaLabel="Робочий кабінет" className={styles.section}>
+      <div className={styles.card}>
+        <h2 className={styles.successTitle}>{workspaceLabel(user.role)}</h2>
+        <p className={styles.successText}>{user.role === "Seller"
+          ? "У вас уже є доступ до кабінету продавця. Керуйте товарами та замовленнями у своїй панелі."
+          : "Це обліковий запис співробітника TREBA. Заявка продавця призначена для покупців; робочі інструменти доступні у вашій панелі."}</p>
+        <div className={styles.successActions}>
+          <a href={adminOrigin + "/site-login/start"} className={styles.btnPrimary}>{workspaceLabel(user.role)} ↗</a>
+          <Link href="/" className={styles.btnSecondary}>До магазину</Link>
+        </div>
+      </div>
+    </SellSection>
+  );
 
   return (
     <SellSection
@@ -47,7 +65,7 @@ export default function SellApply() {
         </div>
 
         <div className={styles.card}>
-          {submitted ? (
+          {isLoading ? <p role="status">Перевіряємо обліковий запис…</p> : submitted ? (
             <div className={styles.success} role="status">
               <span className={styles.successIcon}>
                 <IconCheck size={40} />
