@@ -2,15 +2,16 @@
 
 import { useEffect, useState, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth, type LoginChallenge } from "../../context/AuthContext";
+import { useAuth, type LoginChallenge, type User } from "../../context/AuthContext";
 import { buildAuthHref, getSafeNextPath } from "../../lib/redirect";
+import { getLoginDestination } from "../../lib/admin";
 import { EyeIcon, EyeOffIcon, GoogleIcon } from "./Icons";
 import styles from "./AuthForm.module.css";
 import GuardVerification from "./GuardVerification";
 import Icon from "../common/Icon";
 
 type LoginFormProps = {
-  /** Если задан (модалка), вызывается после входа вместо перехода по ?next */
+  /** Закрывает модалку покупателя, если нет явного адреса возврата. */
   onSuccess?: () => void;
 };
 
@@ -71,19 +72,22 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
 
     try {
       setBusy(true);
-      if (challenge) await verify(challenge.challengeId, method, code, rememberMe);
+      let authenticatedUser: User;
+      if (challenge) authenticatedUser = await verify(challenge.challengeId, method, code, rememberMe);
       else {
-        const next = await login(email, password, rememberMe);
-        if (next) { setChallenge(next); setMethod(""); setPassword(""); return; }
+        const result = await login(email, password, rememberMe);
+        if (result.challenge) { setChallenge(result.challenge); setMethod(""); setPassword(""); return; }
+        authenticatedUser = result.user;
       }
-      finishLogin();
+      finishLogin(authenticatedUser);
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Помилка входу");
     } finally { setBusy(false); }
   }
 
-  function finishLogin() {
-    if (nextParam) window.location.replace(nextPath);
+  function finishLogin(authenticatedUser: User) {
+    const destination = getLoginDestination(authenticatedUser.role, nextParam);
+    if (destination) window.location.replace(destination);
     else if (onSuccess) onSuccess();
     else router.replace(nextPath);
   }

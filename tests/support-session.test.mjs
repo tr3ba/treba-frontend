@@ -7,17 +7,25 @@ import { setTimeout as delay } from "node:timers/promises";
 
 test("support session uses real server authentication without exposing credentials", { timeout: 120000 }, async t => {
   let refreshCount = 0;
-  const authentication = (expired = false, staff = false) => ({ userId: "fixture-customer", firstName: "Test", lastName: "Customer", email: "customer@example.test", role: staff ? "Manager" : "Customer", accessToken: staff ? "fixture-staff" : "fixture-access", refreshToken: "fixture-refresh", expiresAt: new Date(Date.now() + (expired ? -1000 : 3600000)).toISOString() });
+  const authentication = (expired = false, role = "Customer") => ({ userId: "fixture-customer", firstName: "Test", lastName: "Customer", email: "customer@example.test", role, accessToken: role !== "Customer" ? "fixture-staff" : "fixture-access", refreshToken: "fixture-refresh", expiresAt: new Date(Date.now() + (expired ? -1000 : 3600000)).toISOString() });
   const backend = http.createServer(async (request, response) => {
     let body = ""; for await (const part of request) body += part;
     response.setHeader("Content-Type", "application/json");
     if (request.url === "/api/auth/login") {
       if (body.includes("challenge")) { response.end(JSON.stringify({ challenge: { challengeId: "fixture-challenge", methods: ["authenticator", "email", "telegram"], maskedEmail: "t***@example.test", expiresAt: new Date(Date.now() + 60000).toISOString() } })); return; }
-      response.end(JSON.stringify({ authentication: authentication(body.includes("expired"), body.includes("staff")) })); return;
+      const role = ["Administrator", "Manager", "Moderator", "Seller"].find(value => JSON.parse(body).email === value + "@example.test") ?? (body.includes("staff") ? "Manager" : "Customer");
+      response.end(JSON.stringify({ authentication: authentication(body.includes("expired"), role) })); return;
+    }
+    if (request.url === "/api/auth/2fa/email/send") { assert.equal(JSON.parse(body).challengeId, "fixture-challenge"); response.writeHead(204); response.end(); return; }
+    if (request.url === "/api/auth/2fa/verify") {
+      const input = JSON.parse(body);
+      if (input.code !== "123456") { response.writeHead(401); response.end("{}"); return; }
+      assert.equal(input.challengeId, "fixture-challenge"); assert.ok(["email", "authenticator"].includes(input.method));
+      response.end(JSON.stringify({ authentication: authentication(false, "Manager") })); return;
     }
     if (request.url === "/api/telegram/guard") { assert.equal(JSON.parse(body).loginChallengeId, "fixture-challenge"); response.end(JSON.stringify({ id: "fixture-guard", browserSecret: "fixture-browser-secret", qrCodeDataUrl: "data:image/png;base64,fixture", displayCode: "123456" })); return; }
     if (request.url === "/api/telegram/guard/status") { assert.equal(JSON.parse(body).browserSecret, "fixture-browser-secret"); response.end(JSON.stringify({ status: "approved" })); return; }
-    if (request.url === "/api/telegram/guard/complete") { assert.equal(JSON.parse(body).browserSecret, "fixture-browser-secret"); response.end(JSON.stringify({ authentication: authentication(false, true) })); return; }
+    if (request.url === "/api/telegram/guard/complete") { assert.equal(JSON.parse(body).browserSecret, "fixture-browser-secret"); response.end(JSON.stringify({ authentication: authentication(false, "Manager") })); return; }
     if (request.url === "/api/auth/register") { assert.equal(JSON.parse(body).roleName, "Customer"); response.end(JSON.stringify(authentication())); return; }
     if (request.url === "/api/auth/refresh") { refreshCount++; await delay(100); response.end(JSON.stringify(authentication())); return; }
     if (!["Bearer fixture-access", "Bearer fixture-staff"].includes(request.headers.authorization)) { response.writeHead(401); response.end("{}"); return; }
@@ -60,6 +68,26 @@ test("support session uses real server authentication without exposing credentia
   await t.test("remember-me off uses browser-session cookies", async () => {
     const response = await post("/shop-api/session", { action: "login", email: "customer@example.test", password: "fixture-only", remember: false });
     assert.equal(response.status, 200); assert.ok(response.headers.getSetCookie().every(value => !/Max-Age=/i.test(value)));
+  });
+  await t.test("login returns every authoritative workspace role without granting a submitted role", async () => {
+    for (const role of ["Administrator", "Manager", "Moderator", "Seller"]) {
+      const response = await post("/shop-api/session", { action: "login", email: role + "@example.test", password: "fixture-only" });
+      assert.equal(response.status, 200);
+      const result = await response.json(); assert.equal(result.user.role, role); assert.ok(!("accessToken" in result));
+    }
+    const forged = await post("/shop-api/session", { action: "login", email: "customer@example.test", password: "fixture-only", role: "Administrator" });
+    assert.equal((await forged.json()).user.role, "Customer");
+  });
+  await t.test("email and authenticator return the verified role only after a valid code", async () => {
+    const email = await post("/shop-api/session", { action: "email", challengeId: "fixture-challenge" });
+    assert.equal(email.status, 200); assert.equal(email.headers.getSetCookie().length, 0);
+    for (const method of ["email", "authenticator"]) {
+      const invalid = await post("/shop-api/session", { action: "verify", challengeId: "fixture-challenge", method, code: "000000" });
+      assert.equal(invalid.status, 401); assert.equal(invalid.headers.getSetCookie().length, 0);
+      const verified = await post("/shop-api/session", { action: "verify", challengeId: "fixture-challenge", method, code: "123456" });
+      assert.equal(verified.status, 200); assert.equal((await verified.json()).user.role, "Manager");
+      assert.ok(verified.headers.getSetCookie().length > 0);
+    }
   });
   await t.test("connected methods do not establish a session before verification", async () => {
     const pending = await post("/shop-api/session", { action: "login", email: "challenge@example.test", password: "fixture-only" });

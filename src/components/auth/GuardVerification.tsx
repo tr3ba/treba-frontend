@@ -1,11 +1,11 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { sessionRequest, useAuth } from "../../context/AuthContext";
+import { sessionRequest, useAuth, type User } from "../../context/AuthContext";
 import styles from "./AuthForm.module.css";
 
 type Guard = { id: string; browserSecret: string; qrCodeDataUrl: string; displayCode: string; expiresAt: string };
-export default function GuardVerification({ challengeId, remember, onVerified }: { challengeId: string; remember: boolean; onVerified: () => void }) {
+export default function GuardVerification({ challengeId, remember, onVerified }: { challengeId: string; remember: boolean; onVerified: (user: User) => void }) {
   const { verifyGuard } = useAuth();
   const [guard, setGuard] = useState<Guard | null>(null);
   const [error, setError] = useState("");
@@ -30,8 +30,8 @@ export default function GuardVerification({ challengeId, remember, onVerified }:
         const status = await sessionRequest({ action: "guard-status", id: guard.id, browserSecret: guard.browserSecret });
         if (!active) return;
         if (status.status === "approved") {
-          await verify.current(guard.id, guard.browserSecret, remember);
-          if (active) { completed.current = true; verified.current(); }
+          const user = await verify.current(guard.id, guard.browserSecret, remember);
+          if (active) { completed.current = true; verified.current(user); }
         } else if (status.status === "expired" || status.status === "consumed") throw new Error("QR-код недоступний. Почніть підтвердження ще раз.");
       } catch (value) { if (active) { setError(value instanceof Error ? value.message : "Не вдалося підтвердити вхід."); clearInterval(timer); } }
       finally { running = false; }

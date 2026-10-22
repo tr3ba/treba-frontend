@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "../../context/AuthContext";
 import styles from "./UserMenu.module.css";
-import { adminOrigin, canOpenAdmin } from "../../lib/admin";
+import { adminOrigin, canOpenAdmin, canApplyAsSeller, roleLabel, workspaceLabel } from "../../lib/admin";
 import Icon from "../common/Icon";
 
 export default function UserMenu() {
@@ -64,21 +64,22 @@ export default function UserMenu() {
         <div className={styles.dropdown}>
           <p className={styles.userName}>{user.name}</p>
           <p className={styles.userEmail}>{user.email}</p>
+          {roleLabel(user.role) && <span className={styles.roleBadge}>{roleLabel(user.role)}</span>}
+          {canOpenAdmin(user.role) && <a href={adminOrigin + "/site-login/start"} className={styles.accountLink}>{workspaceLabel(user.role)}</a>}
           <Link
             href="/account"
             className={styles.accountLink}
             onClick={() => setIsOpen(false)}
           >
-            Особистий кабінет
+            {canOpenAdmin(user.role) ? "Кабінет покупця" : "Особистий кабінет"}
           </Link>
-          <Link
+          {canApplyAsSeller(user.role) && <Link
             href="/sell"
             className={styles.accountLink}
             onClick={() => setIsOpen(false)}
           >
             Стати продавцем
-          </Link>
-          {canOpenAdmin(user.role) && <a href={adminOrigin + "/site-login/start"} className={styles.accountLink}>Адмін-панель</a>}
+          </Link>}
           <button
             className={styles.logoutButton}
             onClick={() => {
