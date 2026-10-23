@@ -54,3 +54,13 @@ export type ComparisonCardProduct = Pick<
   | "seller"
   | "characteristics"
 >;
+
+/** Рядок таблиці порівняння: назва + значення по товарах (у порядку колонок). */
+export type ComparisonRow = {
+  key: string;
+  label: string;
+  /** null — у товару немає цього значення */
+  values: (string | null)[];
+  /** Усі значення однакові — для «Тільки відмінності» і сірого тексту */
+  isSame: boolean;
+};
