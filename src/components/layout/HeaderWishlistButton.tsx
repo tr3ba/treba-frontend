@@ -2,39 +2,34 @@
 
 import Link from "next/link";
 import { useWishlist } from "../../context/WishlistContext";
-import styles from "./HeaderWishlistButton.module.css";
-import Icon from "../common/Icon";
+import HeaderIcon from "./HeaderIcon";
+import iconStyles from "./HeaderIcon.module.css";
 
 type HeaderWishlistButtonProps = {
   /** Доп. класс от шапки (напр. скрыть на телефоне) */
   className?: string;
 };
 
-// Сердечко в шапці: посилання на список бажань з лічильником
+// Сердечко в шапці: посилання на список бажань з лічильником.
+// Якщо в списку є товари — сердечко залите.
 export default function HeaderWishlistButton({ className }: HeaderWishlistButtonProps) {
   const { count, isReady } = useWishlist();
-  const hasItems = isReady && count > 0;
+  const total = isReady ? count : 0;
 
-  const classes = [styles.wrap, hasItems ? styles.hasItems : "", className ?? ""]
-    .filter(Boolean)
-    .join(" ");
+  const classes = [iconStyles.action, className ?? ""].filter(Boolean).join(" ");
 
   return (
     <Link
       href="/account/wishlist"
       className={classes}
-      aria-label={hasItems ? `Список бажань, товарів: ${count}` : "Список бажань"}
+      aria-label={total > 0 ? `Список бажань, товарів: ${total}` : "Список бажань"}
     >
-      <span className={`${styles.iconSwap} ${styles.heartIcon}`}>
-        <Icon src="/icons/heart.svg" alt="" className={styles.iconOutline} />
-        <Icon src="/icons/heart1.svg" alt="" className={styles.iconFilled} />
-      </span>
-
-      {hasItems && (
-        <span className={styles.badge} key={count}>
-          {count > 99 ? "99+" : count}
-        </span>
-      )}
+      <HeaderIcon
+        outline="/icons/heart.svg"
+        filled="/icons/heart1.svg"
+        active={total > 0}
+        badge={total}
+      />
     </Link>
   );
 }

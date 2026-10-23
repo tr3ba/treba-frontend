@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useAuth } from "../../context/AuthContext";
 import styles from "./UserMenu.module.css";
 import { adminOrigin, canOpenAdmin, canApplyAsSeller, roleLabel, workspaceLabel } from "../../lib/admin";
-import Icon from "../common/Icon";
+import HeaderIcon from "../layout/HeaderIcon";
+import iconStyles from "../layout/HeaderIcon.module.css";
 
 export default function UserMenu() {
   const { user, isLoading, logout } = useAuth();
@@ -27,22 +28,16 @@ export default function UserMenu() {
 
   if (isLoading) {
     return (
-      <button className={styles.actionButton} aria-label="Профіль">
-        <span className={`${styles.iconSwap} ${styles.userIcon}`}>
-          <Icon src="/icons/user.svg" alt="" className={styles.iconOutline} />
-          <Icon src="/icons/user1.svg" alt="" className={styles.iconFilled} />
-        </span>
+      <button className={iconStyles.action} aria-label="Профіль">
+        <HeaderIcon outline="/icons/user.svg" filled="/icons/user1.svg" />
       </button>
     );
   }
 
   if (!user) {
     return (
-      <Link href="/login" className={styles.actionButton} aria-label="Увійти">
-        <span className={`${styles.iconSwap} ${styles.userIcon}`}>
-          <Icon src="/icons/user.svg" alt="" className={styles.iconOutline} />
-          <Icon src="/icons/user1.svg" alt="" className={styles.iconFilled} />
-        </span>
+      <Link href="/login" className={iconStyles.action} aria-label="Увійти">
+        <HeaderIcon outline="/icons/user.svg" filled="/icons/user1.svg" />
       </Link>
     );
   }
@@ -50,14 +45,12 @@ export default function UserMenu() {
   return (
     <div className={styles.wrapper} ref={wrapperRef}>
       <button
-        className={styles.actionButton}
+        className={iconStyles.action}
         aria-label="Профіль"
+        aria-expanded={isOpen}
         onClick={() => setIsOpen((prev) => !prev)}
       >
-        <span className={`${styles.iconSwap} ${styles.userIcon}`}>
-          <Icon src="/icons/user.svg" alt="" className={styles.iconOutline} />
-          <Icon src="/icons/user1.svg" alt="" className={styles.iconFilled} />
-        </span>
+        <HeaderIcon outline="/icons/user.svg" filled="/icons/user1.svg" active={isOpen} />
       </button>
 
       {isOpen && (
