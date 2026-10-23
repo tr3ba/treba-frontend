@@ -1,19 +1,24 @@
-"use client";
-
 import AccountPageShell from "../../../components/account/AccountPageShell";
-import PageTitle from "../../../components/account/PageTitle";
-import EmptyState from "../../../components/account/EmptyState";
+import ComparisonListsView from "../../../components/comparison/ComparisonListsView";
+import { getComparisonProducts } from "../../../lib/api/products";
+import type { ComparisonCardProduct } from "../../../types/comparison";
 
-export default function ComparisonsPage() {
+// Бэк недоступний — сторінка все одно відкриється, превʼю будуть без фото
+async function loadProducts(): Promise<ComparisonCardProduct[]> {
+  try {
+    return await getComparisonProducts();
+  } catch (error) {
+    console.error("Не вдалося завантажити товари для порівняння:", error);
+    return [];
+  }
+}
+
+export default async function ComparisonsPage() {
+  const products = await loadProducts();
+
   return (
     <AccountPageShell>
-      <PageTitle>Списки порівнянь</PageTitle>
-      <EmptyState
-        icon="/icons/circle.svg"
-        title="Список порівнянь порожній"
-        subtitle="Додавайте товари до порівняння прямо з каталогу, щоб було зручніше обрати найкращий варіант"
-        actionLabel="Перейти в каталог"
-      />
+      <ComparisonListsView products={products} />
     </AccountPageShell>
   );
 }

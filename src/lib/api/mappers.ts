@@ -108,8 +108,13 @@ export function mapCatalogProduct(
     image: images[0],
     images,
     categoryId: rootSlugByCategoryId?.get(dto.categoryId) ?? dto.categoryId,
+    subcategoryId: dto.categoryId,
+    subcategoryName: dto.categoryName || undefined,
     inStock: dto.stockQuantity > 0,
     code: dto.sku,
+    brand: dto.brandName || undefined,
+    warrantyMonths: dto.warrantyMonths > 0 ? dto.warrantyMonths : undefined,
+    countryOfOrigin: dto.countryOfOrigin || undefined,
     description: dto.description || dto.shortDescription,
     // Продавец = магазин (Store), а не бренд
     seller: {

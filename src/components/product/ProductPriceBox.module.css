@@ -55,31 +55,6 @@
     gap: 6px;
 }
 
-.iconButton {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 1px solid #e5e3dd;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: border-color 0.15s ease, background-color 0.15s ease;
-}
-
-.iconButton:hover {
-    border-color: #ff6e2a;
-    background-color: #fff6f0;
-}
-
-.iconImg {
-    width: 15px;
-    height: 15px;
-    object-fit: contain;
-    filter: brightness(0);
-}
-
 /* Сердечко (WishlistButton) — у стилі сусідньої круглої кнопки */
 .iconActions .wishlistButton {
     width: 30px;
@@ -103,6 +78,28 @@
 .iconActions .wishlistButton svg {
     width: 16px;
     height: 16px;
+}
+
+/* Терези (CompareButton) — така ж кругла кнопка */
+.iconActions .compareButton {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #e5e3dd;
+    background-color: #fff;
+}
+
+.iconActions .compareButton:hover {
+    border-color: #ff6e2a;
+    background-color: #fff6f0;
+}
+
+.iconActions .compareButton[aria-pressed="true"] {
+    border-color: #ff6e2a;
+}
+
+.iconActions .compareButton svg {
+    width: 17px;
+    height: 14px;
 }
 
 .oldPrice {
