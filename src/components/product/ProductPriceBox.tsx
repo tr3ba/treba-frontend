@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { useCart } from "../../context/CartContext";
 import { parsePrice } from "../../lib/format";
 import WishlistButton from "../wishlist/WishlistButton";
+import CompareButton from "../comparison/CompareButton";
 import styles from "./ProductPriceBox.module.css";
 import { ProductVariant } from "../../types/product";
-import Icon from "../common/Icon";
 
 type ProductPriceBoxProps = {
   id: string;
@@ -15,6 +15,10 @@ type ProductPriceBoxProps = {
   backendId?: string;
   /** Guid варианта по умолчанию — нужен корзине на бэке */
   variantId?: string;
+  /** Категорії — за кінцевою групуються списки порівняння */
+  categoryId?: string;
+  subcategoryId?: string;
+  subcategoryName?: string;
   title: string;
   image?: string;
   price: string;
@@ -28,6 +32,9 @@ export default function ProductPriceBox({
   id,
   backendId,
   variantId,
+  categoryId,
+  subcategoryId,
+  subcategoryName,
   title,
   image,
   price,
@@ -75,9 +82,10 @@ export default function ProductPriceBox({
 
         <div className={styles.iconActions}>
           <WishlistButton product={{ id, backendId }} className={styles.wishlistButton} />
-          <button type="button" className={styles.iconButton} aria-label="Додати до порівняння">
-            <Icon src="/icons/libra.svg" alt="" className={styles.iconImg} />
-          </button>
+          <CompareButton
+            product={{ id, categoryId, subcategoryId, subcategoryName, title, image }}
+            className={styles.compareButton}
+          />
         </div>
       </div>
 
