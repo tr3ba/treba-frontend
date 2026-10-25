@@ -1,0 +1,159 @@
+/* Общие стили иконок шапки: порівняння, сповіщення, бажання, профіль, кошик.
+   Размер, hover и бейдж задаются только здесь — чтобы все иконки были одинаковыми. */
+
+/* Link или button вокруг иконки */
+.action {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.action:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 4px;
+}
+
+.root {
+    position: relative;
+    display: block;
+}
+
+/* бокс иконки: обе картинки лежат друг на друге */
+.swap {
+    position: relative;
+    display: block;
+    width: 34px;
+    height: 34px;
+    transition: transform 0.2s ease;
+}
+
+/* весы широкие и низкие — в квадрате выглядели бы мельче соседей */
+.wide .swap {
+    width: 40px;
+}
+
+.swap img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.2s ease;
+}
+
+.outline {
+    opacity: 1;
+}
+
+.filled {
+    opacity: 0;
+}
+
+/* наведение, фокус с клавиатуры или active: контур -> заливка */
+.action:hover .outline,
+.action:focus-visible .outline,
+.active .outline {
+    opacity: 0;
+}
+
+.action:hover .filled,
+.action:focus-visible .filled,
+.active .filled {
+    opacity: 1;
+}
+
+/* лёгкое увеличение при наведении */
+.action:hover .swap {
+    transform: scale(1.08);
+}
+
+.badge {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 10px;
+    background: #ff6e2a;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    font-family: "Montserrat", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+    pointer-events: none;
+    animation: badgePop 0.3s ease;
+}
+
+@keyframes badgePop {
+    0% {
+        transform: scale(0.6);
+    }
+
+    60% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .swap,
+    .swap img {
+        transition: none;
+    }
+
+    .action:hover .swap {
+        transform: none;
+    }
+
+    .badge {
+        animation: none;
+    }
+}
+
+/* ---------- планшет ---------- */
+@media (max-width: 1024px) {
+    .swap {
+        width: 28px;
+        height: 28px;
+    }
+
+    .wide .swap {
+        width: 33px;
+    }
+}
+
+/* ---------- телефон ---------- */
+@media (max-width: 768px) {
+    .swap {
+        width: 26px;
+        height: 26px;
+    }
+
+    .wide .swap {
+        width: 31px;
+    }
+
+    .badge {
+        top: -5px;
+        right: -8px;
+        min-width: 18px;
+        height: 18px;
+        font-size: 10px;
+        line-height: 14px;
+    }
+}

@@ -5,6 +5,8 @@ import { useAuth } from "../../context/AuthContext";
 import { accountRequest, type Notification, type NotificationFeed } from "../../lib/api/account";
 import { notificationHref } from "../../lib/notifications";
 import { formatDateTime } from "../../lib/format";
+import HeaderIcon from "../layout/HeaderIcon";
+import iconStyles from "../layout/HeaderIcon.module.css";
 import styles from "./Notifications.module.css";
 
 export default function Notifications({ fullPage = false }: { fullPage?: boolean }) {
@@ -44,7 +46,7 @@ export default function Notifications({ fullPage = false }: { fullPage?: boolean
   if (!user) return null;
   const items = feed.items.filter(item => !unreadOnly || !item.read);
   return <div className={styles.root} ref={root}>
-    {!fullPage && <button className={styles.bell} aria-label={`Сповіщення: ${feed.unreadCount} непрочитаних`} aria-expanded={open} onClick={() => setOpen(value => !value)}><svg width="25" height="25" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>{feed.unreadCount > 0 && <span>{feed.unreadCount}</span>}</button>}
+    {!fullPage && <button className={iconStyles.action} aria-label={feed.unreadCount > 0 ? `Сповіщення, непрочитаних: ${feed.unreadCount}` : "Сповіщення"} aria-expanded={open} onClick={() => setOpen(value => !value)}><HeaderIcon outline="/icons/bell.svg" filled="/icons/bell1.svg" active={open} badge={feed.unreadCount} /></button>}
     {(fullPage || open) && <section className={fullPage ? styles.full : styles.popover} aria-label="Сповіщення">
       <div className={styles.heading}><h2>Сповіщення</h2><button disabled={busy || !feed.unreadCount} onClick={readAll}>Прочитати всі</button></div>
       <p className={styles.muted}>Останні події за 30 днів</p>

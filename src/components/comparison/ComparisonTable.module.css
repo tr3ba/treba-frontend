@@ -1,0 +1,127 @@
+/* На десктопі без прокрутки вбік — інакше sticky-шапка не працюватиме */
+.scroller {
+    width: 100%;
+}
+
+.table {
+    --col: minmax(0, 1fr);
+    display: grid;
+    grid-template-columns: repeat(var(--cols), var(--col));
+    border: 1px solid #e5e3dd;
+    border-radius: 12px;
+    background: #ffffff;
+    /* clip, а не hidden: hidden ламає position: sticky */
+    overflow: clip;
+}
+
+/* рядки — «прозорі» обгортки, клітинки лягають у сітку таблиці */
+.headRow,
+.rowGroup,
+.valuesRow {
+    display: contents;
+}
+
+/* ---------- картки товарів ---------- */
+.headCell {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e3dd;
+    box-shadow: 0 6px 12px -10px rgba(40, 37, 29, 0.35);
+}
+
+.headCell+.headCell {
+    border-left: 1px solid #e5e3dd;
+}
+
+/* ---------- назва характеристики ---------- */
+.labelCell {
+    grid-column: 1 / -1;
+    padding: 10px 16px;
+    background: #f7f6f3;
+    border-bottom: 1px solid #e5e3dd;
+    text-align: center;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #28251d;
+}
+
+/* ---------- значення ---------- */
+.valueCell {
+    padding: 14px 16px;
+    border-bottom: 1px solid #e5e3dd;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #28251d;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.valueCell+.valueCell {
+    border-left: 1px solid #e5e3dd;
+}
+
+/* однакові значення — другорядні, відмінності — основний колір */
+.same {
+    color: #8a8578;
+}
+
+.empty {
+    color: #cfcac0;
+}
+
+.noRows {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 32px 16px;
+    text-align: center;
+    font-size: 14px;
+    color: #8a8578;
+}
+
+/* ---------- планшет і телефон: прокрутка вбік ---------- */
+@media (max-width: 1024px) {
+    .scroller {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x proximity;
+    }
+
+    .table {
+        --col: minmax(200px, 1fr);
+        width: max-content;
+        min-width: 100%;
+    }
+
+    .headCell,
+    .valueCell {
+        scroll-snap-align: start;
+    }
+
+    /* назва рядка не їде разом з таблицею */
+    .labelCell {
+        text-align: left;
+    }
+
+    .label {
+        position: sticky;
+        left: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* приблизно два товари на екрані */
+    .table {
+        --col: minmax(calc((100vw - 32px) / 2 - 1px), 1fr);
+    }
+
+    .valueCell {
+        padding: 12px 10px;
+        font-size: 13px;
+    }
+}

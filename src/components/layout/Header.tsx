@@ -3,6 +3,7 @@ import CatalogMenu from "../home/CatalogMenu";
 import SearchBar from "../home/SearchBar";
 import UserMenu from "../home/UserMenu";
 import HeaderCartButton from "./HeaderCartButton";
+import HeaderCompareButton from "./HeaderCompareButton";
 import HeaderWishlistButton from "./HeaderWishlistButton";
 import MobileCatalog from "./MobileCatalog";
 import styles from "./Header.module.css";
@@ -33,9 +34,17 @@ export default function Header() {
 
           <SearchBar />
 
+          {/* Гість: бажання · профіль · кошик.
+              Після входу: порівняння · сповіщення · бажання · профіль · кошик.
+              Кошик завжди крайній справа, профіль поруч — нові іконки з'являються зліва. */}
           <div className={styles.headerActions}>
+            {/* только после входа; на телефоне скрыто — переедет в нижнюю панель */}
+            <HeaderCompareButton className={styles.compareButton} />
+
+            {/* только после входа */}
             <Notifications />
-            {/* на телефоне скрыто классом wishlistButton */}
+
+            {/* на телефоне скрыто — переедет в нижнюю панель */}
             <HeaderWishlistButton className={styles.wishlistButton} />
 
             <UserMenu />
