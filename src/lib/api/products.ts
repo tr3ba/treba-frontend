@@ -1,5 +1,6 @@
 import { cache } from "react";
 import type { Product } from "../../types/product";
+import type { ComparisonCardProduct } from "../../types/comparison";
 import type { ApiCatalogProduct, ApiPagedResponse } from "../../types/api";
 import { ApiError, apiFetch } from "./client";
 import { buildRootCategorySlugMap, mapCatalogProduct } from "./mappers";
@@ -89,4 +90,33 @@ export async function getProductsByCategory(categoryId: string, limit = 12): Pro
     getRootSlugMap(),
   ]);
   return page.content.map((product) => mapCatalogProduct(product, roots));
+}
+
+/**
+ * Товари каталогу для списків порівняння (до 100 — як і в інших вибірках).
+ * Списки зберігають тільки slug, тому фото, ціну й рядки таблиці беремо з каталогу.
+ * TODO: коли з'явиться бэк порівняння — він сам віддаватиме товари списку.
+ */
+export async function getComparisonProducts(): Promise<ComparisonCardProduct[]> {
+  const all = await getAllProducts();
+  return all.map((product) => ({
+    id: product.id,
+    backendId: product.backendId,
+    variantId: product.variantId,
+    title: product.title,
+    price: product.price,
+    oldPrice: product.oldPrice,
+    image: product.image,
+    rating: product.rating,
+    reviewsCount: product.reviewsCount,
+    isPromo: product.isPromo,
+    inStock: product.inStock,
+    code: product.code,
+    brand: product.brand,
+    subcategoryName: product.subcategoryName,
+    warrantyMonths: product.warrantyMonths,
+    countryOfOrigin: product.countryOfOrigin,
+    seller: product.seller,
+    characteristics: product.characteristics,
+  }));
 }

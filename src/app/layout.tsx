@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
 import { CartProvider } from "../context/CartContext";
 import { CategoriesProvider } from "../context/CategoriesContext";
+import { ComparisonProvider } from "../context/ComparisonContext";
 import { WishlistProvider } from "../context/WishlistContext";
 import { getCategories } from "../lib/api/categories";
 import type { Category } from "../types/category";
@@ -50,8 +51,10 @@ export default async function RootLayout({
           <AuthProvider>
             <CartProvider>
               <WishlistProvider>
-                {children}
-                {modal}
+                <ComparisonProvider>
+                  {children}
+                  {modal}
+                </ComparisonProvider>
               </WishlistProvider>
             </CartProvider>
           </AuthProvider>

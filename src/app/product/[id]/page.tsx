@@ -113,6 +113,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
               id={product.id}
               backendId={product.backendId}
               variantId={product.variantId}
+              categoryId={product.categoryId}
+              subcategoryId={product.subcategoryId}
+              subcategoryName={product.subcategoryName}
               title={product.title}
               image={product.image}
               price={product.price}

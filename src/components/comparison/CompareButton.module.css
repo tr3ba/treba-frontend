@@ -1,0 +1,86 @@
+/* Базова кругла кнопка; розмір і рамку в конкретному місці задає батьківський className */
+.button {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #28251d;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.button:hover {
+    color: #ff6e2a;
+    background-color: #fff6f0;
+}
+
+.button:focus-visible {
+    outline: 2px solid #ff6e2a;
+    outline-offset: 2px;
+}
+
+.button:disabled {
+    cursor: progress;
+}
+
+.icon {
+    width: 20px;
+    height: 16px;
+    display: block;
+    overflow: visible;
+}
+
+/* два шари: контур і заливка чаш, перемикання через opacity */
+.outline,
+.filled {
+    fill: currentColor;
+    stroke: currentColor;
+    stroke-width: 1;
+    stroke-linejoin: round;
+    transition: opacity 0.2s ease;
+}
+
+.filled {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+.active {
+    color: #ff6e2a;
+}
+
+.active .outline {
+    opacity: 0;
+}
+
+.active .filled {
+    opacity: 1;
+    animation: scalesPop 0.3s ease;
+}
+
+@keyframes scalesPop {
+    0% {
+        transform: scale(0.7);
+    }
+
+    60% {
+        transform: scale(1.12);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .active .filled {
+        animation: none;
+    }
+}
