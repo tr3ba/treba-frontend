@@ -111,13 +111,32 @@
         position: sticky;
         left: 16px;
     }
+
+    /* 1–2 товари: таблиця рівно по ширині екрана, колонки навпіл, без прокрутки */
+    .fit .table {
+        --col: minmax(0, 1fr);
+        width: 100%;
+    }
+
+    .fit .labelCell {
+        text-align: center;
+    }
+
+    .fit .label {
+        position: static;
+    }
 }
 
 @media (max-width: 768px) {
 
-    /* приблизно два товари на екрані */
+    /* 3+ товари: приблизно два товари на екрані, решта — прокруткою */
     .table {
         --col: minmax(calc((100vw - 32px) / 2 - 1px), 1fr);
+    }
+
+    /* 1–2 товари — без прокрутки (правило вище має перевагу) */
+    .fit .table {
+        --col: minmax(0, 1fr);
     }
 
     .valueCell {

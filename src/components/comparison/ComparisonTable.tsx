@@ -12,16 +12,21 @@ type ComparisonTableProps = {
   onlyDifferences: boolean;
 };
 
+// Скільки товарів поміщаються без прокрутки вбік на планшеті й телефоні
+const FIT_WITHOUT_SCROLL = 2;
+
 // Таблиця на CSS grid: верхній рядок — картки товарів (прилипають при прокрутці на десктопі),
 // далі кожна характеристика = рядок-назва на всю ширину + рядок значень.
-// На планшеті й телефоні таблиця прокручується вбік, назва рядка лишається на місці.
+// На планшеті й телефоні 1–2 товари — на всю ширину без прокрутки,
+// 3 і більше — таблиця прокручується вбік, назва рядка лишається на місці.
 export default function ComparisonTable({ products, rows, onlyDifferences }: ComparisonTableProps) {
   const cheapestId = getCheapestProductId(products);
   const visibleRows = onlyDifferences ? rows.filter((row) => !row.isSame) : rows;
   const gridStyle = { "--cols": products.length } as CSSProperties;
+  const fits = products.length <= FIT_WITHOUT_SCROLL;
 
   return (
-    <div className={styles.scroller}>
+    <div className={`${styles.scroller} ${fits ? styles.fit : ""}`}>
       <div className={styles.table} style={gridStyle} role="table" aria-label="Порівняння товарів">
         <div className={styles.headRow} role="row">
           {products.map((product) => (
