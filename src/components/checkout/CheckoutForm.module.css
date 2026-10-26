@@ -313,6 +313,45 @@
     color: #8a8578;
 }
 
+.deliveryOptions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding: 0;
+    margin: 0 0 4px;
+    border: 0;
+}
+
+.deliveryOptions legend { margin-bottom: 10px; }
+
+.deliveryOption {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 16px;
+    border: 1px solid #ddd9d0;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.deliveryOption input { accent-color: #ed7738; margin: 3px 0 0; }
+.deliveryOption span { display: grid; gap: 6px; min-width: 0; }
+.deliveryOption strong { font-size: 15px; }
+.deliveryOption small { color: #6e695e; line-height: 1.4; }
+.deliveryOption:has(input:disabled) { opacity: .6; cursor: default; }
+.deliveryOption:has(input:focus-visible) { outline: 2px solid #ed7738; outline-offset: 3px; }
+.deliverySelected { border-color: #ed7738; background: #fff8f2; }
+.deliveryFields { display: grid; gap: 18px; min-width: 0; }
+.pickupTypes { display: inline-flex; justify-self: start; gap: 3px; padding: 4px; border-radius: 9px; background: #f5f3ef; }
+.pickupTypes button { border: 0; padding: 8px 16px; border-radius: 6px; background: transparent; color: #8a8578; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.pickupTypes button[aria-pressed="true"] { background: #fff; color: #28251d; box-shadow: 0 1px 4px #28251d12; }
+.pickupTypes button:focus-visible, .recalculate:focus-visible { outline: 2px solid #ed7738; outline-offset: 2px; }
+.deliveryStatus { margin: 0; color: #8a8578; font-size: 13px; }
+.recalculate { justify-self: start; border: 0; padding: 0; color: #c85b22; background: transparent; font: inherit; font-size: 12px; cursor: pointer; }
+.recalculate:hover { text-decoration: underline; }
+.deliveryQuote { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 9px; background: #f8f7f3; font-size: 13px; color: #6e695e; }
+.deliveryQuote strong { color: #28251d; font-size: 15px; }
+
 /* ---------- планшет: підсумок під формою ---------- */
 @media (max-width: 1024px) {
     .layout {
@@ -335,6 +374,8 @@
     .grid {
         grid-template-columns: 1fr;
     }
+
+    .deliveryOptions { grid-template-columns: 1fr; }
 
     .totalValue {
         font-size: 22px;

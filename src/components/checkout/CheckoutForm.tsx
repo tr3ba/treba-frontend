@@ -1,12 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import type { CartItem } from "../../types/cart";
 import type { CheckoutForm as CheckoutFormValues, CreatedOrder } from "../../types/order";
 import { createOrder, OrderError } from "../../lib/api/orders";
 import { formatPrice, pluralize } from "../../lib/format";
 import { DELIVERY_PRICE } from "../../lib/delivery";
+import NovaPoshtaDelivery from "./NovaPoshtaDelivery";
+import { deliveryRequest, type DeliveryQuote } from "../../lib/api/delivery";
 import Icon from "../common/Icon";
 import styles from "./CheckoutForm.module.css";
 
@@ -35,7 +37,7 @@ function normalizePhone(value: string): string | null {
 function validate(values: CheckoutFormValues): FieldErrors {
   const errors: FieldErrors = {};
   const required = (name: FieldName, label: string, max: number) => {
-    const value = values[name].trim();
+    const value = (values[name] ?? "").trim();
     if (!value) errors[name] = `Вкажіть ${label}`;
     else if (value.length > max) errors[name] = `Не більше ${max} символів`;
   };
@@ -66,9 +68,30 @@ export default function CheckoutForm({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [mode, setMode] = useState("nova");
+  const [available, setAvailable] = useState(false);
+  const [checkingDelivery, setCheckingDelivery] = useState(true);
+  const [quote, setQuote] = useState<DeliveryQuote | null>(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    deliveryRequest<{ available: boolean }>("capabilities", undefined, controller.signal).then(result => {
+      if (controller.signal.aborted) return;
+      setAvailable(result.available);
+      if (!result.available) setMode(current => current === "nova" ? "courier" : current);
+    }).catch(() => { if (!controller.signal.aborted) setMode(current => current === "nova" ? "courier" : current); })
+      .finally(() => { if (!controller.signal.aborted) setCheckingDelivery(false); });
+    return () => controller.abort();
+  }, []);
+  useEffect(() => {
+    if (!quote) return;
+    const timer = setTimeout(() => setQuote(null), Math.max(0, Date.parse(quote.expiresAt) - Date.now()));
+    return () => clearTimeout(timer);
+  }, [quote]);
+  const nova = mode === "nova";
+  const deliveryPrice = nova ? quote?.price ?? 0 : DELIVERY_PRICE;
   const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const discount = Math.max(0, totalOldPrice - totalPrice);
-  const total = totalPrice + DELIVERY_PRICE;
+  const total = totalPrice + deliveryPrice;
   // Позиции, которые нельзя заказать: без варианта или снятые с продажи
   const blocked = items.filter((item) => !item.variantId || item.available === false);
 
@@ -81,7 +104,13 @@ export default function CheckoutForm({
     event.preventDefault();
     if (isSubmitting) return;
 
-    const found = validate(values);
+    if (nova && (!quote || Date.parse(quote.expiresAt) <= Date.now())) {
+      setSubmitError("Виберіть відділення та отримайте актуальний розрахунок доставки."); return;
+    }
+    const checkoutValues: CheckoutFormValues = nova && quote
+      ? { ...values, deliveryMethod: "NovaPoshta", city: quote.city.slice(0, 100), street: quote.pickupPoint.slice(0, 150), building: "—", apartment: "", deliveryQuoteId: quote.id }
+      : { ...values, deliveryMethod: "TrebaCourier", deliveryQuoteId: undefined };
+    const found = validate(checkoutValues);
     setErrors(found);
     if (Object.keys(found).length > 0) {
       setSubmitError("Перевірте поля, позначені червоним.");
@@ -96,7 +125,7 @@ export default function CheckoutForm({
     setSubmitError(null);
     try {
       const order = await createOrder(
-        { ...values, phone: normalizePhone(values.phone) ?? values.phone },
+        { ...checkoutValues, phone: normalizePhone(values.phone) ?? values.phone },
         items.flatMap((item) =>
           item.variantId ? [{ variantId: item.variantId, quantity: item.quantity, title: item.title }] : []
         )
@@ -159,14 +188,26 @@ export default function CheckoutForm({
         <section className={styles.card}>
           <h2 className={styles.cardTitle}>
             <span className={styles.step}>2</span>
-            Доставка за адресою
+            Доставка
           </h2>
-          <div className={styles.grid}>
+          <fieldset className={styles.deliveryOptions}>
+            <legend className={styles.label}>Спосіб доставки</legend>
+            <label className={`${styles.deliveryOption} ${nova ? styles.deliverySelected : ""}`}>
+              <input type="radio" name="delivery-method" value="nova" checked={nova} disabled={!available || isSubmitting} onChange={() => { setMode("nova"); setQuote(null); }} />
+              <span><strong>Нова пошта</strong><small>У відділення або поштомат</small></span>
+            </label>
+            <label className={`${styles.deliveryOption} ${!nova ? styles.deliverySelected : ""}`}>
+              <input type="radio" name="delivery-method" value="courier" checked={!nova} disabled={isSubmitting} onChange={() => { setMode("courier"); setQuote(null); }} />
+              <span><strong>Кур’єр TREBA</strong><small>До дверей · {formatPrice(DELIVERY_PRICE)} ₴</small></span>
+            </label>
+          </fieldset>
+          {checkingDelivery ? <p role="status">Перевіряємо способи доставки…</p> : !available && <p className={styles.optional}>Нова пошта тимчасово недоступна. Ви можете оформити кур’єрську доставку.</p>}
+          {nova ? <>{available && <NovaPoshtaDelivery items={items} onQuote={setQuote} />}{quote && <div className={styles.deliveryQuote} role="status"><span>Вартість доставки</span><strong>{formatPrice(quote.price)} ₴</strong></div>}</> : <div className={styles.grid}>
             {field("city", "Місто", { autoComplete: "address-level2" })}
             {field("street", "Вулиця", { autoComplete: "address-line1" })}
             {field("building", "Будинок")}
             {field("apartment", "Квартира", { optional: true })}
-          </div>
+          </div>}
 
           <div className={styles.field}>
             <label htmlFor="checkout-comment" className={styles.label}>
@@ -227,14 +268,14 @@ export default function CheckoutForm({
           )}
           <div className={styles.row}>
             <dt>Доставка</dt>
-            <dd>{formatPrice(DELIVERY_PRICE)} ₴</dd>
+            <dd>{nova && !quote ? "Потрібен розрахунок" : `${formatPrice(deliveryPrice)} ₴`}</dd>
           </div>
         </dl>
 
         <div className={styles.totalRow}>
           <span className={styles.totalLabel}>До сплати</span>
           <span className={styles.totalValue}>
-            {formatPrice(total)}
+            {nova && !quote ? "—" : formatPrice(total)}
             <span className={styles.currency}>₴</span>
           </span>
         </div>
@@ -245,7 +286,7 @@ export default function CheckoutForm({
           </p>
         )}
 
-        <button type="submit" className={styles.submit} disabled={isSubmitting}>
+        <button type="submit" className={styles.submit} disabled={isSubmitting || nova && !quote}>
           {isSubmitting ? "Оформлюємо…" : "Підтвердити замовлення"}
         </button>
 

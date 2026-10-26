@@ -7,6 +7,7 @@ import { useAuth } from "../../../../context/AuthContext";
 import AccountPageShell from "../../../../components/account/AccountPageShell";
 import { accountRequest, type CustomerOrder } from "../../../../lib/api/account";
 import { getOrderStatusLabel } from "../../../../lib/api/orders";
+import { deliveryCarrierLabel } from "../../../../lib/api/delivery";
 import { resolveMediaUrl } from "../../../../lib/api/client";
 import { formatDateTime, formatPrice } from "../../../../lib/format";
 import styles from "../../../../components/account/AccountData.module.css";
@@ -31,7 +32,7 @@ export default function OrderDetailsPage() {
           <div className={styles.grow}>{item.productSlug ? <Link href={`/product/${item.productSlug}`}>{item.name}</Link> : <strong>{item.name}</strong>}<p className={styles.muted}>{item.quantity} × {formatPrice(item.unitPrice)} ₴</p></div><strong>{formatPrice(item.totalPrice)} ₴</strong></article>;
       })}
       <section className={styles.card}><dl className={styles.totals}><dt>Товари</dt><dd>{formatPrice(order.subtotal)} ₴</dd><dt>Знижка</dt><dd>−{formatPrice(order.discountAmount)} ₴</dd><dt>Доставка</dt><dd>{formatPrice(order.deliveryPrice)} ₴</dd><dt><strong>Разом</strong></dt><dd><strong>{formatPrice(order.totalAmount)} ₴</strong></dd></dl></section>
-      <div className={styles.grid}><section className={styles.card}><h2>Отримувач і доставка</h2><p>{order.recipientName}<br />{order.recipientPhone}<br />{order.recipientEmail}</p><p>{order.deliveryAddress ?? "Адресу не вказано"}</p><Link href={`/account/messages?order=${order.id}&title=${encodeURIComponent("Замовлення № " + order.orderNumber)}`}>Звернутися до підтримки</Link></section>
+      <div className={styles.grid}><section className={styles.card}><h2>Отримувач і доставка</h2><p>{order.recipientName}<br />{order.recipientPhone}<br />{order.recipientEmail}</p>{order.delivery ? <div><h3>{deliveryCarrierLabel(order.delivery.carrier)}</h3><p>{order.delivery.city}<br />{order.delivery.pickupPoint}</p>{order.delivery.reference ? <p className={styles.reference}><strong>Номер відправлення: {order.delivery.reference}</strong></p> : <p className={styles.muted}>{order.status === "CANCELLED" ? "Відправлення скасовано" : "Номер відправлення з’явиться після підтвердження оплати."}</p>}</div> : <p>{order.deliveryAddress ?? "Адресу не вказано"}</p>}<Link href={`/account/messages?order=${order.id}&title=${encodeURIComponent("Замовлення № " + order.orderNumber)}`}>Звернутися до підтримки</Link></section>
         <section className={styles.card}><h2>Історія замовлення</h2><ol className={styles.timeline}>{order.history.map((event, index) => <li key={`${event.createdAt}:${index}`}><strong>{getOrderStatusLabel(event.status)}</strong><p className={styles.muted}>{formatDateTime(event.createdAt)}</p></li>)}</ol></section></div>
     </>}
   </AccountPageShell>;

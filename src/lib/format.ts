@@ -5,11 +5,12 @@ export function parsePrice(price: string | null | undefined): number {
   return Number.isFinite(value) ? value : 0;
 }
 
-// 12999 -> "12 999"
+// Preserve kopecks in carrier quotes, product prices and authoritative order totals.
 export function formatPrice(value: number): string {
-  return Math.round(value)
-    .toString()
-    .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  return new Intl.NumberFormat("uk-UA", {
+    minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(value).replace(/\u00a0/g, " ");
 }
 
 // Відмінювання: pluralize(3, ["товар", "товари", "товарів"]) -> "товари"
