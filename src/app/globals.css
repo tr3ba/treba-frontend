@@ -47,3 +47,13 @@ body {
     scroll-behavior: auto;
   }
 }
+
+/* телефон: страница не должна ездить вбок, даже если что-то чуть шире экрана.
+   clip (а не hidden) — чтобы не ломать position: sticky у шапки */
+@media (max-width: 768px) {
+
+  html,
+  body {
+    overflow-x: clip;
+  }
+}

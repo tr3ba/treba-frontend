@@ -1,0 +1,152 @@
+.item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+/* ---------- сама картка ---------- */
+
+.card {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1.6;
+    padding: 16px 18px;
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: #ffffff;
+    font-family: "Montserrat", sans-serif;
+    box-shadow: 0 6px 16px rgba(40, 37, 29, 0.15);
+}
+
+/* декоративный круг */
+.card::after {
+    content: "";
+    position: absolute;
+    width: 170px;
+    height: 170px;
+    right: -55px;
+    top: -70px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.09);
+}
+
+.visa {
+    background: linear-gradient(135deg, #002aff 0%, #4d6bff 100%);
+}
+
+.mastercard {
+    background: linear-gradient(135deg, #28251d 0%, #5c5647 100%);
+}
+
+.other {
+    background: linear-gradient(135deg, #ff6e2a 0%, #ff9d63 100%);
+}
+
+.cardTop,
+.number,
+.cardBottom {
+    position: relative;
+    z-index: 1;
+}
+
+.cardTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.chip {
+    width: 34px;
+    height: 26px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #f5d77a 0%, #d4a93c 100%);
+}
+
+.brand {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.number {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    font-variant-numeric: tabular-nums;
+}
+
+.cardBottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.holder {
+    min-width: 0;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.expiry {
+    flex-shrink: 0;
+    font-size: 13px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------- действия под картой ---------- */
+
+.actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.defaultMark {
+    font-family: "Montserrat", sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #2e9e1a;
+}
+
+.action {
+    padding: 7px 12px;
+    border: 1px solid #e5e3dd;
+    border-radius: 8px;
+    background: #ffffff;
+    font-family: "Montserrat", sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #28251d;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.action:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+@media (hover: hover) {
+    .action:hover:not(:disabled) {
+        border-color: #ff6e2a;
+        color: #ff6e2a;
+    }
+
+    .actionDanger:hover:not(:disabled) {
+        border-color: #e5484d;
+        color: #e5484d;
+    }
+}
