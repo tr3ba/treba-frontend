@@ -31,6 +31,8 @@ export type OrderSummary = {
 
 /** Данные формы оформления (всё — строки из полей ввода). */
 export type CheckoutForm = {
+  deliveryMethod?: "NovaPoshta" | "TrebaCourier";
+  deliveryQuoteId?: string;
   firstName: string;
   lastName: string;
   /** +380XXXXXXXXX */
@@ -99,6 +101,8 @@ export type ApiCreateOrderItem = {
  * но строковые поля без `?` в C# проходят проверку как обязательные — поэтому заполняем их.
  */
 export type ApiCreateOrderRequest = {
+  deliveryMethod?: "NovaPoshta" | "TrebaCourier";
+  deliveryQuoteId?: string;
   /** Пустой Guid — бэк подставит текущего пользователя */
   customerId: string;
   customerComment: string;

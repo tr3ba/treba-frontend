@@ -1,0 +1,37 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { startDeliveryFixture } from "./helpers/delivery-fixture.mjs";
+
+test("delivery and notification proxies authenticate users, reject foreign writes, and preserve quotes and preferences", { timeout: 120000 }, async t => {
+  const fixture = await startDeliveryFixture(); t.after(() => fixture.close()); const { origin } = fixture;
+  assert.equal((await fetch(origin + "/shop-api/delivery/cities?query=Київ")).status, 401);
+  assert.equal((await fetch(origin + "/shop-api/account/notification-settings")).status, 401);
+  assert.equal((await fetch(origin + "/shop-api/telegram/link")).status, 401);
+  const login = await fetch(origin + "/shop-api/session", { method: "POST", headers: { Origin: origin, "Content-Type": "application/json" }, body: JSON.stringify({ action: "login", email: "fixture@example.test", password: "fixture-only" }) });
+  assert.equal(login.status, 200);
+  const cookie = login.headers.getSetCookie().map(value => value.split(";")[0]).join("; ");
+  const request = (path, method = "GET", body, from = origin) => fetch(origin + path, { method, headers: { Cookie: cookie, Origin: from, "Content-Type": "application/json" }, body: body === undefined ? undefined : JSON.stringify(body) });
+  assert.equal((await (await request("/shop-api/delivery/capabilities")).json()).available, true);
+  const cities = await request("/shop-api/delivery/cities?query=Київ"); assert.equal((await cities.json())[0].ref, fixture.city); assert.match(cities.headers.get("cache-control"), /no-store/);
+  const input = { cityRef: fixture.city, pickupPointRef: fixture.point, items: [{ variantId: fixture.variantId, quantity: 1 }] };
+  assert.equal((await request("/shop-api/delivery/quotes", "POST", input, "https://foreign.example")).status, 403);
+  const quote = await (await request("/shop-api/delivery/quotes", "POST", input)).json(); assert.equal(quote.price, 95.5);
+  const order = await request("/shop-api/orders", "POST", { deliveryMethod: "NovaPoshta", deliveryQuoteId: quote.id }); assert.equal(order.status, 201);
+  assert.equal(fixture.requests.find(r => r.path === "/api/v1/orders").body.deliveryQuoteId, fixture.quoteId);
+  assert.equal(fixture.requests.find(r => r.path === "/api/v1/orders").body.deliveryMethod, "NovaPoshta");
+  const courier = await request("/shop-api/orders", "POST", { deliveryMethod: "TrebaCourier" }); assert.equal(courier.status, 201);
+  assert.equal(fixture.requests.filter(r => r.path === "/api/v1/orders").at(-1).body.deliveryMethod, "TrebaCourier");
+  const shipments = await (await request("/shop-api/account/shipments?page=1&search=TRB-")).json();
+  assert.match(shipments.content[0].delivery.reference, /^TRB-/);
+  assert.equal(shipments.content[0].delivery.carrier, "NovaPoshta");
+  const preferences = await (await request("/shop-api/account/notification-settings")).json();
+  const changed = { ...preferences, ordersEmail: true, supportTelegram: true };
+  assert.equal((await request("/shop-api/account/notification-settings", "PUT", changed, "https://foreign.example")).status, 403);
+  assert.equal((await request("/shop-api/account/notification-settings", "PUT", changed)).status, 200);
+  assert.equal((await (await request("/shop-api/account/notification-settings")).json()).ordersEmail, true);
+  assert.equal((await request("/shop-api/account/notification-settings", "PUT", changed)).status, 409);
+  assert.equal((await request("/shop-api/telegram/link", "POST", {}, "https://foreign.example")).status, 403);
+  assert.match((await (await request("/shop-api/telegram/link", "POST", {})).json()).botUrl, /^https:\/\/t\.me\//);
+  for (const path of ["/shop-api/delivery/save", "/shop-api/delivery/webhooks", "/shop-api/telegram/guard", "/shop-api/telegram/configuration"]) assert.equal((await request(path, "POST", {})).status, 404);
+  assert.ok(fixture.requests.filter(r => r.path.startsWith("/api/v1/delivery/")).every(r => r.authorization === "Bearer fixture-access"));
+});
