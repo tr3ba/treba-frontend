@@ -78,3 +78,83 @@
         position: static;
     }
 }
+
+/* ---------- телефон: компактный заголовок, продавец во всю ширину ---------- */
+@media (max-width: 768px) {
+    .page {
+        padding: 12px 16px 40px;
+    }
+
+    .titleRow {
+        gap: 14px;
+        margin-bottom: 0;
+    }
+
+    .title {
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.35;
+        margin-bottom: 6px;
+    }
+
+    .code {
+        font-size: 12px;
+    }
+
+    .sellerRow {
+        width: 100%;
+        max-width: none;
+    }
+
+    /* все блоки — в один столбик, обёртки колонок не участвуют в раскладке */
+    .body {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .contentGrid,
+    .leftColumn,
+    .rightColumn,
+    .descriptionGrid {
+        display: contents;
+    }
+
+    /* поднимаем наверх: фото → цена → доп. сервисы → опис → питання;
+       дальше обычный порядок (характеристики, доставка, оплата, відгуки) */
+    .mGallery {
+        order: -5;
+    }
+
+    .mPrice {
+        order: -4;
+    }
+
+    .mAddServices {
+        order: -3;
+    }
+
+    .mDescription {
+        order: -2;
+    }
+
+    .mQuestion {
+        order: -1;
+    }
+
+    /* карусели и «Разом дешевше» — после отзывов */
+    .mLater {
+        order: 1;
+    }
+
+    /* «Переглянуті» — в самом конце */
+    .mLast {
+        order: 2;
+    }
+
+    /* пустая обёртка (нет товаров в карусели) не даёт лишнего отступа */
+    .mLater:empty,
+    .mLast:empty {
+        display: none;
+    }
+}

@@ -48,6 +48,8 @@ export default function ProductTabs({ tabs }: ProductTabsProps) {
         <button
           key={tab.id}
           type="button"
+          // data-tab — чтобы на телефоне можно было менять порядок вкладок через CSS
+          data-tab={tab.id}
           className={`${styles.tab} ${activeId === tab.id ? styles.tabActive : ""}`}
           onClick={() => handleClick(tab.id)}
         >

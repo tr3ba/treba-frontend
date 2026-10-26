@@ -18,3 +18,19 @@
     margin: 0;
     white-space: pre-line;
 }
+
+@media (max-width: 768px) {
+    .section {
+        padding: 16px;
+    }
+
+    .title {
+        font-size: 15px;
+        line-height: 1.35;
+        margin-bottom: 10px;
+    }
+
+    .text {
+        font-size: 13.5px;
+    }
+}

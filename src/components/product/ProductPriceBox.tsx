@@ -59,26 +59,11 @@ export default function ProductPriceBox({
 
   return (
     <div className={styles.box}>
+      {/* Верхняя строка: статус наличия слева, бажання и порівняння справа */}
       <div className={styles.topRow}>
-        {variants && variants.length > 0 ? (
-          <div className={styles.variants}>
-            <span className={styles.variantsLabel}>Колір:</span>
-            {variants.map((variant) => (
-              <button
-                key={variant.id}
-                type="button"
-                className={`${styles.swatch} ${activeVariant === variant.id ? styles.swatchActive : ""}`}
-                style={{ backgroundColor: variant.colorHex ?? "#e5e3dd" }}
-                onClick={() => setActiveVariant(variant.id)}
-                disabled={!variant.available}
-                aria-label={variant.label}
-                title={variant.label}
-              />
-            ))}
-          </div>
-        ) : (
-          <span />
-        )}
+        <span className={`${styles.status} ${inStock ? styles.statusIn : styles.statusOut}`}>
+          {inStock ? "Є в наявності" : "Закінчився"}
+        </span>
 
         <div className={styles.iconActions}>
           <WishlistButton product={{ id, backendId }} className={styles.wishlistButton} />
@@ -89,11 +74,31 @@ export default function ProductPriceBox({
         </div>
       </div>
 
-      {isPromo && oldPrice && <div className={styles.oldPrice}>{oldPrice}₴</div>}
+      {variants && variants.length > 0 && (
+        <div className={styles.variants}>
+          <span className={styles.variantsLabel}>Колір:</span>
+          {variants.map((variant) => (
+            <button
+              key={variant.id}
+              type="button"
+              className={`${styles.swatch} ${activeVariant === variant.id ? styles.swatchActive : ""}`}
+              style={{ backgroundColor: variant.colorHex ?? "#e5e3dd" }}
+              onClick={() => setActiveVariant(variant.id)}
+              disabled={!variant.available}
+              aria-label={variant.label}
+              title={variant.label}
+            />
+          ))}
+        </div>
+      )}
 
-      <div className={styles.priceRow}>
-        <span className={styles.price}>{price}</span>
-        <span className={styles.currency}>₴</span>
+      <div className={styles.priceBlock}>
+        {isPromo && oldPrice && <div className={styles.oldPrice}>{oldPrice}₴</div>}
+
+        <div className={styles.priceRow}>
+          <span className={styles.price}>{price}</span>
+          <span className={styles.currency}>₴</span>
+        </div>
       </div>
 
       {inStock && bonus > 0 && (
@@ -114,12 +119,9 @@ export default function ProductPriceBox({
           </button>
         </div>
       ) : (
-        <>
-          <p className={styles.outOfStock}>Товар закінчився</p>
-          <button type="button" className={styles.notifyButton}>
-            Повідомити про наявність
-          </button>
-        </>
+        <button type="button" className={styles.notifyButton}>
+          Повідомити про наявність
+        </button>
       )}
     </div>
   );

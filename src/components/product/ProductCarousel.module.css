@@ -29,6 +29,48 @@
     border-radius: 4px;
 }
 
+/* ширина как у обычной карточки — внешний вид на ПК не меняется */
 .item {
-    flex: 0 0 auto;
+    flex: 0 0 217.3px;
+    width: 217.3px;
+}
+
+/* ---------- телефон: 2 карточки целиком + половина третьей, лента до краёв экрана ---------- */
+@media (max-width: 768px) {
+    .section {
+        margin-top: 20px;
+    }
+
+    .title {
+        font-size: 17px;
+        margin-bottom: 12px;
+    }
+
+    .track {
+        gap: 10px;
+        /* выходим за поля страницы (16px), первая карточка — по линии контента */
+        padding: 4px 16px 8px;
+        margin: -4px -16px -8px;
+        scroll-snap-type: x proximity;
+        scroll-padding-inline: 16px;
+        scrollbar-width: none;
+    }
+
+    .track::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* хвостовой отступ справа (Safari игнорирует padding-right в прокрутке) */
+    .track::after {
+        content: "";
+        flex: 0 0 6px;
+    }
+
+    .item {
+        /* 100% — ширина ленты без полей; 2 зазора по 10px; на экран 2,5 карточки */
+        flex: 0 0 calc((100% - 20px) / 2.5);
+        width: auto;
+        min-width: 0;
+        scroll-snap-align: start;
+    }
 }

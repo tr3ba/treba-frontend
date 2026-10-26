@@ -44,3 +44,37 @@
     background: #ff6e2a;
     border-radius: 2px;
 }
+
+/* ---------- телефон: ровный ряд одинаковой ширины, без прокрутки и прилипания ---------- */
+@media (max-width: 768px) {
+    .nav {
+        position: static;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        gap: 2px;
+        padding: 4px;
+        margin: 20px 0 16px;
+        overflow: visible;
+        border: 1px solid #e5e3dd;
+        border-radius: 12px;
+        box-shadow: none;
+    }
+
+    .tab {
+        min-width: 0;
+        padding: 10px 4px;
+        font-size: 13px;
+        text-align: center;
+    }
+
+    .tabActive::after {
+        left: 12px;
+        right: 12px;
+    }
+
+    /* на телефоне описание стоит сразу после цены — его вкладка первая */
+    .tab[data-tab="description"] {
+        order: -1;
+    }
+}

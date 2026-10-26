@@ -16,6 +16,7 @@ export default function ProductCarousel({ title, products }: ProductCarouselProp
 
       <div className={styles.track}>
         {products.map((product) => (
+          // ширину карточки задаёт обёртка: на ПК 217px, на телефоне — 2,5 карточки на экран
           <div key={product.id} className={styles.item}>
             <ProductCard
               id={product.id}
@@ -27,6 +28,7 @@ export default function ProductCarousel({ title, products }: ProductCarouselProp
               image={product.image}
               rating={product.rating}
               isPromo={product.isPromo}
+              fluid
             />
           </div>
         ))}
