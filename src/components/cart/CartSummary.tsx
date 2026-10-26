@@ -1,7 +1,6 @@
 "use client";
 
 import { formatPrice, pluralize } from "../../lib/format";
-import { DELIVERY_PRICE } from "../../lib/delivery";
 import styles from "./CartSummary.module.css";
 import Icon from "../common/Icon";
 
@@ -26,7 +25,6 @@ export default function CartSummary({
   onCheckout,
 }: CartSummaryProps) {
   const discount = Math.max(0, totalOldPrice - totalPrice);
-  const total = totalPrice + DELIVERY_PRICE;
   const bonus = Math.round(totalPrice * 0.02);
 
   return (
@@ -50,14 +48,14 @@ export default function CartSummary({
 
         <div className={styles.row}>
           <dt>Доставка</dt>
-          <dd>{formatPrice(DELIVERY_PRICE)} ₴</dd>
+          <dd>При оформленні</dd>
         </div>
       </dl>
 
       <div className={styles.totalRow}>
-        <span className={styles.totalLabel}>До сплати</span>
+        <span className={styles.totalLabel}>Вартість товарів</span>
         <span className={styles.totalValue}>
-          {formatPrice(total)}
+          {formatPrice(totalPrice)}
           <span className={styles.currency}>₴</span>
         </span>
       </div>

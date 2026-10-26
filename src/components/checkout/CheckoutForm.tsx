@@ -202,7 +202,7 @@ export default function CheckoutForm({
             </label>
           </fieldset>
           {checkingDelivery ? <p role="status">Перевіряємо способи доставки…</p> : !available && <p className={styles.optional}>Нова пошта тимчасово недоступна. Ви можете оформити кур’єрську доставку.</p>}
-          {nova ? <>{available && <NovaPoshtaDelivery items={items} onQuote={setQuote} />}{quote && <p role="status">Доставка: {formatPrice(quote.price)} ₴. Вага: {quote.weightKg} кг{quote.estimatedWeight ? " (орієнтовна)" : ""}. Розрахунок дійсний до {new Date(quote.expiresAt).toLocaleTimeString("uk-UA")}.</p>}</> : <div className={styles.grid}>
+          {nova ? <>{available && <NovaPoshtaDelivery items={items} onQuote={setQuote} />}{quote && <div className={styles.deliveryQuote} role="status"><span>Вартість доставки</span><strong>{formatPrice(quote.price)} ₴</strong></div>}</> : <div className={styles.grid}>
             {field("city", "Місто", { autoComplete: "address-level2" })}
             {field("street", "Вулиця", { autoComplete: "address-line1" })}
             {field("building", "Будинок")}

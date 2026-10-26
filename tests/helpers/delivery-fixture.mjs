@@ -4,7 +4,7 @@ import { once } from "node:events";
 import { setTimeout as delay } from "node:timers/promises";
 import { pathToFileURL } from "node:url";
 
-export async function startDeliveryFixture() {
+export async function startDeliveryFixture({ liveDirectory = false } = {}) {
   const city = "11111111-1111-1111-1111-111111111111", point = "22222222-2222-2222-2222-222222222222";
   const quoteId = "44444444-4444-4444-4444-444444444444", variantId = "55555555-5555-5555-5555-555555555555";
   let settings = { ordersEmail: false, ordersTelegram: false, supportEmail: false, supportTelegram: false, version: "fixture-v1", emailAvailable: true, telegramAvailable: false };
@@ -37,6 +37,25 @@ export async function startDeliveryFixture() {
     }
     if (path === "/api/telegram/link/confirm") { linked = true; return send({ configured: true, linked }); }
     if (path === "/api/v1/checkout-delivery/capabilities") return send({ available: true, shipmentMode: "Managed" });
+    if (liveDirectory && ["/api/v1/checkout-delivery/cities", "/api/v1/checkout-delivery/pickup-points"].includes(path)) {
+      const parameters = new URL(req.url, "http://fixture").searchParams;
+      const cities = path.endsWith("/cities");
+      const properties = { FindByString: parameters.get("query") ?? "", Limit: cities ? "20" : "50", Page: parameters.get("page") ?? "1" };
+      if (!cities) {
+        properties.CityRef = parameters.get("cityRef"); properties.Language = "UA";
+        const kind = parameters.get("kind");
+        if (kind === "branch" || kind === "postomat") properties.CategoryOfWarehouse = kind === "branch" ? "Warehouse" : "Postomat";
+      }
+      try {
+        const response = await fetch("https://api.novaposhta.ua/v2.0/json/", { method: "POST", signal: AbortSignal.timeout(15000),
+          headers: { "Content-Type": "application/json" }, body: JSON.stringify({ apiKey: "", modelName: "Address", calledMethod: cities ? "getCities" : "getWarehouses", methodProperties: properties }) });
+        const result = await response.json();
+        if (!result.success) return send({ title: "Доставка тимчасово недоступна" }, 503);
+        if (cities) return send(result.data.map(row => ({ ref: row.Ref, name: row.Description, area: row.AreaDescription })));
+        return send({ items: result.data.filter(row => row.WarehouseStatus === "Working").map(row => ({ ref: row.Ref, cityRef: row.CityRef,
+          name: row.Description, number: row.Number, postomat: row.CategoryOfWarehouse === "Postomat" })), page: Number(properties.Page), hasMore: result.data.length === 50 });
+      } catch { return send({ title: "Не вдалося завантажити довідник" }, 503); }
+    }
     if (path === "/api/v1/checkout-delivery/cities") return send([{ ref: city, name: "Київ", area: "Київська" }]);
     if (path === "/api/v1/checkout-delivery/pickup-points") return send({ items: [{ ref: point, cityRef: city, name: "Поштомат №123: вул. Тестова, 1", number: "123", postomat: true }], page: 1, hasMore: false });
     if (path === "/api/v1/checkout-delivery/quotes") return send({ id: quoteId, price: 95.5, currency: "UAH", city: "Київ", pickupPoint: "Поштомат №123: вул. Тестова, 1", weightKg: 1, estimatedWeight: true, expiresAt: new Date(Date.now() + 600000).toISOString(), shipmentMode: "Managed" });
@@ -61,7 +80,7 @@ export async function startDeliveryFixture() {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const fixture = await startDeliveryFixture(); console.log(JSON.stringify({ origin: fixture.origin }));
+  const fixture = await startDeliveryFixture({ liveDirectory: process.argv.includes("--live-directory") }); console.log(JSON.stringify({ origin: fixture.origin }));
   process.on("SIGTERM", () => fixture.close().then(() => process.exit(0)));
   process.stdin.once("data", () => fixture.close().then(() => process.exit(0)));
 }
