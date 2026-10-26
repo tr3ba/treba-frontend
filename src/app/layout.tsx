@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
+import MobileTabBar from "../components/layout/MobileTabBar";
 import { AuthProvider } from "../context/AuthContext";
 import { CartProvider } from "../context/CartContext";
 import { CategoriesProvider } from "../context/CategoriesContext";
@@ -18,6 +19,14 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "Treba",
   description: "TREBA — український маркетплейс",
+};
+
+// viewportFit: "cover" — чтобы env(safe-area-inset-bottom) работал на iPhone
+// и нижняя панель не залезала под системную полоску «домой». На ПК ни на что не влияет.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 // Все страницы рендерятся при запросе, а не во время next build:
@@ -54,6 +63,8 @@ export default async function RootLayout({
                 <ComparisonProvider>
                   {children}
                   {modal}
+                  {/* нижняя панель — только на телефоне (≤768px) */}
+                  <MobileTabBar />
                 </ComparisonProvider>
               </WishlistProvider>
             </CartProvider>

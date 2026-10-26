@@ -1,0 +1,143 @@
+/* Нижняя панель — только на телефоне (≤768px). На ПК и планшете её нет. */
+.bar,
+.spacer {
+    display: none;
+}
+
+.item {
+    position: relative;
+    min-width: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border: none;
+    border-radius: 26px;
+    background: transparent;
+    color: #28251d;
+    font-family: "Montserrat", sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.item:focus-visible {
+    outline: 2px solid #ff6e2a;
+    outline-offset: -2px;
+}
+
+/* активная вкладка — оранжевый акцент на светлой «таблетке» */
+.active {
+    color: #ff6e2a;
+    background-color: #fff1e9;
+}
+
+.iconWrap {
+    position: relative;
+    display: flex;
+}
+
+.icon {
+    width: 24px;
+    height: 24px;
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.15s ease;
+}
+
+.active .icon {
+    fill: rgba(255, 110, 42, 0.18);
+}
+
+.item:active .icon {
+    transform: scale(0.9);
+}
+
+.label {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* счётчик товаров; key в разметке перезапускает анимацию при изменении числа */
+.badge {
+    position: absolute;
+    top: -6px;
+    left: calc(100% - 9px);
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: #ff6e2a;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    box-shadow: 0 0 0 2px #ffffff;
+    animation: badgePop 0.3s ease;
+}
+
+@keyframes badgePop {
+    0% {
+        transform: scale(0.6);
+    }
+
+    60% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* ---------- телефон ---------- */
+@media (max-width: 768px) {
+    .spacer {
+        display: block;
+        height: calc(86px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* «плавающая» панель со скруглением и размытием фона, как у Rozetka */
+    .bar {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        z-index: 900;
+        height: 64px;
+        padding: 6px;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 2px;
+        border: 1px solid #e5e3dd;
+        border-radius: 32px;
+        background: rgba(255, 255, 255, 0.9);
+        -webkit-backdrop-filter: blur(16px) saturate(160%);
+        backdrop-filter: blur(16px) saturate(160%);
+        box-shadow: 0 8px 28px rgba(40, 37, 29, 0.14);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .item,
+    .icon {
+        transition: none;
+    }
+
+    .badge {
+        animation: none;
+    }
+}

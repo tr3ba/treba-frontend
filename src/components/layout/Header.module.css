@@ -37,6 +37,12 @@
     align-items: center;
 }
 
+/* обёртка бургера: на ПК бургер скрыт, обёртка пустая */
+.burgerSlot {
+    display: flex;
+    flex-shrink: 0;
+}
+
 .logoLink {
     display: flex;
     align-items: center;
@@ -128,59 +134,29 @@
     }
 }
 
-/* ---------- телефон: бургер + логотип + поиск + иконки в одну строку ---------- */
+/* ---------- телефон: только поиск, как у Rozetka; остальное — в нижней панели ---------- */
 @media (max-width: 768px) {
     .topPromo {
-        height: 40px;
-        padding: 8px 16px;
-        background-size: cover;
+        display: none;
     }
 
-    .topPromoText {
-        font-size: 16px;
-    }
-
+    /* шапка с поиском прилипает к верху при прокрутке */
     .header {
-        height: 64px;
+        height: auto;
+        position: sticky;
+        top: 0;
+        z-index: 800;
     }
 
     .headerInner {
         /* относительно этого блока позиционируются подсказки поиска на всю ширину */
         position: relative;
-        padding-inline: 12px;
-        gap: 10px;
+        padding: 10px 12px;
     }
 
-    .logoLink {
-        margin-right: 0;
-        flex-shrink: 0;
-    }
-
-    .logo {
-        width: 76px;
-        height: 19px;
-    }
-
-    /* порівняння и избранное на телефоне переедут в нижнюю панель */
-    .compareButton,
-    .wishlistButton {
-        display: none;
-    }
-
+    .burgerSlot,
+    .logoLink,
     .headerActions {
-        gap: 14px;
-        margin-left: 0;
-        flex-shrink: 0;
-    }
-}
-
-@media (max-width: 400px) {
-    .headerInner {
-        gap: 8px;
-    }
-
-    .logo {
-        width: 64px;
-        height: 16px;
+        display: none;
     }
 }
