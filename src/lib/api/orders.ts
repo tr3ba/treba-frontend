@@ -103,6 +103,8 @@ function toRequest(form: CheckoutForm, items: CheckoutItem[]): ApiCreateOrderReq
   const phone = form.phone.trim();
   return {
     customerId: EMPTY_GUID,
+    deliveryMethod: form.deliveryMethod,
+    deliveryQuoteId: form.deliveryQuoteId,
     customerComment: form.comment.trim() || NO_COMMENT,
     recipientName,
     recipientPhone: phone,

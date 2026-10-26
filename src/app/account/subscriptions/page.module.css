@@ -8,6 +8,25 @@
     background-color: #ffffff;
 }
 
+.action {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 12px 20px;
+    border: 1px solid #ff6e2a;
+    border-radius: 8px;
+    background: #ff6e2a;
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: none;
+}
+.action:disabled { opacity: .6; cursor: wait; }
+.action:focus-visible { outline: 3px solid #28251d; outline-offset: 3px; }
+@media (max-width: 600px) {
+    .card { padding: 16px; gap: 28px; }
+    .column { min-width: 0; flex-basis: 100%; }
+}
+
 .column {
     flex: 1;
     min-width: 260px;

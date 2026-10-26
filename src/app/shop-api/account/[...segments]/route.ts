@@ -7,8 +7,8 @@ async function proxy(request: NextRequest, context: Context) {
   const { segments } = await context.params;
   const path = segments.join("/");
   const get = request.method === "GET";
-  const allowed = get ? /^(preferences|orders|orders\/[0-9a-f-]{36}|seller-application|notifications)$/i.test(path)
-    : request.method === "PATCH" ? path === "preferences" : ["seller-application", "notifications/read"].includes(path);
+  const allowed = get ? /^(preferences|shipments|orders|orders\/[0-9a-f-]{36}|seller-application|notifications|notification-settings)$/i.test(path)
+    : request.method === "PUT" ? path === "notification-settings" : request.method === "PATCH" ? path === "preferences" : ["seller-application", "notifications/read"].includes(path);
   if (!allowed) return json({}, 404);
   if (!get && !sameOrigin(request)) return json({}, 403);
   if (request.nextUrl.search.length > 2048) return json({}, 400);
@@ -31,3 +31,4 @@ async function proxy(request: NextRequest, context: Context) {
 export const GET = proxy;
 export const POST = proxy;
 export const PATCH = proxy;
+export const PUT = proxy;

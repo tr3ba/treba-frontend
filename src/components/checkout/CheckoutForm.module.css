@@ -313,6 +313,35 @@
     color: #8a8578;
 }
 
+.deliveryOptions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding: 0;
+    margin: 0 0 22px;
+    border: 0;
+}
+
+.deliveryOptions legend { margin-bottom: 10px; }
+
+.deliveryOption {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 16px;
+    border: 1px solid #ddd9d0;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.deliveryOption input { accent-color: #002aff; margin: 3px 0 0; }
+.deliveryOption span { display: grid; gap: 6px; min-width: 0; }
+.deliveryOption strong { font-size: 15px; }
+.deliveryOption small { color: #6e695e; line-height: 1.4; }
+.deliveryOption:has(input:disabled) { opacity: .6; cursor: default; }
+.deliveryOption:has(input:focus-visible) { outline: 2px solid #002aff; outline-offset: 3px; }
+.deliverySelected { border-color: #002aff; background: #f3f6ff; }
+
 /* ---------- планшет: підсумок під формою ---------- */
 @media (max-width: 1024px) {
     .layout {
@@ -335,6 +364,8 @@
     .grid {
         grid-template-columns: 1fr;
     }
+
+    .deliveryOptions { grid-template-columns: 1fr; }
 
     .totalValue {
         font-size: 22px;

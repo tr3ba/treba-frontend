@@ -1,6 +1,7 @@
 export type Page<T> = { content: T[]; page: number; size: number; totalElements: number; totalPages: number };
 export type Preferences = { values: Record<string, string>; version: string };
 export type CustomerOrder = {
+  delivery?: import("./delivery").OrderDelivery;
   id: string; orderNumber: string; status: string; paymentStatus: string; currency: string;
   subtotal: number; discountAmount: number; deliveryPrice: number; totalAmount: number; createdAt: string;
   recipientName: string; recipientPhone: string; recipientEmail: string; deliveryAddress?: string;
@@ -10,7 +11,7 @@ export type CustomerOrder = {
 export type Notification = { key: string; kind: string; title: string; text: string; scope: "shop" | "admin"; path: string; createdAt: string; read: boolean };
 export type NotificationFeed = { items: Notification[]; unreadCount: number };
 
-export async function accountRequest<T>(path: string, options: { method?: "GET" | "POST" | "PATCH"; body?: unknown; signal?: AbortSignal } = {}): Promise<T> {
+export async function accountRequest<T>(path: string, options: { method?: "GET" | "POST" | "PATCH" | "PUT"; body?: unknown; signal?: AbortSignal } = {}): Promise<T> {
   const response = await fetch("/shop-api/account/" + path, {
     method: options.method ?? "GET", cache: "no-store", signal: options.signal,
     ...(options.body === undefined ? {} : { headers: { "Content-Type": "application/json" }, body: JSON.stringify(options.body) }),
