@@ -4,12 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useState, type ReactNode } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { useCart } from "../../context/CartContext";
+import { useComparison } from "../../context/ComparisonContext";
 import { useWishlist } from "../../context/WishlistContext";
 import MobileCatalogDrawer from "./MobileCatalogDrawer";
 import styles from "./MobileTabBar.module.css";
 
-type TabKey = "home" | "catalog" | "cart" | "wishlist" | "profile";
+type TabKey = "catalog" | "comparison" | "wishlist" | "profile";
+
+const COMPARISONS_PATH = "/account/comparisons";
 
 // Страницы без панели: оформление заказа и лендинг продавца со своим макетом
 const HIDDEN_ROUTES = ["/checkout", "/sell"];
@@ -19,19 +21,19 @@ function isHiddenOn(pathname: string): boolean {
 }
 
 function getActiveTab(pathname: string): TabKey | null {
-  if (pathname === "/") return "home";
   if (pathname.startsWith("/catalog")) return "catalog";
-  if (pathname === "/cart") return "cart";
+  if (pathname.startsWith(COMPARISONS_PATH) || pathname.startsWith("/comparison/")) return "comparison";
   if (pathname.startsWith("/account/wishlist")) return "wishlist";
   if (pathname.startsWith("/account") || pathname === "/login" || pathname === "/register") return "profile";
   return null;
 }
 
-// Нижняя панель навигации — только на телефоне (≤768px), как в приложении Rozetka.
+// Нижняя панель навигации — только на телефоне (≤768px), как в мобильной версии Rozetka.
+// Головна — по логотипу в шапке, кошик — в шапке.
 export default function MobileTabBar() {
   const pathname = usePathname() ?? "/";
   const { user } = useAuth();
-  const { totalCount, isReady: isCartReady } = useCart();
+  const { count: comparisonCount, isReady: isComparisonReady } = useComparison();
   const { count: wishlistCount, isReady: isWishlistReady } = useWishlist();
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const closeCatalog = useCallback(() => setIsCatalogOpen(false), []);
@@ -39,8 +41,11 @@ export default function MobileTabBar() {
   if (isHiddenOn(pathname)) return null;
 
   const active: TabKey | null = isCatalogOpen ? "catalog" : getActiveTab(pathname);
-  const cartBadge = isCartReady ? totalCount : 0;
+  const comparisonBadge = user && isComparisonReady ? comparisonCount : 0;
   const wishlistBadge = isWishlistReady ? wishlistCount : 0;
+
+  // порівняння — только после входа: гостя ведём на вход и потом обратно
+  const comparisonHref = user ? COMPARISONS_PATH : `/login?next=${encodeURIComponent(COMPARISONS_PATH)}`;
 
   const itemClass = (key: TabKey) => (active === key ? `${styles.item} ${styles.active}` : styles.item);
   const current = (key: TabKey) => (active === key && !isCatalogOpen ? "page" : undefined);
@@ -51,10 +56,6 @@ export default function MobileTabBar() {
       <div className={styles.spacer} aria-hidden="true" />
 
       <nav className={styles.bar} aria-label="Мобільна навігація">
-        <Link href="/" className={itemClass("home")} aria-current={current("home")}>
-          <TabContent label="Головна" icon={<HomeIcon />} />
-        </Link>
-
         <button
           type="button"
           className={itemClass("catalog")}
@@ -65,21 +66,21 @@ export default function MobileTabBar() {
         </button>
 
         <Link
-          href="/cart"
-          className={itemClass("cart")}
-          aria-current={current("cart")}
-          aria-label={cartBadge > 0 ? `Кошик, товарів: ${cartBadge}` : undefined}
+          href={comparisonHref}
+          className={itemClass("comparison")}
+          aria-current={current("comparison")}
+          aria-label={comparisonBadge > 0 ? `Порівняння, товарів: ${comparisonBadge}` : undefined}
         >
-          <TabContent label="Кошик" icon={<CartIcon />} badge={cartBadge} />
+          <TabContent label="Порівняння" icon={<CompareIcon />} badge={comparisonBadge} />
         </Link>
 
         <Link
           href="/account/wishlist"
           className={itemClass("wishlist")}
           aria-current={current("wishlist")}
-          aria-label={wishlistBadge > 0 ? `Бажання, товарів: ${wishlistBadge}` : undefined}
+          aria-label={wishlistBadge > 0 ? `Обране, товарів: ${wishlistBadge}` : undefined}
         >
-          <TabContent label="Бажання" icon={<HeartIcon />} badge={wishlistBadge} />
+          <TabContent label="Обране" icon={<HeartIcon />} badge={wishlistBadge} />
         </Link>
 
         {/* гость — модалка входа (intercepting route), после входа — кабинет */}
@@ -110,14 +111,6 @@ function TabContent({ label, icon, badge = 0 }: { label: string; icon: ReactNode
 }
 
 // Иконки — inline SVG с currentColor: цвет и заливка активной вкладки задаются в CSS
-function HomeIcon() {
-  return (
-    <svg className={styles.icon} viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3.5 10.2 12 3.5l8.5 6.7V19a1.5 1.5 0 0 1-1.5 1.5h-4.2v-5.7H9.2v5.7H5A1.5 1.5 0 0 1 3.5 19z" />
-    </svg>
-  );
-}
-
 function CatalogIcon() {
   return (
     <svg className={styles.icon} viewBox="0 0 24 24" aria-hidden="true">
@@ -129,12 +122,12 @@ function CatalogIcon() {
   );
 }
 
-function CartIcon() {
+function CompareIcon() {
   return (
     <svg className={styles.icon} viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M2.8 3.8h2.3l2.3 10.6a1.6 1.6 0 0 0 1.6 1.3h8.4a1.6 1.6 0 0 0 1.6-1.2l1.9-7.3H6" />
-      <circle cx="9.5" cy="19.6" r="1.4" />
-      <circle cx="17" cy="19.6" r="1.4" />
+      <path d="M12 3.5v16.5M8.5 20h7M4.5 6.5h15" />
+      <path d="M4.5 6.5 2 13M4.5 6.5 7 13M19.5 6.5 17 13M19.5 6.5 22 13" />
+      <path d="M2 13h5a2.5 2.5 0 0 1-5 0zM17 13h5a2.5 2.5 0 0 1-5 0z" />
     </svg>
   );
 }

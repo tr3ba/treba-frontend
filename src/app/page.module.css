@@ -481,9 +481,14 @@
     font-size: 11px;
   }
 
-  .productsSection,
-  .secondBannerSection {
+  .productsSection {
     margin-top: 24px;
+  }
+
+  /* на телефоне из баннеров остаётся только верхний слайдер */
+  .secondBannerSection,
+  .promoCard {
+    display: none;
   }
 
   .productsTitle {
@@ -495,14 +500,6 @@
   .productsGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
-  }
-
-  .promoCard {
-    height: auto;
-  }
-
-  .secondBanner {
-    border-radius: 8px;
   }
 
   .footerTextSection {

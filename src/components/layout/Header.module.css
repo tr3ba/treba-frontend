@@ -64,6 +64,11 @@
     margin-left: 40px;
 }
 
+/* «прозрачная» обёртка: её дети ведут себя как прямые дети .headerActions */
+.phoneHidden {
+    display: contents;
+}
+
 /* каталог: обёртка, чтобы прятать его на узких экранах */
 .catalogSlot {
     flex-shrink: 0;
@@ -134,13 +139,13 @@
     }
 }
 
-/* ---------- телефон: только поиск, как у Rozetka; остальное — в нижней панели ---------- */
+/* ---------- телефон: бургер · логотип · поиск · кошик (как мобильная версия Rozetka) ---------- */
 @media (max-width: 768px) {
     .topPromo {
         display: none;
     }
 
-    /* шапка с поиском прилипает к верху при прокрутке */
+    /* шапка прилипает к верху при прокрутке */
     .header {
         height: auto;
         position: sticky;
@@ -152,11 +157,37 @@
         /* относительно этого блока позиционируются подсказки поиска на всю ширину */
         position: relative;
         padding: 10px 12px;
+        gap: 12px;
     }
 
-    .burgerSlot,
-    .logoLink,
-    .headerActions {
+    .logoLink {
+        margin-right: 0;
+        flex-shrink: 0;
+    }
+
+    .logo {
+        width: 76px;
+        height: 19px;
+    }
+
+    .phoneHidden {
         display: none;
+    }
+
+    .headerActions {
+        gap: 0;
+        margin-left: 0;
+        flex-shrink: 0;
+    }
+}
+
+@media (max-width: 400px) {
+    .headerInner {
+        gap: 10px;
+    }
+
+    .logo {
+        width: 64px;
+        height: 16px;
     }
 }

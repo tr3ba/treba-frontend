@@ -14,7 +14,6 @@
     justify-content: center;
     gap: 4px;
     border: none;
-    border-radius: 26px;
     background: transparent;
     color: #28251d;
     font-family: "Montserrat", sans-serif;
@@ -23,18 +22,35 @@
     line-height: 1;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    transition: color 0.2s ease, background-color 0.2s ease;
+    transition: color 0.2s ease;
+}
+
+/* оранжевая полоска над активной вкладкой — «вырастает» из центра */
+.item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: #ff6e2a;
+    transform: translateX(-50%);
+    transition: width 0.25s ease;
 }
 
 .item:focus-visible {
     outline: 2px solid #ff6e2a;
     outline-offset: -2px;
+    border-radius: 8px;
 }
 
-/* активная вкладка — оранжевый акцент на светлой «таблетке» */
 .active {
     color: #ff6e2a;
-    background-color: #fff1e9;
+}
+
+.active::before {
+    width: 28px;
 }
 
 .iconWrap {
@@ -84,7 +100,7 @@
     font-weight: 700;
     line-height: 18px;
     text-align: center;
-    box-shadow: 0 0 0 2px #ffffff;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9);
     animation: badgePop 0.3s ease;
 }
 
@@ -106,33 +122,39 @@
 @media (max-width: 768px) {
     .spacer {
         display: block;
-        height: calc(86px + env(safe-area-inset-bottom, 0px));
+        height: calc(60px + env(safe-area-inset-bottom, 0px));
     }
 
-    /* «плавающая» панель со скруглением и размытием фона, как у Rozetka */
+    /* панель прижата к низу; полупрозрачная с размытием — контент «просвечивает» при прокрутке */
     .bar {
         position: fixed;
-        left: 12px;
-        right: 12px;
-        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        left: 0;
+        right: 0;
+        bottom: 0;
         z-index: 900;
-        height: 64px;
-        padding: 6px;
+        height: calc(60px + env(safe-area-inset-bottom, 0px));
+        padding: 0 8px env(safe-area-inset-bottom, 0px);
         display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 2px;
-        border: 1px solid #e5e3dd;
-        border-radius: 32px;
-        background: rgba(255, 255, 255, 0.9);
-        -webkit-backdrop-filter: blur(16px) saturate(160%);
-        backdrop-filter: blur(16px) saturate(160%);
-        box-shadow: 0 8px 28px rgba(40, 37, 29, 0.14);
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        border-top: 1px solid rgba(229, 227, 221, 0.8);
+        background: rgba(255, 255, 255, 0.78);
+        -webkit-backdrop-filter: blur(18px) saturate(180%);
+        backdrop-filter: blur(18px) saturate(180%);
+        box-shadow: 0 -6px 24px rgba(40, 37, 29, 0.06);
+    }
+
+    /* браузеры без размытия — фон плотнее, чтобы текст под панелью не мешал */
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+        .bar {
+            background: rgba(255, 255, 255, 0.96);
+        }
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
 
     .item,
+    .item::before,
     .icon {
         transition: none;
     }

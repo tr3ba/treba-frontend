@@ -79,6 +79,11 @@
     transform: scaleX(-1);
 }
 
+/* точки-индикаторы: на ПК и планшете скрыты, показываются только на телефоне */
+.dots {
+    display: none;
+}
+
 /* ---------- планшет: стрелки меньше ---------- */
 @media (max-width: 1024px) {
 
@@ -103,16 +108,78 @@
     }
 }
 
-/* ---------- телефон: стрелки скрыты, слайды листаются автоматически ---------- */
+/* ---------- телефон: крупный баннер как у Rozetka, свайп и точки вместо стрелок ---------- */
 @media (max-width: 768px) {
+
+    /* выше, чем на ПК: широкие картинки обрезаются по бокам (object-fit: cover).
+       Когда появятся отдельные мобильные баннеры — подставим их сюда без обрезки. */
+    .mainBanner {
+        aspect-ratio: 2.1 / 1;
+    }
 
     .mainBanner,
     .track {
-        border-radius: 8px;
+        border-radius: 12px;
+    }
+
+    /* вертикальная прокрутка страницы пальцем по баннеру работает как обычно */
+    .track {
+        touch-action: pan-y;
+    }
+
+    .mainBannerImage {
+        user-select: none;
+        -webkit-user-drag: none;
     }
 
     .bannerArrowLeft,
     .bannerArrowRight {
         display: none;
+    }
+
+    .dots {
+        position: absolute;
+        left: 50%;
+        bottom: 10px;
+        z-index: 5;
+        padding: 5px 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.6);
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+        transform: translateX(-50%);
+    }
+
+    .dot {
+        position: relative;
+        width: 6px;
+        height: 6px;
+        padding: 0;
+        border: none;
+        border-radius: 3px;
+        background: rgba(40, 37, 29, 0.3);
+        cursor: pointer;
+        transition: width 0.3s ease, background-color 0.3s ease;
+    }
+
+    /* увеличенная зона нажатия, точка остаётся маленькой */
+    .dot::after {
+        content: "";
+        position: absolute;
+        inset: -8px -4px;
+    }
+
+    .dotActive {
+        width: 16px;
+        background: #ff6e2a;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dot {
+        transition: none;
     }
 }
