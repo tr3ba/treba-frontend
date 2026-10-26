@@ -33,5 +33,5 @@ test("delivery and notification proxies authenticate users, reject foreign write
   assert.equal((await request("/shop-api/telegram/link", "POST", {}, "https://foreign.example")).status, 403);
   assert.match((await (await request("/shop-api/telegram/link", "POST", {})).json()).botUrl, /^https:\/\/t\.me\//);
   for (const path of ["/shop-api/delivery/save", "/shop-api/delivery/webhooks", "/shop-api/telegram/guard", "/shop-api/telegram/configuration"]) assert.equal((await request(path, "POST", {})).status, 404);
-  assert.ok(fixture.requests.filter(r => r.path.startsWith("/api/v1/delivery/")).every(r => r.authorization === "Bearer fixture-access"));
+  assert.ok(fixture.requests.filter(r => r.path.startsWith("/api/v1/checkout-delivery/")).every(r => r.authorization === "Bearer fixture-access"));
 });

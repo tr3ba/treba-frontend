@@ -36,10 +36,10 @@ export async function startDeliveryFixture() {
       return send({ configured: true, linked, username: linked ? "fixture_customer" : null });
     }
     if (path === "/api/telegram/link/confirm") { linked = true; return send({ configured: true, linked }); }
-    if (path === "/api/v1/delivery/capabilities") return send({ available: true, shipmentMode: "Managed" });
-    if (path === "/api/v1/delivery/cities") return send([{ ref: city, name: "Київ", area: "Київська" }]);
-    if (path === "/api/v1/delivery/pickup-points") return send({ items: [{ ref: point, cityRef: city, name: "Поштомат №123: вул. Тестова, 1", number: "123", postomat: true }], page: 1, hasMore: false });
-    if (path === "/api/v1/delivery/quotes") return send({ id: quoteId, price: 95.5, currency: "UAH", city: "Київ", pickupPoint: "Поштомат №123: вул. Тестова, 1", weightKg: 1, estimatedWeight: true, expiresAt: new Date(Date.now() + 600000).toISOString(), shipmentMode: "Managed" });
+    if (path === "/api/v1/checkout-delivery/capabilities") return send({ available: true, shipmentMode: "Managed" });
+    if (path === "/api/v1/checkout-delivery/cities") return send([{ ref: city, name: "Київ", area: "Київська" }]);
+    if (path === "/api/v1/checkout-delivery/pickup-points") return send({ items: [{ ref: point, cityRef: city, name: "Поштомат №123: вул. Тестова, 1", number: "123", postomat: true }], page: 1, hasMore: false });
+    if (path === "/api/v1/checkout-delivery/quotes") return send({ id: quoteId, price: 95.5, currency: "UAH", city: "Київ", pickupPoint: "Поштомат №123: вул. Тестова, 1", weightKg: 1, estimatedWeight: true, expiresAt: new Date(Date.now() + 600000).toISOString(), shipmentMode: "Managed" });
     if (path === "/api/v1/cart") return send({ id: "fixture-cart", userId: "fixture-customer", totalQuantity: 1, totalPrice: 250, items: [{ id: "fixture-item", productId: variantId, productVariantId: variantId, productName: "Тестовий товар TREBA", variantName: "Основний", imageUrl: null, price: 250, oldPrice: null, quantity: 1, totalPrice: 250, isAvailable: true }] });
     if (path === "/api/v1/wishlist") return send({ items: [] });
     if (path === "/api/v1/orders") return send({ id: quoteId, orderNumber: "ORD-FIXTURE", status: "AWAITING_PAYMENT", subtotal: 250, discountAmount: 0, deliveryPrice: 95.5, totalAmount: 345.5 }, 201);

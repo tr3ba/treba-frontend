@@ -14,7 +14,7 @@ async function proxy(request: NextRequest, context: Context) {
     if (!session) { const response = json({ message: "Потрібно увійти в акаунт." }, 401); clearSession(response); return response; }
     const body = get ? undefined : await request.text();
     if (body !== undefined && (body.length === 0 || body.length > 24000)) return json({}, 400);
-    const result = await backend("/api/v1/delivery/" + path + request.nextUrl.search, { method: request.method, headers: { Authorization: `Bearer ${session.token}` }, body });
+    const result = await backend("/api/v1/checkout-delivery/" + path + request.nextUrl.search, { method: request.method, headers: { Authorization: `Bearer ${session.token}` }, body });
     const response = new NextResponse(await result.text(), { status: result.status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store, private" } });
     if (session.renewed) saveSession(response, session.renewed, session.remember);
     if (result.status === 401) clearSession(response);
