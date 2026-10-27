@@ -1,0 +1,249 @@
+.form {
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    border: 1px solid #e5e3dd;
+    border-radius: 12px;
+    background: #ffffff;
+    font-family: "Montserrat", sans-serif;
+}
+
+.title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #28251d;
+}
+
+.group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #28251d;
+}
+
+.optional {
+    font-weight: 400;
+    color: #8a8578;
+}
+
+/* ---------- плитки номинала ---------- */
+
+.amounts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.amount {
+    padding: 12px 6px;
+    border: 1px solid #e5e3dd;
+    border-radius: 10px;
+    background: #ffffff;
+    font-family: "Montserrat", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #28251d;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.amountCustom {
+    grid-column: span 2;
+}
+
+.amountActive {
+    border-color: #ff6e2a;
+    background-color: #fff1e8;
+    color: #ff6e2a;
+}
+
+@media (hover: hover) {
+    .amount:hover {
+        border-color: #ff6e2a;
+    }
+}
+
+/* ---------- поля ---------- */
+
+.input,
+.textarea {
+    width: 100%;
+    border: 1px solid #e5e3dd;
+    border-radius: 10px;
+    background: #ffffff;
+    font-family: "Montserrat", sans-serif;
+    font-size: 15px;
+    color: #28251d;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input {
+    height: 46px;
+    padding: 0 14px;
+}
+
+.textarea {
+    padding: 12px 14px;
+    line-height: 1.45;
+    resize: vertical;
+    min-height: 84px;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+    color: #b5b1a6;
+}
+
+.input:focus,
+.textarea:focus {
+    outline: none;
+    border-color: #ff6e2a;
+    box-shadow: 0 0 0 3px rgba(255, 110, 42, 0.12);
+}
+
+.inputError {
+    border-color: #e5484d;
+}
+
+/* «₴» внутри поля справа */
+.inputWithSuffix {
+    position: relative;
+}
+
+.inputWithSuffix .input {
+    padding-right: 36px;
+}
+
+.suffix {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    font-weight: 600;
+    color: #8a8578;
+    pointer-events: none;
+}
+
+.counter {
+    align-self: flex-end;
+    font-size: 11.5px;
+    color: #8a8578;
+}
+
+.error {
+    font-size: 12px;
+    color: #e5484d;
+}
+
+.note {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: #8a8578;
+}
+
+.submitError {
+    margin: 0;
+    font-size: 13px;
+    color: #e5484d;
+}
+
+/* ---------- кнопки ---------- */
+
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.buyButton,
+.cancelButton {
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-family: "Montserrat", sans-serif;
+    font-size: 14.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.buyButton {
+    border: none;
+    background: #ff6e2a;
+    color: #ffffff;
+}
+
+.cancelButton {
+    border: 1px solid #e5e3dd;
+    background: #ffffff;
+    color: #28251d;
+}
+
+.buyButton:disabled,
+.cancelButton:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+@media (hover: hover) {
+    .buyButton:hover:not(:disabled) {
+        background: #e8611f;
+    }
+
+    .cancelButton:hover:not(:disabled) {
+        border-color: #ff6e2a;
+        color: #ff6e2a;
+    }
+}
+
+/* ---------- телефон: плитки по 3 в ряд, «Інша сума» — на всю ширину ---------- */
+@media (max-width: 768px) {
+    .form {
+        max-width: none;
+        padding: 16px;
+    }
+
+    .amounts {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .amountCustom {
+        grid-column: 1 / -1;
+    }
+
+    .amount {
+        font-size: 13.5px;
+    }
+
+    /* 16px — чтобы iPhone не увеличивал страницу при фокусе */
+    .input,
+    .textarea,
+    .suffix {
+        font-size: 16px;
+    }
+
+    .buyButton {
+        flex: 1 1 100%;
+    }
+
+    .cancelButton {
+        flex: 1 1 100%;
+    }
+}

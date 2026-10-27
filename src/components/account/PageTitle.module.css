@@ -5,3 +5,11 @@
     font-weight: 600;
     color: #28251d;
 }
+
+/* телефон: компактнее, чтобы длинные названия разделов помещались в строку */
+@media (max-width: 768px) {
+    .title {
+        font-size: 20px;
+        line-height: 1.3;
+    }
+}

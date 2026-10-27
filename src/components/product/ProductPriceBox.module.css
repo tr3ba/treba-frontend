@@ -14,9 +14,39 @@
     gap: 12px;
 }
 
+/* ---------- Статус наличия (левый верхний угол) ---------- */
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+
+.statusIn {
+    color: #2e9e1a;
+}
+
+.statusOut {
+    color: #8a8578;
+}
+
+/* ---------- Варианты (цвет) ---------- */
+
 .variants {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 8px;
 }
 
@@ -48,6 +78,8 @@
     opacity: 0.35;
     cursor: not-allowed;
 }
+
+/* ---------- Кнопки-иконки ---------- */
 
 .iconActions {
     display: flex;
@@ -102,6 +134,14 @@
     height: 14px;
 }
 
+/* ---------- Цена ---------- */
+
+.priceBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
 .oldPrice {
     color: #8a8578;
     text-decoration: line-through;
@@ -131,6 +171,8 @@
     font-size: 12.5px;
     color: #8a8578;
 }
+
+/* ---------- Кнопки ---------- */
 
 .buttonRow {
     display: flex;
@@ -178,12 +220,6 @@
     background: #0022cc;
 }
 
-.outOfStock {
-    color: #8a8578;
-    font-size: 14px;
-    margin: 0;
-}
-
 .notifyButton {
     background: transparent;
     color: #ff6e2a;
@@ -193,4 +229,26 @@
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
+}
+
+/* ---------- телефон: чуть компактнее ---------- */
+@media (max-width: 768px) {
+    .box {
+        padding: 16px;
+        gap: 14px;
+    }
+
+    .price {
+        font-size: 26px;
+    }
+
+    .currency {
+        font-size: 18px;
+    }
+
+    .cartButton,
+    .creditButton,
+    .notifyButton {
+        padding: 13px;
+    }
 }

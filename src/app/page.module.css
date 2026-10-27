@@ -41,6 +41,7 @@
 }
 
 .categoryItem {
+  max-width: 100%;
   display: flex;
   align-items: center;
   gap: 15px;
@@ -71,11 +72,15 @@
 }
 
 .categoryText {
+  /* min-width: 0 + перенос — длинные названия («Алкогольні напої та продукти харчування»)
+     переносятся на вторую строку, а не вылезают на товары */
+  min-width: 0;
   font-family: "Montserrat", sans-serif;
   font-size: 16.73px;
   font-weight: 400;
   line-height: 1.2;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 /* нижние блоки под меню */
@@ -268,6 +273,11 @@
   color: #5c5c5c;
 }
 
+/* короткий текст плашки — только на телефоне */
+.badgeShort {
+  display: none;
+}
+
 .productsSection {
   margin-top: 50px;
 }
@@ -450,40 +460,72 @@
     padding: 12px 12px 0;
   }
 
-  /* плашки «Доставка / Повернення / Гарантія» — горизонтальная прокрутка */
+  /* плашки: на телефоне две компактные в ряд (Повернення, Гарантія), Доставка скрыта */
   .bannerBadges {
     margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
-    overflow-x: auto;
-    scrollbar-width: none;
   }
 
-  .bannerBadges::-webkit-scrollbar {
+  .bannerBadgeDelivery {
     display: none;
   }
 
   .bannerBadge {
-    flex: 0 0 78%;
+    min-width: 0;
     min-height: 0;
-    padding: 10px 12px;
-    align-items: flex-start;
+    padding: 10px;
+    gap: 10px;
+    border-radius: 12px;
   }
 
   .badgeIconWrapper {
-    padding: 2px 8px 0 0;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    padding: 0;
+    border-radius: 10px;
+    background-color: #ffffff;
+  }
+
+  .badgeIcon {
+    width: 22px;
+    height: 18px;
+  }
+
+  .badgeTextWrapper {
+    min-width: 0;
   }
 
   .badgeTitle {
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #28251d;
   }
 
   .badgeSubtitle {
-    font-size: 11px;
+    display: none;
   }
 
-  .productsSection,
-  .secondBannerSection {
+  .badgeShort {
+    display: block;
+    margin-top: 3px;
+    font-family: "Montserrat", sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.25;
+    color: #8a8578;
+  }
+
+  .productsSection {
     margin-top: 24px;
+  }
+
+  /* на телефоне из баннеров остаётся только верхний слайдер */
+  .secondBannerSection,
+  .promoCard {
+    display: none;
   }
 
   .productsTitle {
@@ -495,14 +537,6 @@
   .productsGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
-  }
-
-  .promoCard {
-    height: auto;
-  }
-
-  .secondBanner {
-    border-radius: 8px;
   }
 
   .footerTextSection {

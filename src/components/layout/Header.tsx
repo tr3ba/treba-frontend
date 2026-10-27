@@ -10,7 +10,9 @@ import styles from "./Header.module.css";
 import Icon from "../common/Icon";
 import Notifications from "../account/Notifications";
 
-// Синій header + верхня промо-плашка
+// Синій header + верхня промо-плашка.
+// На телефоне (≤768px), как в мобильной версии Rozetka: бургер · логотип · поиск · кошик.
+// Порівняння, бажання и профиль — в нижней панели (MobileTabBar).
 export default function Header() {
   return (
     <>
@@ -20,8 +22,10 @@ export default function Header() {
 
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          {/* бургер с каталогом — только на планшете и телефоне */}
-          <MobileCatalog />
+          {/* бургер с каталогом — на планшете и телефоне */}
+          <div className={styles.burgerSlot}>
+            <MobileCatalog />
+          </div>
 
           <Link href="/" className={styles.logoLink}>
             <Icon src="/logo/MainLogo.svg" alt="Treba" className={styles.logo} />
@@ -38,16 +42,18 @@ export default function Header() {
               Після входу: порівняння · сповіщення · бажання · профіль · кошик.
               Кошик завжди крайній справа, профіль поруч — нові іконки з'являються зліва. */}
           <div className={styles.headerActions}>
-            {/* только после входа; на телефоне скрыто — переедет в нижнюю панель */}
-            <HeaderCompareButton className={styles.compareButton} />
+            {/* на ПК обёртка «прозрачная» (display: contents), на телефоне скрыта */}
+            <div className={styles.phoneHidden}>
+              {/* только после входа */}
+              <HeaderCompareButton />
 
-            {/* только после входа */}
-            <Notifications />
+              {/* только после входа */}
+              <Notifications />
 
-            {/* на телефоне скрыто — переедет в нижнюю панель */}
-            <HeaderWishlistButton className={styles.wishlistButton} />
+              <HeaderWishlistButton />
 
-            <UserMenu />
+              <UserMenu />
+            </div>
 
             <HeaderCartButton />
           </div>

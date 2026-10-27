@@ -1,0 +1,152 @@
+.card {
+    min-width: 0;
+    border: 1px solid #e5e3dd;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #ffffff;
+    font-family: "Montserrat", sans-serif;
+}
+
+.cardExpired {
+    opacity: 0.6;
+}
+
+/* ---------- цветная верхняя часть ---------- */
+
+.top {
+    position: relative;
+    overflow: hidden;
+    padding: 16px 18px 18px;
+    background: linear-gradient(135deg, #ff6e2a 0%, #ff9d63 100%);
+    color: #ffffff;
+}
+
+/* декоративный круг */
+.top::after {
+    content: "";
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    right: -45px;
+    bottom: -75px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.topRow {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.caption {
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+.brand {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.amount {
+    position: relative;
+    z-index: 1;
+    margin: 10px 0 0;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+/* ---------- нижняя часть ---------- */
+
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px 16px;
+}
+
+.codeRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 8px 8px 12px;
+    border-radius: 10px;
+    background: #f7f6f3;
+}
+
+.code {
+    min-width: 0;
+    font-size: 14.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #28251d;
+    font-variant-numeric: tabular-nums;
+    /* один тап — выделяется весь код */
+    user-select: all;
+    -webkit-user-select: all;
+    overflow-wrap: anywhere;
+}
+
+.copyButton {
+    flex-shrink: 0;
+    padding: 6px 10px;
+    border: 1px solid #e5e3dd;
+    border-radius: 8px;
+    background: #ffffff;
+    font-family: "Montserrat", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #28251d;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.copyButtonDone {
+    border-color: #2e9e1a;
+    color: #2e9e1a;
+}
+
+@media (hover: hover) {
+    .copyButton:hover {
+        border-color: #ff6e2a;
+        color: #ff6e2a;
+    }
+}
+
+.meta {
+    margin: 0;
+    font-size: 13px;
+    color: #5c584f;
+}
+
+.meta strong {
+    font-weight: 600;
+    color: #28251d;
+}
+
+.message {
+    margin: 0;
+    font-size: 13px;
+    font-style: italic;
+    line-height: 1.45;
+    color: #5c584f;
+    overflow-wrap: anywhere;
+}
+
+.validity {
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    color: #8a8578;
+}
+
+.validityExpired {
+    color: #e5484d;
+}

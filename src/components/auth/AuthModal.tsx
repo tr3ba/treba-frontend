@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, ReactNode } from "react";
+import { useEffect, useRef, ReactNode } from "react";
 import { CloseIcon } from "./Icons";
 import styles from "./AuthForm.module.css";
 
@@ -10,6 +10,10 @@ type AuthModalProps = {
 };
 
 export default function AuthModal({ onClose, children }: AuthModalProps) {
+  // Нажатие началось на затемнении? Иначе выделение текста в поле
+  // с отпусканием снаружи закрывало бы окно
+  const pressedOnOverlayRef = useRef(false);
+
   // Пока модалка открыта — страница под ней не скроллится
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -28,18 +32,25 @@ export default function AuthModal({ onClose, children }: AuthModalProps) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
+  // Закрытие по клику / тапу на пустое место вокруг окна
+  const handleOverlayPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    pressedOnOverlayRef.current = e.target === e.currentTarget;
+  };
+
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const shouldClose = pressedOnOverlayRef.current && e.target === e.currentTarget;
+    pressedOnOverlayRef.current = false;
+    if (shouldClose) onClose();
+  };
+
   return (
     <div
       className={styles.overlay}
-      onClick={onClose}
+      onPointerDown={handleOverlayPointerDown}
+      onClick={handleOverlayClick}
       role="presentation"
     >
-      <div
-        className={styles.card}
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-      >
+      <div className={styles.card} role="dialog" aria-modal="true">
         <button
           type="button"
           className={styles.closeButton}

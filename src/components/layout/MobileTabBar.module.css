@@ -1,0 +1,165 @@
+/* Нижняя панель — только на телефоне (≤768px). На ПК и планшете её нет. */
+.bar,
+.spacer {
+    display: none;
+}
+
+.item {
+    position: relative;
+    min-width: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border: none;
+    background: transparent;
+    color: #28251d;
+    font-family: "Montserrat", sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s ease;
+}
+
+/* оранжевая полоска над активной вкладкой — «вырастает» из центра */
+.item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: #ff6e2a;
+    transform: translateX(-50%);
+    transition: width 0.25s ease;
+}
+
+.item:focus-visible {
+    outline: 2px solid #ff6e2a;
+    outline-offset: -2px;
+    border-radius: 8px;
+}
+
+.active {
+    color: #ff6e2a;
+}
+
+.active::before {
+    width: 28px;
+}
+
+.iconWrap {
+    position: relative;
+    display: flex;
+}
+
+.icon {
+    width: 24px;
+    height: 24px;
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.15s ease;
+}
+
+.active .icon {
+    fill: rgba(255, 110, 42, 0.18);
+}
+
+.item:active .icon {
+    transform: scale(0.9);
+}
+
+.label {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* счётчик товаров; key в разметке перезапускает анимацию при изменении числа */
+.badge {
+    position: absolute;
+    top: -6px;
+    left: calc(100% - 9px);
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: #ff6e2a;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9);
+    animation: badgePop 0.3s ease;
+}
+
+@keyframes badgePop {
+    0% {
+        transform: scale(0.6);
+    }
+
+    60% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* ---------- телефон ---------- */
+@media (max-width: 768px) {
+    .spacer {
+        display: block;
+        height: calc(60px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* панель прижата к низу; полупрозрачная с размытием — контент «просвечивает» при прокрутке */
+    .bar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 900;
+        height: calc(60px + env(safe-area-inset-bottom, 0px));
+        padding: 0 8px env(safe-area-inset-bottom, 0px);
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        border-top: 1px solid rgba(229, 227, 221, 0.8);
+        background: rgba(255, 255, 255, 0.78);
+        -webkit-backdrop-filter: blur(18px) saturate(180%);
+        backdrop-filter: blur(18px) saturate(180%);
+        box-shadow: 0 -6px 24px rgba(40, 37, 29, 0.06);
+    }
+
+    /* браузеры без размытия — фон плотнее, чтобы текст под панелью не мешал */
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+        .bar {
+            background: rgba(255, 255, 255, 0.96);
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .item,
+    .item::before,
+    .icon {
+        transition: none;
+    }
+
+    .badge {
+        animation: none;
+    }
+}

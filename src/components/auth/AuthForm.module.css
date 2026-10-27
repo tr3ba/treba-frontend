@@ -10,12 +10,46 @@
     overflow-y: auto;
 }
 
-.verificationMethods { display: grid; gap: 12px; margin: 18px 0; }
-.verificationMethods button { display: grid; gap: 6px; padding: 16px; text-align: left; background: #fff; border: 1px solid #d9dfe8; border-radius: 12px; color: #222; cursor: pointer; font: inherit; }
-.verificationMethods button:hover { border-color: #eb7838; background: #fff8f3; }
-.verificationMethods span { font-size: 13px; color: #666; }
-.guardPanel { text-align: center; display: grid; gap: 12px; }
-.guardPanel img { margin: 0 auto; max-width: 100%; height: auto; }
+.verificationMethods {
+    display: grid;
+    gap: 12px;
+    margin: 18px 0;
+}
+
+.verificationMethods button {
+    display: grid;
+    gap: 6px;
+    padding: 16px;
+    text-align: left;
+    background: #fff;
+    border: 1px solid #d9dfe8;
+    border-radius: 12px;
+    color: #222;
+    cursor: pointer;
+    font: inherit;
+}
+
+.verificationMethods button:hover {
+    border-color: #eb7838;
+    background: #fff8f3;
+}
+
+.verificationMethods span {
+    font-size: 13px;
+    color: #666;
+}
+
+.guardPanel {
+    text-align: center;
+    display: grid;
+    gap: 12px;
+}
+
+.guardPanel img {
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+}
 
 .card {
     position: relative;
@@ -316,20 +350,129 @@
     display: block;
 }
 
-@media (max-width: 640px) {
+/* ---------- телефон: окно «выезжает» снизу (bottom sheet), как в мобильных магазинах ----------
+   Сверху остаётся полоска затемнения — тап по ней закрывает окно, как и крестик. */
+@media (max-width: 768px) {
+    .overlay {
+        /* выше шапки (800), нижней панели (900) и панели каталога (1000) */
+        z-index: 1100;
+        align-items: flex-end;
+        padding: 48px 0 0;
+        overflow: hidden;
+        animation: overlayFadeIn 0.2s ease;
+    }
+
     .card {
+        width: 100%;
+        max-width: none;
+        max-height: calc(100vh - 48px);
+        max-height: calc(100dvh - 48px);
+        margin: 0;
+        padding: 32px 20px calc(24px + env(safe-area-inset-bottom, 0px));
         flex-direction: column;
-        padding: 36px 24px;
-        max-width: 420px;
+        gap: 20px;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.18);
+        /* длинная форма (регистрация) прокручивается внутри окна, страница под ним стоит */
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        animation: sheetSlideUp 0.28s ease;
+    }
+
+    /* «ручка» сверху — визуальная подсказка, что это выдвижное окно */
+    .card::before {
+        content: "";
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        width: 40px;
+        height: 4px;
+        border-radius: 2px;
+        background-color: #e5e3dd;
+        transform: translateX(-50%);
+    }
+
+    /* крестик крупнее — удобно попасть пальцем */
+    .closeButton {
+        top: 14px;
+        right: 14px;
+        width: 40px;
+        height: 40px;
+        background-color: #f4f3ef;
+        color: #28251d;
+    }
+
+    .formColumn,
+    .socialColumn {
+        flex: none;
+        min-width: 0;
+    }
+
+    .title {
+        /* не залезать под крестик */
+        padding-right: 48px;
+        margin-bottom: 18px;
+        font-size: 22px;
+    }
+
+    .form {
+        gap: 14px;
+    }
+
+    /* 16px — иначе iPhone увеличивает страницу при фокусе на поле */
+    .input {
+        font-size: 16px;
+    }
+
+    .submitButton {
+        height: 52px;
+        font-size: 16px;
+    }
+
+    .switchText {
+        margin-top: 16px;
     }
 
     .divider {
         flex-direction: row;
-        margin: 4px 0;
+        margin: 0;
     }
 
     .dividerLine {
         width: 100%;
         height: 1px;
+    }
+
+    .socialButton {
+        height: 48px;
+    }
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes sheetSlideUp {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .overlay,
+    .card {
+        animation: none;
     }
 }

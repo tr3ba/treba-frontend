@@ -87,8 +87,10 @@ export default async function Home() {
     <BannerSlider />
   </section>
 
-<section className={styles.bannerBadges}>
-  <div className={styles.bannerBadge}>
+{/* Переваги. На ПК — три плашки з повним текстом.
+    На телефоні — дві компактні (Повернення, Гарантія) з коротким текстом badgeShort. */}
+<section className={styles.bannerBadges} aria-label="Переваги TREBA">
+  <div className={`${styles.bannerBadge} ${styles.bannerBadgeDelivery}`}>
     <div className={styles.badgeIconWrapper}>
       <Icon src="/icons/track.svg" alt="" className={styles.badgeIcon} />
     </div>
@@ -105,6 +107,7 @@ export default async function Home() {
     <div className={styles.badgeTextWrapper}>
       <p className={styles.badgeTitle}>Повернення</p>
       <p className={styles.badgeSubtitle}>Повернення товару відбувається протягом 14 днів після покупки, у відповідності із діючим законом.</p>
+      <p className={styles.badgeShort}>14 днів на повернення товару</p>
     </div>
   </div>
 
@@ -114,14 +117,13 @@ export default async function Home() {
     </div>
     <div className={styles.badgeTextWrapper}>
       <p className={styles.badgeTitle}>Гарантія</p>
-                <p className={styles.badgeSubtitle}>Сертифікована техніка з</p>
-                      <p className={styles.badgeSubtitle}>офіційною гарантією від виробника.</p>
-
+      <p className={styles.badgeSubtitle}>Сертифікована техніка з</p>
+      <p className={styles.badgeSubtitle}>офіційною гарантією від виробника.</p>
+      <p className={styles.badgeShort}>Офіційна гарантія виробника</p>
     </div>
-            </div>
-            
-            
- </section>
+  </div>
+</section>
+
 <section className={styles.productsSection}>
   <h2 className={styles.productsTitle}>Найкращі пропозиції для вас</h2>
 

@@ -25,6 +25,15 @@ const AUTOPLAY_DELAY = 5000;
 const TRANSITION_DURATION = 500;
 // Запас на випадок, якщо transitionend не прийде (фонова вкладка тощо)
 const TRANSITION_FALLBACK = TRANSITION_DURATION + 100;
+// Мінімальний зсув пальця, щоб вважати жест свайпом
+const SWIPE_THRESHOLD = 40;
+
+// Індекс у extendedSlides -> номер справжнього слайда (0..slides.length-1)
+function toRealIndex(index: number): number {
+  if (index <= 0) return slides.length - 1;
+  if (index >= LAST_INDEX) return 0;
+  return index - 1;
+}
 
 export default function BannerSlider() {
   const [index, setIndex] = useState(1); // 1 = перший справжній слайд
@@ -35,6 +44,7 @@ export default function BannerSlider() {
   const isHoveredRef = useRef(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fallbackRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
   // Завершення анімації: якщо стоїмо на клоні — непомітно стрибаємо на справжній слайд
   const finishTransition = useCallback(() => {
@@ -57,19 +67,22 @@ export default function BannerSlider() {
     }
   }, []);
 
-  // Зсув на один слайд. Поки йде анімація — нові кліки ігноруються
-  const move = useCallback(
-    (delta: 1 | -1) => {
-      if (isAnimatingRef.current) return;
+  // Перехід до слайда за індексом у extendedSlides. Поки йде анімація — нові дії ігноруються
+  const goTo = useCallback(
+    (target: number) => {
+      if (isAnimatingRef.current || target === indexRef.current) return;
       isAnimatingRef.current = true;
 
-      indexRef.current += delta;
-      setIndex(indexRef.current);
+      indexRef.current = target;
+      setIndex(target);
 
       fallbackRef.current = setTimeout(finishTransition, TRANSITION_FALLBACK);
     },
     [finishTransition]
   );
+
+  // Зсув на один слайд
+  const move = useCallback((delta: 1 | -1) => goTo(indexRef.current + delta), [goTo]);
 
   const stopAutoplay = useCallback(() => {
     if (intervalRef.current) {
@@ -117,9 +130,10 @@ export default function BannerSlider() {
     };
   }, [withTransition]);
 
-  const handleManualNav = (delta: 1 | -1) => {
+  // Ручне керування (стрілки, точки, свайп): перезапускаємо автопрокрутку, щоб не перемкнулось одразу
+  const navigate = (action: () => void) => {
     stopAutoplay();
-    move(delta);
+    action();
     if (!isHoveredRef.current) startAutoplay();
   };
 
@@ -128,14 +142,46 @@ export default function BannerSlider() {
     finishTransition();
   };
 
+  // Свайп пальцем (телефон). Вертикальний жест не чіпаємо — це прокрутка сторінки
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    stopAutoplay();
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    const start = touchStartRef.current;
+    touchStartRef.current = null;
+    const touch = e.changedTouches[0];
+
+    if (start) {
+      const dx = touch.clientX - start.x;
+      const dy = touch.clientY - start.y;
+      if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+        move(dx < 0 ? 1 : -1);
+      }
+    }
+    startAutoplay();
+  };
+
+  const handleTouchCancel = () => {
+    touchStartRef.current = null;
+    startAutoplay();
+  };
+
+  const activeDot = toRealIndex(index);
+
   return (
     <div
       className={styles.mainBanner}
-      onMouseEnter={() => {
+      // Пауза при наведенні — тільки для миші: на телефоні дотик теж генерує «наведення»
+      onPointerEnter={(e) => {
+        if (e.pointerType !== "mouse") return;
         isHoveredRef.current = true;
         stopAutoplay();
       }}
-      onMouseLeave={() => {
+      onPointerLeave={(e) => {
+        if (e.pointerType !== "mouse") return;
         isHoveredRef.current = false;
         startAutoplay();
       }}
@@ -143,12 +189,17 @@ export default function BannerSlider() {
       <button
         className={styles.bannerArrowLeft}
         aria-label="Попередній банер"
-        onClick={() => handleManualNav(-1)}
+        onClick={() => navigate(() => move(-1))}
       >
         <Icon src="/icons/arrow.svg" />
       </button>
 
-      <div className={styles.track}>
+      <div
+        className={styles.track}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
+      >
         <div
           className={styles.trackInner}
           style={{
@@ -169,6 +220,7 @@ export default function BannerSlider() {
                  решту теж одразу (eager), щоб під час гортання не було порожніх кадрів */
               priority={i === 1}
               loading={i === 1 ? undefined : "eager"}
+              draggable={false}
               className={styles.mainBannerImage}
             />
           ))}
@@ -178,10 +230,24 @@ export default function BannerSlider() {
       <button
         className={styles.bannerArrowRight}
         aria-label="Наступний банер"
-        onClick={() => handleManualNav(1)}
+        onClick={() => navigate(() => move(1))}
       >
         <Icon src="/icons/arrow.svg" className={styles.arrowMirrored} />
       </button>
+
+      {/* точки-індикатори — тільки на телефоні (на ПК приховані в CSS) */}
+      <div className={styles.dots}>
+        {slides.map((src, i) => (
+          <button
+            key={src}
+            type="button"
+            className={i === activeDot ? `${styles.dot} ${styles.dotActive}` : styles.dot}
+            aria-label={`Банер ${i + 1} з ${slides.length}`}
+            aria-current={i === activeDot ? "true" : undefined}
+            onClick={() => navigate(() => goTo(i + 1))}
+          />
+        ))}
+      </div>
     </div>
   );
 }

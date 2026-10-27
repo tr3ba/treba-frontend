@@ -1,0 +1,113 @@
+.card {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px;
+    border: 1px solid #e5e3dd;
+    border-radius: 12px;
+    background: #ffffff;
+    font-family: "Montserrat", sans-serif;
+}
+
+.name {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #28251d;
+    overflow-wrap: anywhere;
+}
+
+.meta {
+    margin: 4px 0 0;
+    font-size: 12.5px;
+    color: #8a8578;
+}
+
+/* ---------- плашки «Верх / Низ / Взуття» ---------- */
+
+.sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+}
+
+.sizeItem {
+    min-width: 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: #f7f6f3;
+}
+
+.sizeLabel {
+    font-size: 11.5px;
+    color: #8a8578;
+}
+
+.sizeValue {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #28251d;
+}
+
+.params {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #5c584f;
+}
+
+.emptyText {
+    margin: 0;
+    font-size: 13px;
+    color: #8a8578;
+}
+
+/* ---------- действия ---------- */
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.action {
+    padding: 7px 12px;
+    border: 1px solid #e5e3dd;
+    border-radius: 8px;
+    background: #ffffff;
+    font-family: "Montserrat", sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #28251d;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.action:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+@media (hover: hover) {
+    .action:hover:not(:disabled) {
+        border-color: #ff6e2a;
+        color: #ff6e2a;
+    }
+
+    .actionDanger:hover:not(:disabled) {
+        border-color: #e5484d;
+        color: #e5484d;
+    }
+}
+
+@media (max-width: 768px) {
+    .card {
+        padding: 16px;
+    }
+}

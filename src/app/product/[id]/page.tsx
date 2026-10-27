@@ -48,6 +48,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
       ? [product.image]
       : [];
 
+  const hasCharacteristics = (product.characteristics?.length ?? 0) > 0;
+  const hasAccessories = (product.accessories?.length ?? 0) > 0;
+  const hasServices = (product.services?.length ?? 0) > 0;
+
+  // Вкладки — только для разделов, которые реально есть на странице
+  const tabs: { id: string; label: string }[] = [];
+  if (hasCharacteristics) tabs.push({ id: "characteristics", label: "Характеристики" });
+  if (hasAccessories) tabs.push({ id: "accessories", label: "Аксесуари" });
+  if (hasServices) tabs.push({ id: "services", label: "Сервіси" });
+  tabs.push({ id: "description", label: "Опис" });
+  tabs.push({ id: "reviews", label: "Відгуки" });
+
   return (
     <>
       <Header />
@@ -80,70 +92,95 @@ export default async function ProductPage({ params }: ProductPageProps) {
           )}
         </div>
 
-        <ProductTabs
-          tabs={[
-            { id: "characteristics", label: "Характеристики" },
-            { id: "accessories", label: "Аксесуари" },
-            { id: "services", label: "Сервіси" },
-            { id: "reviews", label: "Відгуки" },
-          ]}
-        />
+        <ProductTabs tabs={tabs} />
 
-        <div className={styles.contentGrid}>
-          <div className={styles.leftColumn}>
-            <ProductGallery images={images} title={product.title} />
-
-            {product.characteristics && (
-              <ProductQuickSpecs characteristics={product.characteristics} />
-            )}
-
-            {product.characteristics && (
-              <div id="characteristics">
-                <ProductCharacteristics characteristics={product.characteristics} />
+        {/* На телефоне обёртки внутри .body «разбираются» (display: contents),
+            и порядок блоков задаётся через order — см. page.module.css */}
+        <div className={styles.body}>
+          <div className={styles.contentGrid}>
+            <div className={styles.leftColumn}>
+              <div className={styles.mGallery}>
+                <ProductGallery images={images} title={product.title} />
               </div>
-            )}
 
-            {product.accessories && <ProductAccessories accessories={product.accessories} />}
+              {hasCharacteristics && product.characteristics && (
+                <ProductQuickSpecs characteristics={product.characteristics} />
+              )}
 
-            {product.services && <ProductServices services={product.services} />}
+              {hasCharacteristics && product.characteristics && (
+                <div id="characteristics">
+                  <ProductCharacteristics characteristics={product.characteristics} />
+                </div>
+              )}
+
+              {hasAccessories && product.accessories && (
+                <ProductAccessories accessories={product.accessories} />
+              )}
+
+              {hasServices && product.services && <ProductServices services={product.services} />}
+            </div>
+
+            <div className={styles.rightColumn}>
+              <div className={styles.mPrice}>
+                <ProductPriceBox
+                  id={product.id}
+                  backendId={product.backendId}
+                  variantId={product.variantId}
+                  categoryId={product.categoryId}
+                  subcategoryId={product.subcategoryId}
+                  subcategoryName={product.subcategoryName}
+                  title={product.title}
+                  image={product.image}
+                  price={product.price}
+                  oldPrice={product.oldPrice}
+                  isPromo={product.isPromo}
+                  inStock={product.inStock}
+                  variants={product.variants}
+                />
+              </div>
+
+              {hasServices && product.services && (
+                <div className={styles.mAddServices}>
+                  <ProductAddServices services={product.services} />
+                </div>
+              )}
+
+              <ProductDeliveryInfo />
+              <ProductPaymentInfo />
+
+              {product.backendId && (
+                <div className={styles.mQuestion}>
+                  <ProductQuestion id={product.backendId} slug={product.id} title={product.title} />
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className={styles.rightColumn}>
-            <ProductPriceBox
-              id={product.id}
-              backendId={product.backendId}
-              variantId={product.variantId}
-              categoryId={product.categoryId}
-              subcategoryId={product.subcategoryId}
-              subcategoryName={product.subcategoryName}
-              title={product.title}
-              image={product.image}
-              price={product.price}
-              oldPrice={product.oldPrice}
-              isPromo={product.isPromo}
-              inStock={product.inStock}
-              variants={product.variants}
-            />
+          {/* на телефоне карусели идут после отзывов (order: 1) */}
+          <div className={styles.mLater}>
+            <ProductCarousel title="Також вас можуть зацікавити" products={related} />
+          </div>
 
-            {product.services && <ProductAddServices services={product.services} />}
+          <div className={styles.mLater}>
+            <ProductBundle product={product} />
+          </div>
 
-            <ProductDeliveryInfo />
-            <ProductPaymentInfo />
-            <ProductQuestion id={product.backendId} slug={product.id} title={product.title} />
+          <div className={styles.mLater}>
+            <ProductCarousel title="Спонсорські товари" products={sponsored} />
+          </div>
+
+          <div className={styles.descriptionGrid}>
+            <div id="description" className={styles.mDescription}>
+              <ProductDescription title={product.title} description={product.description} />
+            </div>
+            <ProductReviews reviews={reviews.items} total={reviews.total} />
+          </div>
+
+          {/* на телефоне «Переглянуті» — самый последний блок (order: 2) */}
+          <div className={styles.mLast}>
+            <ViewedProductsCarousel excludeId={product.id} />
           </div>
         </div>
-
-        <ProductCarousel title="Також вас можуть зацікавити" products={related} />
-
-        <ProductBundle product={product} />
-
-        <ProductCarousel title="Спонсорські товари" products={sponsored} />
-
-        <div className={styles.descriptionGrid}>
-          <ProductDescription title={product.title} description={product.description} />
-          <ProductReviews reviews={reviews.items} total={reviews.total} />
-        </div>
-        <ViewedProductsCarousel excludeId={product.id} />
       </main>
 
       <Footer />

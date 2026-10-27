@@ -1,9 +1,33 @@
 import Link from "next/link";
-export default function ProductQuestion({ id, slug, title }: { id?: string; slug: string; title: string }) {
+import styles from "./ProductQuestion.module.css";
+
+type ProductQuestionProps = {
+  /** Guid товара на бэке — без него переписку не открыть */
+  id?: string;
+  slug: string;
+  title: string;
+};
+
+// Блок «Є питання про товар?» — ведёт в переписку с підтримкою
+export default function ProductQuestion({ id, slug, title }: ProductQuestionProps) {
   if (!id) return null;
-  return <section style={{ padding: 20, border: "1px solid #e5e5e5", borderRadius: 12, marginTop: 20 }}>
-    <h2 style={{ fontSize: 18, margin: "0 0 8px" }}>Є питання про товар?</h2>
-    <p style={{ fontSize: 14, lineHeight: 1.6, color: "#666" }}>Уточніть характеристики або умови покупки в особистій переписці з підтримкою TREBA.</p>
-    <Link href={`/account/messages?product=${encodeURIComponent(id)}&slug=${encodeURIComponent(slug)}&title=${encodeURIComponent(title)}`} style={{ display: "inline-block", padding: "12px 18px", borderRadius: 8, background: "#002aff", color: "white", fontWeight: 600 }}>Задати питання</Link>
-  </section>;
+
+  const href =
+    `/account/messages?product=${encodeURIComponent(id)}` +
+    `&slug=${encodeURIComponent(slug)}&title=${encodeURIComponent(title)}`;
+
+  return (
+    <section className={styles.box}>
+      <div className={styles.textGroup}>
+        <h2 className={styles.title}>Є питання про товар?</h2>
+        <p className={styles.text}>
+          Уточніть характеристики або умови покупки в особистій переписці з підтримкою TREBA.
+        </p>
+      </div>
+
+      <Link href={href} className={styles.button}>
+        Задати питання
+      </Link>
+    </section>
+  );
 }

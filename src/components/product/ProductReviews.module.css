@@ -117,3 +117,38 @@
     color: #5c584f;
     margin: 0;
 }
+
+/* ---------- телефон: заголовок в одну строку, больше воздуха вокруг секции ---------- */
+@media (max-width: 768px) {
+    .section {
+        margin-top: 20px;
+    }
+
+    .header {
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .title {
+        font-size: 17px;
+        white-space: nowrap;
+    }
+
+    .writeButton {
+        padding: 9px 14px;
+        font-size: 13px;
+    }
+
+    .empty {
+        margin: 0;
+        font-size: 13.5px;
+    }
+
+    .list {
+        gap: 12px;
+    }
+
+    .card {
+        padding: 14px;
+    }
+}
