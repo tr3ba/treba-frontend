@@ -1,5 +1,6 @@
 import styles from "./ProductReviews.module.css";
 import { Review } from "../../types/review";
+import Link from "next/link";
 
 type ProductReviewsProps = {
   reviews: Review[];
@@ -14,9 +15,9 @@ export default function ProductReviews({ reviews, total }: ProductReviewsProps) 
         <h2 className={styles.title}>
           Відгуки покупців <span className={styles.count}>{total}</span>
         </h2>
-        <button type="button" className={styles.writeButton}>
+        <Link href="/account/reviews" className={styles.writeButton}>
           Написати відгук
-        </button>
+        </Link>
       </div>
 
       {reviews.length === 0 ? (

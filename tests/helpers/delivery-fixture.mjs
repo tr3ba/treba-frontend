@@ -4,11 +4,13 @@ import { once } from "node:events";
 import { setTimeout as delay } from "node:timers/promises";
 import { pathToFileURL } from "node:url";
 
-export async function startDeliveryFixture({ liveDirectory = false } = {}) {
+export async function startDeliveryFixture({ liveDirectory = false, fulfilled = false, backendPort = 0 } = {}) {
   const city = "11111111-1111-1111-1111-111111111111", point = "22222222-2222-2222-2222-222222222222";
   const quoteId = "44444444-4444-4444-4444-444444444444", variantId = "55555555-5555-5555-5555-555555555555";
   let settings = { ordersEmail: false, ordersTelegram: false, supportEmail: false, supportTelegram: false, version: "fixture-v1", emailAvailable: true, telegramAvailable: false };
-  let linked = false; const requests = [];
+  let linked = false; const requests = []; const reviews = [];
+  const reviewItem = { orderItemId: "66666666-6666-6666-6666-666666666666", productId: variantId,
+    title: "Тестовий товар TREBA", orderId: quoteId, orderNumber: "ORD-FIXTURE" };
   const backend = http.createServer(async (req, res) => {
     let text = ""; for await (const chunk of req) text += chunk;
     const body = text ? JSON.parse(text) : undefined;
@@ -17,15 +19,30 @@ export async function startDeliveryFixture({ liveDirectory = false } = {}) {
     res.setHeader("Content-Type", "application/json");
     const send = (value, status = 200) => { res.writeHead(status); res.end(JSON.stringify(value)); };
     if (path === "/api/auth/login") return send({ authentication: { userId: "fixture-customer", firstName: "Тест", lastName: "Покупець", email: "fixture@example.test", role: "Customer", accessToken: "fixture-access", refreshToken: "fixture-refresh", expiresAt: new Date(Date.now() + 3600000).toISOString() } });
-    if (path.startsWith("/api/v1/catalog") || path === "/api/categories/tree") return send(path.includes("categories") ? [] : { content: [], totalElements: 0 });
+    if (path.startsWith("/api/v1/catalog") || ["/api/v1/categories", "/api/categories/tree"].includes(path)) return send(path.includes("categories") ? [] : { content: [], totalElements: 0 });
     if (req.headers.authorization !== "Bearer fixture-access") return send({}, 401);
     if (path === "/api/users/me") return send({ id: "fixture-customer", firstName: "Тест", lastName: "Покупець", email: "fixture@example.test", phone: "+380501234567", role: "Customer" });
+    if (path === "/api/v1/reviews/awaiting" || path === "/api/v1/reviews/mine") {
+      const items = path.endsWith("mine") ? reviews : fulfilled && reviews.length === 0 ? [reviewItem] : [];
+      return send({ items, page: 1, pageSize: 20, totalCount: items.length, totalPages: items.length ? 1 : 0 });
+    }
+    if (path === "/api/v1/reviews" && req.method === "POST") {
+      if (!fulfilled || reviews.length || body.orderItemId !== reviewItem.orderItemId || body.productId !== variantId) return send({ title: "Відгук недоступний або вже надісланий." }, 409);
+      if (!body.comment?.trim() || body.rating < 1 || body.rating > 5) return send({ title: "Перевірте текст та оцінку." }, 400);
+      const review = { ...body, id: "77777777-7777-7777-7777-777777777777", status: "PENDING", verifiedPurchase: true, createdAt: new Date().toISOString() };
+      reviews.push(review); return send(review);
+    }
     if (path === "/api/v1/account/shipments" || path === "/api/v1/account/orders/" + quoteId) {
       const order = { id: quoteId, orderNumber: "ORD-FIXTURE", status: "SHIPPED", paymentStatus: "SUCCEEDED", currency: "UAH", subtotal: 250, discountAmount: 0, deliveryPrice: 95.5, totalAmount: 345.5, createdAt: new Date().toISOString(), recipientName: "Тест Покупець", recipientPhone: "+380501234567", recipientEmail: "fixture@example.test", deliveryAddress: "Київ, поштомат №123", items: [], history: [{ status: "AWAITING_PAYMENT", createdAt: new Date().toISOString() }, { status: "SHIPPED", createdAt: new Date().toISOString() }], delivery: { carrier: "NovaPoshta", mode: "Managed", reference: "TRB-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", city: "Київ", pickupPoint: "Поштомат №123: вул. Тестова, 1", postomat: true, status: "SHIPPED", notice: "" } };
+      if (fulfilled) {
+        order.status = "DELIVERED"; order.delivery.status = "DELIVERED";
+        order.items = [{ id: reviewItem.orderItemId, productId: variantId, name: reviewItem.title, quantity: 1, unitPrice: 250, totalPrice: 250, canReview: reviews.length === 0, reviewId: reviews[0]?.id }];
+        order.history.push({ status: "DELIVERED", createdAt: new Date().toISOString() });
+      }
       return send(path.endsWith("shipments") ? { content: [order], page: 1, totalPages: 1, totalElements: 1 } : order);
     }
     if (path === "/api/v1/account/preferences") return send({ values: {}, version: "fixture-preferences" });
-    if (path === "/api/v1/account/notifications") return send({ items: [], unreadCount: 0 });
+    if (path === "/api/v1/account/notifications") return send({ items: fulfilled ? [{ key: "order-status:receipt", kind: "order-status", title: "Замовлення отримано", text: "Усі товари доставлено. За бажанням залиште відгук про покупку.", scope: "shop", path: "/account/orders/" + quoteId, createdAt: new Date().toISOString(), read: false }] : [], unreadCount: fulfilled ? 1 : 0 });
     if (path === "/api/v1/account/notification-settings") {
       if (req.method === "PUT") { if (body.version !== settings.version) return send({ title: "Stale settings" }, 409); settings = { ...settings, ...body, version: "fixture-v2" }; }
       return send(settings);
@@ -64,7 +81,7 @@ export async function startDeliveryFixture({ liveDirectory = false } = {}) {
     if (path === "/api/v1/orders") return send({ id: quoteId, orderNumber: "ORD-FIXTURE", status: "AWAITING_PAYMENT", subtotal: 250, discountAmount: 0, deliveryPrice: 95.5, totalAmount: 345.5 }, 201);
     return send({}, 404);
   });
-  backend.listen(0, "127.0.0.1"); await once(backend, "listening");
+  backend.listen(backendPort, "127.0.0.1"); await once(backend, "listening");
   const reserve = http.createServer(); reserve.listen(0, "127.0.0.1"); await once(reserve, "listening");
   const port = reserve.address().port; await new Promise(resolve => reserve.close(resolve));
   const origin = `http://127.0.0.1:${port}`;

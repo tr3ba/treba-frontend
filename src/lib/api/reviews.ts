@@ -4,6 +4,7 @@ import type {
   ApiReviewsPage,
   Review,
   ReviewableProduct,
+  ReviewPage,
   ReviewsPage,
 } from "../../types/review";
 import { formatDate } from "../format";
@@ -46,10 +47,23 @@ export async function getProductReviews(productBackendId: string | undefined): P
   }
 }
 
-/**
- * Купленные товары без отзыва — для кабинета («Чекають відгуків»).
- * Эндпоинта на бэке пока нет -> пустой список; страница уже готова к данным.
- */
-export async function getProductsAwaitingReview(): Promise<ReviewableProduct[]> {
-  return [];
+async function reviewRequest<T>(path: string, body?: unknown): Promise<T> {
+  const response = await fetch("/shop-api/reviews" + path, { cache: "no-store",
+    ...(body === undefined ? {} : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }),
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(response.status === 401 ? "Потрібно увійти в акаунт." : result.title ?? result.message ?? "Не вдалося завантажити відгуки.");
+  return result as T;
+}
+
+export function getProductsAwaitingReview(page = 1) {
+  return reviewRequest<ReviewPage<ReviewableProduct>>("/awaiting?page=" + page);
+}
+
+export function getMyReviews(page = 1) {
+  return reviewRequest<ReviewPage<ApiReview>>("/mine?page=" + page);
+}
+
+export function createReview(input: { orderItemId: string; productId: string; rating: number; title: string; comment: string }) {
+  return reviewRequest<ApiReview>("", input);
 }

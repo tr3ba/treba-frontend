@@ -134,3 +134,20 @@
 .reviewButton:hover {
     background-color: #ff8f57;
 }
+
+.reviewCard { border: 1px solid #dadada; border-radius: 10px; background: white; overflow: hidden; }
+.reviewCard .row { border: 0; }
+.formWrap { padding: 0 20px 20px; }
+.myReview { padding: 20px; border: 1px solid #dadada; border-radius: 10px; background: white; }
+.myReview h2 { font-size: 17px; }
+.reviewMeta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.reviewMeta strong { color: #e86923; }
+.reviewMeta span { color: #6b6a63; font-size: 13px; }
+.reviewText { white-space: pre-wrap; overflow-wrap: anywhere; }
+.pillsRow { flex-wrap: wrap; align-items: center; }
+@media (max-width: 600px) {
+    .row { flex-wrap: wrap; padding: 14px; gap: 12px; }
+    .itemTitle { min-width: 160px; overflow-wrap: anywhere; }
+    .reviewButton { width: 100%; }
+    .formWrap { padding: 0 14px 14px; }
+}
