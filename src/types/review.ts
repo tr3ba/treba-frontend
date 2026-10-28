@@ -19,10 +19,16 @@ export type ReviewsPage = {
 
 /** Купленный товар, на который можно оставить отзыв (кабинет → «Відгуки»). */
 export type ReviewableProduct = {
-  id: string;
+  orderItemId: string;
+  productId: string;
   title: string;
-  image?: string;
+  productSlug?: string;
+  imageUrl?: string;
+  orderId: string;
+  orderNumber: string;
 };
+
+export type ReviewPage<T> = { items: T[]; page: number; totalCount: number; totalPages: number };
 
 export type ReviewsSummary = {
   average: number;

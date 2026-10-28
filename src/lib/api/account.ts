@@ -5,7 +5,7 @@ export type CustomerOrder = {
   id: string; orderNumber: string; status: string; paymentStatus: string; currency: string;
   subtotal: number; discountAmount: number; deliveryPrice: number; totalAmount: number; createdAt: string;
   recipientName: string; recipientPhone: string; recipientEmail: string; deliveryAddress?: string;
-  items: { id: string; productId: string; productSlug?: string; name: string; quantity: number; unitPrice: number; totalPrice: number; imageUrl?: string }[];
+  items: { id: string; productId: string; productSlug?: string; name: string; quantity: number; unitPrice: number; totalPrice: number; imageUrl?: string; canReview?: boolean; reviewId?: string }[];
   history: { status: string; createdAt: string }[];
 };
 export type Notification = { key: string; kind: string; title: string; text: string; scope: "shop" | "admin"; path: string; createdAt: string; read: boolean };
