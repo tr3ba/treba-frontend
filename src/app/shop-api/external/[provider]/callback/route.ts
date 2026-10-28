@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { getLoginDestination } from "../../../../../lib/admin";
 import { isProvider, loginResult, readTransaction, redirect, resultCookie, siteOrigin, stateCookie, transientOptions } from "../../../../../lib/server/external-auth";
-import { backend, json, saveSession } from "../../../../../lib/server/session";
+import { backend, json, saveLoginSession } from "../../../../../lib/server/session";
 
 export const runtime = "nodejs";
 export async function GET(request: NextRequest, context: { params: Promise<{ provider: string }> }) {
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ pro
         if (!authentication?.accessToken || !authentication.refreshToken || !authentication.expiresAt) throw new Error("Не вдалося підтвердити вхід.");
         const destination = getLoginDestination(authentication.role ?? authentication.roleName, transaction.next) ?? transaction.next;
         response = redirect(new URL(destination, siteOrigin(request)));
-        saveSession(response, authentication, transaction.remember);
+        saveLoginSession(response, authentication, transaction.remember);
         response.cookies.set(resultCookie, "", { ...transientOptions, maxAge: 0 });
       }
     }

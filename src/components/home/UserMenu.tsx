@@ -58,15 +58,15 @@ export default function UserMenu() {
           <p className={styles.userName}>{user.name}</p>
           <p className={styles.userEmail}>{user.email}</p>
           {roleLabel(user.role) && <span className={styles.roleBadge}>{roleLabel(user.role)}</span>}
-          <Link href="/account/notifications" className={styles.accountLink} onClick={() => setIsOpen(false)}>Сповіщення</Link>
+          {!canOpenAdmin(user.role) && <Link href="/account/notifications" className={styles.accountLink} onClick={() => setIsOpen(false)}>Сповіщення</Link>}
           {canOpenAdmin(user.role) && <a href={adminOrigin + "/site-login/start"} className={styles.accountLink}>{workspaceLabel(user.role)}</a>}
-          <Link
+          {!canOpenAdmin(user.role) && <Link
             href="/account"
             className={styles.accountLink}
             onClick={() => setIsOpen(false)}
           >
-            {canOpenAdmin(user.role) ? "Кабінет покупця" : "Особистий кабінет"}
-          </Link>
+            Особистий кабінет
+          </Link>}
           {canApplyAsSeller(user.role) && <Link
             href="/sell"
             className={styles.accountLink}

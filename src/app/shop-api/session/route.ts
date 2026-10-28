@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
-import { authenticated, backend, clearSession, json, sameOrigin, saveSession } from "../../../lib/server/session";
+import { authenticated, backend, clearSession, clearAdminHandoff, json, sameOrigin, saveSession, saveLoginSession } from "../../../lib/server/session";
+import { canUseCustomerAccount } from "../../../lib/admin";
 import { resultCookie, transientOptions } from "../../../lib/server/external-auth";
 
 export const runtime = "nodejs";
@@ -13,7 +14,9 @@ export async function GET(request: NextRequest) {
     if (!session) { const response = json({ user: null }, 401); clearSession(response); return response; }
     const result = await backend("/api/users/me", { headers: { Authorization: `Bearer ${session.token}` } });
     if (!result.ok) { const response = json({ user: null }, result.status); if (result.status === 401 || result.status === 404) clearSession(response); return response; }
-    const response = json({ user: profile(await result.json()) });
+    const user = profile(await result.json());
+    if (!canUseCustomerAccount(user.role as string | undefined)) { const response = json({ user: null }, 403); clearSession(response); return response; }
+    const response = json({ user });
     if (session.renewed) saveSession(response, session.renewed, session.remember);
     return response;
   } catch { return json({ message: "Не вдалося перевірити вхід. Спробуйте ще раз." }, 503); }
@@ -29,7 +32,7 @@ export async function POST(request: NextRequest) {
       const session = await authenticated(request);
       try { if (session) await backend("/api/auth/logout", { method: "POST", headers: { Authorization: `Bearer ${session.token}` }, body: JSON.stringify({ refreshToken: session.renewed?.refreshToken ?? request.cookies.get("treba_refresh")?.value }) }); }
       finally { /* Local cookies are cleared even if the backend has already expired the session. */ }
-      const response = json({ user: null }); clearSession(response); return response;
+      const response = json({ user: null }); clearSession(response); clearAdminHandoff(response); return response;
     }
     const path = routes[input.action];
     if (!path) return json({}, 400);
@@ -48,7 +51,7 @@ export async function POST(request: NextRequest) {
     if (data.challenge) return json({ challenge: data.challenge });
     const authentication = data.authentication ?? data;
     if (!authentication.accessToken || !authentication.refreshToken) return json({}, 502);
-    const response = json({ user: profile(authentication) }); saveSession(response, authentication, input.remember !== false);
+    const response = json({ user: profile(authentication) }); saveLoginSession(response, authentication, input.remember !== false);
     if (request.cookies.has(resultCookie)) response.cookies.set(resultCookie, "", { ...transientOptions, maxAge: 0 });
     return response;
   } catch {

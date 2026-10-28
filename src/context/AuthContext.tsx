@@ -1,6 +1,7 @@
 "use client";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { accountRequest, type Preferences } from "../lib/api/account";
+import { canOpenAdmin, canUseCustomerAccount } from "../lib/admin";
 
 export type UserProfile = {
   phone?: string; lastName?: string; firstName?: string; patronymic?: string; gender?: string; birthDate?: string;
@@ -46,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch { /* Cookie authentication also works when browser storage is unavailable. */ }
     let active = true;
     void sessionRequest().then(async result => {
-      if (!result.user) return;
+      if (!result.user || !canUseCustomerAccount(result.user.role)) return;
       let loaded = result.user;
       try { const preferences = await accountRequest<Preferences>("preferences"); loaded = withPreferences(result.user, preferences.values); if (active) setPreferencesVersion(preferences.version); } catch { /* Profile writes retry this request before saving. */ }
       if (active) setUser(loaded);
@@ -59,6 +60,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
   async function acceptUser(value: User | null | undefined): Promise<User> {
     if (!value?.id) throw new Error("Не вдалося підтвердити вхід.");
+    if (canOpenAdmin(value.role)) { setUser(null); setPreferencesVersion(null); return value; }
+    if (!canUseCustomerAccount(value.role)) throw new Error("Цей акаунт не має доступу до кабінету покупця.");
     let authenticatedUser = value;
     setPreferencesVersion(null);
     try { const preferences = await accountRequest<Preferences>("preferences"); authenticatedUser = withPreferences(value, preferences.values); setPreferencesVersion(preferences.version); } catch { /* Authentication succeeds even if preferences are temporarily unavailable. */ }
