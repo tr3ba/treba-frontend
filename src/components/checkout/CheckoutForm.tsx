@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import type { CartItem } from "../../types/cart";
 import type { CheckoutForm as CheckoutFormValues, CreatedOrder } from "../../types/order";
@@ -8,7 +9,9 @@ import { createOrder, OrderError } from "../../lib/api/orders";
 import { formatPrice, pluralize } from "../../lib/format";
 import { DELIVERY_PRICE } from "../../lib/delivery";
 import NovaPoshtaDelivery from "./NovaPoshtaDelivery";
+import PromoCode from "./PromoCode";
 import { deliveryRequest, type DeliveryQuote } from "../../lib/api/delivery";
+import type { AppliedCoupon } from "../../types/promotion";
 import Icon from "../common/Icon";
 import styles from "./CheckoutForm.module.css";
 
@@ -72,6 +75,7 @@ export default function CheckoutForm({
   const [available, setAvailable] = useState(false);
   const [checkingDelivery, setCheckingDelivery] = useState(true);
   const [quote, setQuote] = useState<DeliveryQuote | null>(null);
+  const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
   useEffect(() => {
     const controller = new AbortController();
     deliveryRequest<{ available: boolean }>("capabilities", undefined, controller.signal).then(result => {
@@ -88,12 +92,26 @@ export default function CheckoutForm({
     return () => clearTimeout(timer);
   }, [quote]);
   const nova = mode === "nova";
-  const deliveryPrice = nova ? quote?.price ?? 0 : DELIVERY_PRICE;
+  const freeDelivery = coupon?.freeDelivery ?? false;
+  const couponDiscount = coupon?.discount ?? 0;
+  // Нова пошта: бэк уже учёл промокод в расчёте; кур’єр — 50 ₴ или 0 при бесплатной доставке
+  const deliveryPrice = nova ? quote?.price ?? 0 : freeDelivery ? 0 : DELIVERY_PRICE;
+  // Нова пошта без выбранного отделения — цены доставки ещё нет (как у Rozetka: «за тарифами перевізника»)
+  const needsQuote = nova && !quote;
   const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const discount = Math.max(0, totalOldPrice - totalPrice);
-  const total = totalPrice + deliveryPrice;
+  const total = Math.max(0, totalPrice - couponDiscount) + deliveryPrice;
+  // Для промокода — только позиции, которые можно заказать
+  const couponItems = items.flatMap((item) =>
+    item.variantId && item.available !== false ? [{ variantId: item.variantId, quantity: item.quantity }] : []
+  );
   // Позиции, которые нельзя заказать: без варианта или снятые с продажи
   const blocked = items.filter((item) => !item.variantId || item.available === false);
+
+  function changeCoupon(next: AppliedCoupon | null) {
+    setCoupon(next);
+    setSubmitError(null);
+  }
 
   function update(name: FieldName, value: string) {
     setValues((prev) => ({ ...prev, [name]: value }));
@@ -108,8 +126,8 @@ export default function CheckoutForm({
       setSubmitError("Виберіть відділення та отримайте актуальний розрахунок доставки."); return;
     }
     const checkoutValues: CheckoutFormValues = nova && quote
-      ? { ...values, deliveryMethod: "NovaPoshta", city: quote.city.slice(0, 100), street: quote.pickupPoint.slice(0, 150), building: "—", apartment: "", deliveryQuoteId: quote.id }
-      : { ...values, deliveryMethod: "TrebaCourier", deliveryQuoteId: undefined };
+      ? { ...values, deliveryMethod: "NovaPoshta", city: quote.city.slice(0, 100), street: quote.pickupPoint.slice(0, 150), building: "—", apartment: "", deliveryQuoteId: quote.id, couponCode: coupon?.code }
+      : { ...values, deliveryMethod: "TrebaCourier", deliveryQuoteId: undefined, couponCode: coupon?.code };
     const found = validate(checkoutValues);
     setErrors(found);
     if (Object.keys(found).length > 0) {
@@ -198,11 +216,11 @@ export default function CheckoutForm({
             </label>
             <label className={`${styles.deliveryOption} ${!nova ? styles.deliverySelected : ""}`}>
               <input type="radio" name="delivery-method" value="courier" checked={!nova} disabled={isSubmitting} onChange={() => { setMode("courier"); setQuote(null); }} />
-              <span><strong>Кур’єр TREBA</strong><small>До дверей · {formatPrice(DELIVERY_PRICE)} ₴</small></span>
+              <span><strong>Кур’єр TREBA</strong><small>До дверей · {freeDelivery ? "безкоштовно" : `${formatPrice(DELIVERY_PRICE)} ₴`}</small></span>
             </label>
           </fieldset>
           {checkingDelivery ? <p role="status">Перевіряємо способи доставки…</p> : !available && <p className={styles.optional}>Нова пошта тимчасово недоступна. Ви можете оформити кур’єрську доставку.</p>}
-          {nova ? <>{available && <NovaPoshtaDelivery items={items} onQuote={setQuote} />}{quote && <div className={styles.deliveryQuote} role="status"><span>Вартість доставки</span><strong>{formatPrice(quote.price)} ₴</strong></div>}</> : <div className={styles.grid}>
+          {nova ? <>{available && <NovaPoshtaDelivery items={items} couponCode={coupon?.code} onQuote={setQuote} />}{quote && <div className={styles.deliveryQuote} role="status"><span>Вартість доставки</span><strong>{formatPrice(quote.price)} ₴</strong></div>}</> : <div className={styles.grid}>
             {field("city", "Місто", { autoComplete: "address-level2" })}
             {field("street", "Вулиця", { autoComplete: "address-line1" })}
             {field("building", "Будинок")}
@@ -227,7 +245,12 @@ export default function CheckoutForm({
       </div>
 
       <aside className={styles.summary}>
-        <h2 className={styles.summaryTitle}>Ваше замовлення</h2>
+        <div className={styles.summaryHead}>
+          <h2 className={styles.summaryTitle}>Ваше замовлення</h2>
+          <Link href="/cart" className={styles.editLink}>
+            Редагувати товари
+          </Link>
+        </div>
 
         <ul className={styles.items}>
           {items.map((item) => (
@@ -240,7 +263,13 @@ export default function CheckoutForm({
                 )}
               </div>
               <div className={styles.itemInfo}>
-                <p className={styles.itemTitle}>{item.title}</p>
+                {item.slug ? (
+                  <Link href={`/product/${item.slug}`} className={`${styles.itemTitle} ${styles.itemLink}`}>
+                    {item.title}
+                  </Link>
+                ) : (
+                  <p className={styles.itemTitle}>{item.title}</p>
+                )}
                 <p className={styles.itemMeta}>
                   {item.quantity} шт. × {formatPrice(item.price)} ₴
                 </p>
@@ -252,6 +281,8 @@ export default function CheckoutForm({
             </li>
           ))}
         </ul>
+
+        <PromoCode items={couponItems} applied={coupon} onApply={changeCoupon} onRemove={() => changeCoupon(null)} disabled={isSubmitting} />
 
         <dl className={styles.rows}>
           <div className={styles.row}>
@@ -266,16 +297,24 @@ export default function CheckoutForm({
               <dd className={styles.discount}>−{formatPrice(discount)} ₴</dd>
             </div>
           )}
+          {couponDiscount > 0 && (
+            <div className={styles.row}>
+              <dt>Промокод</dt>
+              <dd className={styles.discount}>−{formatPrice(couponDiscount)} ₴</dd>
+            </div>
+          )}
           <div className={styles.row}>
             <dt>Доставка</dt>
-            <dd>{nova && !quote ? "Потрібен розрахунок" : `${formatPrice(deliveryPrice)} ₴`}</dd>
+            <dd>
+              {needsQuote ? "За тарифами перевізника" : deliveryPrice === 0 ? "Безкоштовно" : `${formatPrice(deliveryPrice)} ₴`}
+            </dd>
           </div>
         </dl>
 
         <div className={styles.totalRow}>
           <span className={styles.totalLabel}>До сплати</span>
           <span className={styles.totalValue}>
-            {nova && !quote ? "—" : formatPrice(total)}
+            {formatPrice(total)}
             <span className={styles.currency}>₴</span>
           </span>
         </div>
@@ -286,9 +325,13 @@ export default function CheckoutForm({
           </p>
         )}
 
-        <button type="submit" className={styles.submit} disabled={isSubmitting || nova && !quote}>
+        <button type="submit" className={styles.submit} disabled={isSubmitting || needsQuote}>
           {isSubmitting ? "Оформлюємо…" : "Підтвердити замовлення"}
         </button>
+
+        {needsQuote && available && (
+          <p className={styles.note}>Виберіть відділення або поштомат, щоб розрахувати доставку.</p>
+        )}
 
         <p className={styles.note}>
           Після оформлення менеджер зв’яжеться з вами для підтвердження та оплати. Натискаючи кнопку,

@@ -1,0 +1,188 @@
+/* Промокод: второстепенные действия — синие (#002aff), главная кнопка заказа остаётся оранжевой */
+
+.link {
+    justify-self: start;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: #002aff;
+    cursor: pointer;
+}
+
+.link:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.link:focus-visible,
+.apply:focus-visible {
+    outline: 2px solid #002aff;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    font-size: 14px;
+}
+
+.plus {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.field {
+    display: grid;
+    gap: 8px;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #28251d;
+}
+
+.controls {
+    display: flex;
+    gap: 8px;
+}
+
+.input {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid #e5e3dd;
+    border-radius: 10px;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #28251d;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input::placeholder {
+    letter-spacing: normal;
+    text-transform: none;
+    color: #b5b0a5;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #002aff;
+    box-shadow: 0 0 0 3px rgba(0, 42, 255, 0.12);
+}
+
+.input:disabled {
+    background: #f8f7f4;
+}
+
+.inputError {
+    border-color: #e5484d;
+}
+
+/* второстепенная кнопка — синяя обводка */
+.apply {
+    flex-shrink: 0;
+    padding: 0 14px;
+    border: 1px solid #002aff;
+    border-radius: 10px;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: #002aff;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.apply:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.error {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: #e5484d;
+}
+
+.cancel {
+    font-size: 12px;
+    color: #8a8578;
+}
+
+/* применённый промокод */
+.applied {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px dashed #b3bfff;
+    border-radius: 10px;
+    background: #f3f5ff;
+}
+
+.appliedInfo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 8px;
+    min-width: 0;
+}
+
+.appliedLabel {
+    font-size: 13px;
+    color: #8a8578;
+}
+
+.code {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #002aff;
+    overflow-wrap: anywhere;
+}
+
+.appliedNote {
+    flex-basis: 100%;
+    font-size: 12px;
+    color: #28251d;
+}
+
+.appliedNote:empty {
+    display: none;
+}
+
+@media (hover: hover) {
+    .link:hover:not(:disabled) {
+        color: #0022cc;
+        text-decoration: underline;
+    }
+
+    .cancel:hover:not(:disabled) {
+        color: #28251d;
+    }
+
+    .apply:hover:not(:disabled) {
+        background: #002aff;
+        color: #ffffff;
+    }
+}
+
+/* телефон: 16px — иначе iPhone зумит поле */
+@media (max-width: 768px) {
+    .input {
+        font-size: 16px;
+    }
+}
