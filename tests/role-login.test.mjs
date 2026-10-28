@@ -11,7 +11,7 @@ async function compiled(name) {
 const dataUrl = source => "data:text/javascript;base64," + Buffer.from(source).toString("base64");
 const redirects = dataUrl(await compiled("redirect"));
 const source = (await compiled("admin")).replace('from "./redirect"', `from "${redirects}"`);
-const { getLoginDestination, canOpenAdmin, canApplyAsSeller, workspaceLabel, adminOrigin } = await import(dataUrl(source));
+const { getLoginDestination, canOpenAdmin, canApplyAsSeller, canUseCustomerAccount, workspaceLabel, adminOrigin } = await import(dataUrl(source));
 
 test("every workspace role goes to its panel after login, including from a customer page", () => {
   for (const role of ["Administrator", "Manager", "Moderator", "Seller"]) {
@@ -20,6 +20,7 @@ test("every workspace role goes to its panel after login, including from a custo
     assert.equal(getLoginDestination(role, "/sell#apply"), adminOrigin + "/site-login/start");
     assert.equal(getLoginDestination(role, "/account"), adminOrigin + "/site-login/start");
     assert.equal(canApplyAsSeller(role), false);
+    assert.equal(canUseCustomerAccount(role), false);
   }
   assert.equal(workspaceLabel("Seller"), "Кабінет продавця");
   assert.equal(workspaceLabel("Administrator"), "Адмін-панель");
@@ -29,6 +30,7 @@ test("customers keep modal login and their intended customer destination", () =>
   assert.equal(getLoginDestination("Customer"), null);
   assert.equal(getLoginDestination("Customer", "/account/messages?product=fixture"), "/account/messages?product=fixture");
   assert.equal(canApplyAsSeller("Customer"), true);
+  assert.equal(canUseCustomerAccount("Customer"), true);
   for (const role of [undefined, "", "Unrecognized", "administrator"]) {
     assert.equal(canOpenAdmin(role), false);
     assert.equal(canApplyAsSeller(role), false);

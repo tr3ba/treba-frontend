@@ -1,14 +1,6 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-import AuthModal from "../../components/auth/AuthModal";
-import LoginForm from "../../components/auth/LoginForm";
+import AuthPageBackground from "../../components/auth/AuthPageBackground";
+import AuthPageModal from "../../components/auth/AuthPageModal";
 
 export default function LoginPage() {
-  const router = useRouter();
-  return (
-    <AuthModal onClose={() => router.push("/")}>
-      <LoginForm />
-    </AuthModal>
-  );
+  return <><AuthPageBackground /><AuthPageModal /></>;
 }

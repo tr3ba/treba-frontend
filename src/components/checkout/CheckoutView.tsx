@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "../../context/AuthContext";
+import { canUseCustomerAccount } from "../../lib/admin";
 import { useCart } from "../../context/CartContext";
 import { formatPrice } from "../../lib/format";
 import { getOrderStatusLabel } from "../../lib/api/orders";
@@ -56,7 +57,7 @@ export default function CheckoutView() {
         <div className={`${styles.skeleton} ${styles.skeletonSummary}`} />
       </div>
     );
-  } else if (!user) {
+  } else if (!user || !canUseCustomerAccount(user.role)) {
     content = (
       <section className={styles.stateCard}>
         <div className={styles.stateIcon}>

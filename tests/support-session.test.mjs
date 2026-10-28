@@ -83,7 +83,7 @@ test("support session uses real server authentication without exposing credentia
   });
   await t.test("remember-me off uses browser-session cookies", async () => {
     const response = await post("/shop-api/session", { action: "login", email: "customer@example.test", password: "fixture-only", remember: false });
-    assert.equal(response.status, 200); assert.ok(response.headers.getSetCookie().every(value => !/Max-Age=/i.test(value)));
+    assert.equal(response.status, 200); assert.ok(response.headers.getSetCookie().filter(value => !/Max-Age=0/i.test(value)).every(value => !/Max-Age=/i.test(value)));
   });
   await t.test("account proxy keeps preferences, applications and notification receipts on the server", async () => {
     assert.equal((await fetch(origin + "/shop-api/account/preferences")).status, 401);
@@ -108,6 +108,12 @@ test("support session uses real server authentication without exposing credentia
       const response = await post("/shop-api/session", { action: "login", email: role + "@example.test", password: "fixture-only" });
       assert.equal(response.status, 200);
       const result = await response.json(); assert.equal(result.user.role, role); assert.ok(!("accessToken" in result));
+      assert.ok(response.headers.getSetCookie().some(value => value.startsWith("treba_staff_handoff=fixture-staff;") && /Path=\/shop-api\/admin-entry/i.test(value) && /Max-Age=60/i.test(value)));
+      assert.ok(!response.headers.getSetCookie().some(value => value.startsWith("treba_access=fixture-staff;")));
+      const staffCookie = cookieJar(response);
+      assert.equal((await fetch(origin + "/shop-api/session", { headers: { Cookie: staffCookie } })).status, 401);
+      assert.equal((await fetch(origin + "/shop-api/account/preferences", { headers: { Cookie: staffCookie } })).status, 401);
+      assert.equal((await post("/shop-api/orders", {}, staffCookie)).status, 401);
     }
     const forged = await post("/shop-api/session", { action: "login", email: "customer@example.test", password: "fixture-only", role: "Administrator" });
     assert.equal((await forged.json()).user.role, "Customer");
@@ -142,10 +148,25 @@ test("support session uses real server authentication without exposing credentia
     assert.equal(publicLogin.searchParams.get("next"), path); assert.match(anonymous.headers.get("cache-control"), /no-store/);
     assert.equal((await fetch(origin + path, { headers: { Cookie: cookie }, redirect: "manual" })).status, 403);
     const login = await post("/shop-api/session", { action: "login", email: "staff@example.test", password: "fixture-only" }); const staff = cookieJar(login);
-    const profile = await fetch(origin + "/shop-api/session", { headers: { Cookie: staff } }); assert.equal((await profile.json()).user.role, "Manager");
+    const profile = await fetch(origin + "/shop-api/session", { headers: { Cookie: staff } }); assert.equal(profile.status, 401); assert.equal((await profile.json()).user, null);
     const handoff = await fetch(origin + path, { headers: { Cookie: staff }, redirect: "manual" }); assert.equal(handoff.status, 307);
     const target = new URL(handoff.headers.get("location")); assert.equal(target.origin, "https://admin.treba.duckdns.org"); assert.equal(target.pathname, "/site-login/callback"); assert.equal(target.searchParams.get("state"), state); assert.equal(target.searchParams.get("code"), "one-time-admin-code");
     assert.ok(!target.href.includes("fixture-staff")); assert.equal(handoff.headers.get("referrer-policy"), "no-referrer"); assert.match(handoff.headers.get("cache-control"), /no-store/);
+    assert.ok(handoff.headers.getSetCookie().some(value => value.startsWith("treba_staff_handoff=;") && /Max-Age=0/i.test(value)));
+  });
+  await t.test("legacy staff sessions are cleared instead of becoming a customer profile", async () => {
+    const legacy = `treba_access=fixture-staff; treba_refresh=fixture-refresh; treba_expiry=${encodeURIComponent(new Date(Date.now() + 600000).toISOString())}`;
+    const response = await fetch(origin + "/shop-api/session", { headers: { Cookie: legacy } });
+    assert.equal(response.status, 403); assert.deepEqual(await response.json(), { user: null });
+    assert.ok(response.headers.getSetCookie().filter(value => /Max-Age=0/i.test(value)).length >= 4);
+  });
+  await t.test("returning from admin ends the website session and accepts only the admin origin", async () => {
+    assert.equal((await fetch(origin + "/shop-api/staff-exit")).status, 405);
+    const invalid = await post("/shop-api/staff-exit", {}, cookie, "https://untrusted.example"); assert.equal(invalid.status, 403); assert.equal(invalid.headers.getSetCookie().length, 0);
+    const response = await fetch(origin + "/shop-api/staff-exit", { method: "POST", redirect: "manual", headers: { Origin: "https://admin.treba.duckdns.org", Cookie: cookie } });
+    assert.equal(response.status, 303); assert.equal(response.headers.get("location"), "/");
+    for (const name of ["treba_access", "treba_refresh", "treba_expiry", "treba_remember", "treba_staff_handoff"])
+      assert.ok(response.headers.getSetCookie().some(value => value.startsWith(name + "=;") && /Max-Age=0/i.test(value)));
   });
   await t.test("concurrent requests share one rotating refresh", async () => {
     const expired = await post("/shop-api/session", { action: "login", email: "expired@example.test", password: "fixture-only" }); const oldCookie = cookieJar(expired);

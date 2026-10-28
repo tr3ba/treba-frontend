@@ -1,0 +1,12 @@
+.background {
+  min-height: 100dvh;
+  background: #f7f5f2;
+}
+
+.placeholder {
+  margin: 28px auto;
+  width: min(1200px, 90%);
+  height: 360px;
+  border-radius: 20px;
+  background: linear-gradient(110deg, #f1e6db, #f8b987);
+}

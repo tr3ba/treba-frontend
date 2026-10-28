@@ -9,6 +9,10 @@ export function canApplyAsSeller(role?: string) {
   return role === "Customer";
 }
 
+export function canUseCustomerAccount(role?: string) {
+  return role === "Customer";
+}
+
 export function workspaceLabel(role?: string) {
   return role === "Seller" ? "Кабінет продавця" : "Адмін-панель";
 }

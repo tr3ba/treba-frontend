@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticated, backend, json, saveSession } from "../../../lib/server/session";
+import { authenticated, backend, json, clearSession, clearAdminHandoff } from "../../../lib/server/session";
 import { adminOrigin } from "../../../lib/admin";
 
 export const runtime = "nodejs";
@@ -7,7 +7,8 @@ export async function GET(request: NextRequest) {
   const state = request.nextUrl.searchParams.get("state");
   if (!state || !/^[A-F0-9]{64}$/.test(state)) return json({ message: "Почніть вхід з кнопки «Адмін-панель»." }, 400);
   try {
-    const session = await authenticated(request);
+    const staffToken = request.cookies.get("treba_staff_handoff")?.value;
+    const session = staffToken ? { token: staffToken } : await authenticated(request);
     if (!session) {
       // Keep the public browser origin: behind Caddy, request.url can contain the container's localhost.
       const query = new URLSearchParams({ next: "/shop-api/admin-entry?state=" + state });
@@ -21,7 +22,8 @@ export async function GET(request: NextRequest) {
     target.searchParams.set("state", state); target.searchParams.set("code", data.code);
     const response = NextResponse.redirect(target);
     response.headers.set("Cache-Control", "no-store, private"); response.headers.set("Referrer-Policy", "no-referrer");
-    if (session.renewed) saveSession(response, session.renewed, session.remember);
+    clearSession(response);
+    clearAdminHandoff(response);
     return response;
   } catch { return json({ message: "Сервіс входу тимчасово недоступний." }, 503); }
 }

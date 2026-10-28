@@ -25,7 +25,7 @@ test("Google and Facebook authorization creates protected website sessions and r
     if (request.url === "/api/auth/external/code") {
       const input = JSON.parse(body); exchanges.push(input);
       if (input.code === "invalid") { response.writeHead(401); response.end(JSON.stringify({ message: "Код входу недійсний." })); return; }
-      response.end(JSON.stringify(input.code === "challenge" ? { challenge } : { authentication })); return;
+      response.end(JSON.stringify(input.code === "challenge" ? { challenge } : { authentication: input.code === "staff" ? { ...authentication, role: "Manager" } : authentication })); return;
     }
     if (request.url === "/api/auth/2fa/verify") {
       const input = JSON.parse(body); assert.equal(input.challengeId, challenge.challengeId); assert.equal(input.code, "123456");
@@ -71,6 +71,20 @@ test("Google and Facebook authorization creates protected website sessions and r
     assert.ok(!response.headers.get("location").includes("private-website"));
     const session = await fetch(origin + "/shop-api/session", { headers: { Cookie: jar(response) } });
     assert.equal(session.status, 200); const text = await session.text(); assert.ok(text.includes("social-customer")); assert.ok(!text.includes("private-website"));
+  });
+
+  await t.test("a staff OAuth login creates only a short-lived admin handoff", async () => {
+    const response = await callback("google", await start("google"), "staff");
+    assert.equal(response.status, 303); assert.equal(response.headers.get("location"), "https://admin.treba.duckdns.org/site-login/start");
+    assert.ok(response.headers.getSetCookie().some(value => value.startsWith("treba_staff_handoff=private-website-access;") && /Path=\/shop-api\/admin-entry/i.test(value)));
+    assert.ok(!response.headers.getSetCookie().some(value => value.startsWith("treba_access=private-website-access;")));
+  });
+
+  await t.test("direct login, register and OAuth-return pages contain the storefront behind their dialog", async () => {
+    for (const path of ["/login", "/register", "/login?external=1"]) {
+      const response = await fetch(origin + path); assert.equal(response.status, 200);
+      const html = await response.text(); assert.match(html, /<header[ >]/); assert.match(html, /role="dialog"/); assert.match(html, /aria-hidden="true" inert/);
+    }
   });
 
   await t.test("wrong state, missing cookie and wrong provider never exchange an authorization code", async () => {

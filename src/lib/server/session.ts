@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { canOpenAdmin } from "../admin";
 
 const origin = (process.env.TREBA_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "https://treba.duckdns.org").replace(/\/+$/, "");
-type Authentication = { accessToken: string; refreshToken: string; expiresAt: string };
+type Authentication = { accessToken: string; refreshToken: string; expiresAt: string; role?: string; roleName?: string };
 const options = { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, path: "/shop-api", maxAge: 7 * 86400 };
 const refreshes = new Map<string, Promise<Authentication | null>>();
 
@@ -18,6 +19,20 @@ export function saveSession(response: NextResponse, authentication: Authenticati
 }
 export function clearSession(response: NextResponse) {
   for (const name of ["treba_access", "treba_refresh", "treba_expiry", "treba_remember"]) response.cookies.set(name, "", { ...options, maxAge: 0 });
+}
+const handoffOptions = { ...options, path: "/shop-api/admin-entry", maxAge: 60 };
+export function clearAdminHandoff(response: NextResponse) {
+  response.cookies.set("treba_staff_handoff", "", { ...handoffOptions, maxAge: 0 });
+}
+export function saveLoginSession(response: NextResponse, authentication: Authentication, remember = true) {
+  if (canOpenAdmin(authentication.role ?? authentication.roleName)) {
+    clearSession(response);
+    // The staff credential is only sent to the one-time admin handoff, never to customer APIs.
+    response.cookies.set("treba_staff_handoff", authentication.accessToken, handoffOptions);
+  } else {
+    clearAdminHandoff(response);
+    saveSession(response, authentication, remember);
+  }
 }
 export function backend(path: string, init: RequestInit = {}) {
   return fetch(origin + path, { ...init, cache: "no-store", signal: AbortSignal.timeout(15000), headers: { Accept: "application/json", "Content-Type": "application/json", ...init.headers } });
