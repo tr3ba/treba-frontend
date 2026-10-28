@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { authenticated, backend, clearSession, json, sameOrigin, saveSession } from "../../../lib/server/session";
+import { resultCookie, transientOptions } from "../../../lib/server/external-auth";
 
 export const runtime = "nodejs";
 function profile(data: Record<string, unknown>) {
@@ -47,7 +48,9 @@ export async function POST(request: NextRequest) {
     if (data.challenge) return json({ challenge: data.challenge });
     const authentication = data.authentication ?? data;
     if (!authentication.accessToken || !authentication.refreshToken) return json({}, 502);
-    const response = json({ user: profile(authentication) }); saveSession(response, authentication, input.remember !== false); return response;
+    const response = json({ user: profile(authentication) }); saveSession(response, authentication, input.remember !== false);
+    if (request.cookies.has(resultCookie)) response.cookies.set(resultCookie, "", { ...transientOptions, maxAge: 0 });
+    return response;
   } catch {
     const response = json({ message: "Сервер недоступний. Спробуйте ще раз." }, 503);
     if (input.action === "logout") clearSession(response);

@@ -112,8 +112,10 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
     } finally { setBusy(false); }
   }
 
-  function handleSocialClick() {
-    setFormError("Реєстрація через соцмережі буде доступна пізніше");
+  function handleSocialClick(provider: "google" | "facebook") {
+    if (busy) return;
+    setBusy(true);
+    window.location.assign(`/shop-api/external/${provider}/start?${new URLSearchParams({ next: nextPath })}`);
   }
 
   return (
@@ -257,7 +259,8 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
         <button
           type="button"
           className={styles.socialButton}
-          onClick={handleSocialClick}
+          onClick={() => handleSocialClick("facebook")}
+          disabled={busy}
         >
           <Icon src="/icons/facebook.svg" alt="" className={styles.socialIcon} />
           Facebook
@@ -266,7 +269,8 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
         <button
           type="button"
           className={styles.socialButton}
-          onClick={handleSocialClick}
+          onClick={() => handleSocialClick("google")}
+          disabled={busy}
         >
           <GoogleIcon />
           Google

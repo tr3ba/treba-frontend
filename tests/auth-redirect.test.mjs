@@ -19,7 +19,7 @@ test("protected chat redirects once and keeps the product context after login", 
 });
 
 test("recursive auth returns, external addresses and malformed paths are discarded", () => {
-  for (const target of ["//outside.test", "/\\outside.test", "/%2f%2foutside.test", "/login?next=%2Flogin", "/register/", "/%6cogin", "/a/../login", "/LOGIN", "/account\n", "/%00", "/%zz", "/" + "a".repeat(2048)]) {
+  for (const target of ["//outside.test", "/\\outside.test", "/%2f%2foutside.test", "/login?next=%2Flogin", "/register/", "/%6cogin", "/a/../login", "/LOGIN", "/shop-api/external/google/start", "/api/auth/external/facebook/callback", "/account\n", "/%00", "/%zz", "/" + "a".repeat(2048)]) {
     assert.equal(getSafeNextPath(target), "/", target);
     assert.equal(buildAuthHref("/login", target), "/login?next=%2F");
   }

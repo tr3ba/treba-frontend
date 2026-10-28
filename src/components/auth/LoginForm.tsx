@@ -39,12 +39,23 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
     {}
   );
   const [formError, setFormError] = useState("");
+  const external = searchParams.get("external");
+  useEffect(() => {
+    if (external !== "1") return;
+    let active = true;
+    void fetch("/shop-api/external/pending", { cache: "no-store" }).then(response => response.json()).then(result => {
+      if (!active) return;
+      if (result.challenge) { setChallenge(result.challenge); setMethod(""); setRememberMe(result.remember !== false); }
+      else setFormError(result.message ?? "Не вдалося підтвердити вхід.");
+    }).catch(() => { if (active) setFormError("Не вдалося завершити вхід. Спробуйте ще раз."); });
+    return () => { active = false; };
+  }, [external]);
   useEffect(() => {
     if (!challenge) return;
     const remaining = Date.parse(challenge.expiresAt) - Date.now();
     const timer = setTimeout(() => {
       setChallenge(null); setMethod(""); setCode("");
-      setFormError("Час підтвердження минув. Введіть пароль і спробуйте ще раз.");
+      setFormError("Час підтвердження минув. Почніть вхід ще раз.");
     }, Number.isFinite(remaining) ? Math.max(0, remaining) : 0);
     return () => clearTimeout(timer);
   }, [challenge]);
@@ -99,8 +110,10 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
     finally { setBusy(false); }
   }
 
-  function handleSocialClick() {
-    setFormError("Вхід через соцмережі буде доступний пізніше");
+  function handleSocialClick(provider: "google" | "facebook") {
+    if (busy) return;
+    setBusy(true);
+    window.location.assign(`/shop-api/external/${provider}/start?${new URLSearchParams({ next: nextPath, remember: rememberMe ? "1" : "0" })}`);
   }
 
   return (
@@ -209,7 +222,8 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         <button
           type="button"
           className={styles.socialButton}
-          onClick={handleSocialClick}
+          onClick={() => handleSocialClick("facebook")}
+          disabled={busy}
         >
           <Icon src="/icons/facebook.svg" alt="" className={styles.socialIcon} />
           Facebook
@@ -218,7 +232,8 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         <button
           type="button"
           className={styles.socialButton}
-          onClick={handleSocialClick}
+          onClick={() => handleSocialClick("google")}
+          disabled={busy}
         >
           <GoogleIcon />
           Google
