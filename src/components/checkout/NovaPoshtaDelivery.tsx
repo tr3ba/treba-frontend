@@ -6,7 +6,8 @@ import type { CartItem } from "../../types/cart";
 import DeliveryCombobox from "./DeliveryCombobox";
 import styles from "./CheckoutForm.module.css";
 
-export default function NovaPoshtaDelivery({ items, onQuote }: { items: CartItem[]; onQuote: (quote: DeliveryQuote | null) => void }) {
+// couponCode — применённый промокод: бэк учитывает его в расчёте и сверяет при оформлении заказа
+export default function NovaPoshtaDelivery({ items, couponCode, onQuote }: { items: CartItem[]; couponCode?: string; onQuote: (quote: DeliveryQuote | null) => void }) {
   const [query, setQuery] = useState("");
   const [cities, setCities] = useState<DeliveryCity[]>([]);
   const [city, setCity] = useState<DeliveryCity | null>(null);
@@ -63,13 +64,13 @@ export default function NovaPoshtaDelivery({ items, onQuote }: { items: CartItem
     const controller = new AbortController();
     const timer = setTimeout(() => {
       setBusy(true); setQuoteError("");
-      deliveryRequest<DeliveryQuote>("quotes", { cityRef: city.ref, pickupPointRef: point.ref, items: JSON.parse(fingerprint) }, controller.signal)
+      deliveryRequest<DeliveryQuote>("quotes", { cityRef: city.ref, pickupPointRef: point.ref, items: JSON.parse(fingerprint), couponCode: couponCode ?? null }, controller.signal)
         .then(quote => { if (!controller.signal.aborted) onQuote(quote); })
         .catch(error => { if (!controller.signal.aborted) setQuoteError(error.message); })
         .finally(() => { if (!controller.signal.aborted) setBusy(false); });
     }, 0);
     return () => { clearTimeout(timer); controller.abort(); };
-  }, [city, point, fingerprint, onQuote, quoteRetry]);
+  }, [city, point, fingerprint, couponCode, onQuote, quoteRetry]);
 
   function clearPoint() {
     setPoint(null); setPointError(""); setQuoteError(""); setBusy(false); onQuote(null);

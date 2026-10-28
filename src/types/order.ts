@@ -33,6 +33,8 @@ export type OrderSummary = {
 export type CheckoutForm = {
   deliveryMethod?: "NovaPoshta" | "TrebaCourier";
   deliveryQuoteId?: string;
+  /** Применённый промокод (нормализованный) */
+  couponCode?: string;
   firstName: string;
   lastName: string;
   /** +380XXXXXXXXX */
