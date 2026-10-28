@@ -90,6 +90,9 @@ function messageForError(status: number, backendMessage: string): string {
   if (text.includes("unavailable")) {
     return "Деякі товари вже недоступні для покупки. Приберіть їх із кошика і спробуйте ще раз.";
   }
+  if (text.includes("coupon") || text.includes("promotion")) {
+    return "Промокод більше не діє. Видаліть його і спробуйте ще раз.";
+  }
   if (text.includes("email")) return "Вкажіть коректний email.";
   if (text.includes("stock") || text.includes("insufficient")) {
     return "Недостатньо товару на складі. Зменшіть кількість і спробуйте ще раз.";
@@ -132,7 +135,7 @@ function toRequest(form: CheckoutForm, items: CheckoutItem[]): ApiCreateOrderReq
       discountAmount: 0,
       productSnapshot: null,
     })),
-    couponCode: null,
+    couponCode: form.couponCode ?? null,
   };
 }
 
