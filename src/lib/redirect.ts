@@ -6,7 +6,7 @@ export function getSafeNextPath(value: string | null | undefined, fallback = "/"
   try {
     const url = new URL(value, "https://treba.invalid");
     const path = decodeURIComponent(url.pathname);
-    if (url.origin !== "https://treba.invalid" || /[\\\u0000-\u0020]/.test(path) || path.startsWith("//") || /^\/(login|register)(\/|$)/i.test(path)) return fallback;
+    if (url.origin !== "https://treba.invalid" || /[\\\u0000-\u0020]/.test(path) || path.startsWith("//") || /^\/(login|register)(\/|$)/i.test(path) || /^\/(shop-api|api\/auth)\/external(\/|$)/i.test(path)) return fallback;
     return url.pathname + url.search + url.hash;
   } catch { return fallback; }
 }
