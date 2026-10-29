@@ -1,4 +1,5 @@
 "use client";
+import { useAdminI18n } from "@/features/admin/i18n/provider";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -16,9 +17,8 @@ import {
   Pagination,
   Table,
   useAction,
-  label,
 } from "@/components/admin/ui";
-import { date, useResource } from "./api";
+import { useResource } from "./api";
 import type { Lookup, Paged, Product, Promotion } from "./types";
 const fresh = (): Promotion => ({
   id: "",
@@ -50,6 +50,7 @@ export default function Promotions({
   id?: string;
   create?: boolean;
 }) {
+  const { date, label, t } = useAdminI18n();
   const params = useSearchParams(),
     list = useResource<Paged<Promotion>>(
       !id && !create ? "promotions?" + params : null,
@@ -88,13 +89,19 @@ export default function Promotions({
     <>
       <Hero
         title={
-          create ? "Нова акція" : id ? "Редактор акції" : "Акції та промокоди"
+          create
+            ? t("Нова акція")
+            : id
+              ? t("Редактор акції")
+              : t("Акції та промокоди")
         }
-        description="Керуйте знижками, термінами та умовами застосування."
+        description={t("Керуйте знижками, термінами та умовами застосування.")}
         action={
           !create &&
           !id && (
-            <ActionLink href="/admin/loyalty/new">Створити акцію</ActionLink>
+            <ActionLink href="/admin/loyalty/new">
+              {t("Створити акцію")}
+            </ActionLink>
           )
         }
       />
@@ -114,7 +121,7 @@ export default function Promotions({
                   rows={list.data.content}
                   columns={[
                     {
-                      title: "Акція",
+                      title: t("Акція"),
                       render: (p) => (
                         <Link
                           className="treba-admin-text-link"
@@ -128,20 +135,23 @@ export default function Promotions({
                       ),
                     },
                     {
-                      title: "Статус",
+                      title: t("Статус"),
                       render: (p) => <Badge value={p.status} />,
                     },
                     {
-                      title: "Знижка",
+                      title: t("Знижка"),
                       render: (p) =>
-                        `${p.discountValue}${p.type === "PERCENTAGE" ? "%" : p.type === "FREE_SHIPPING" ? " · Доставка" : " ₴"}`,
+                        `${p.discountValue}${p.type === "PERCENTAGE" ? "%" : p.type === "FREE_SHIPPING" ? t(" · Доставка") : " ₴"}`,
                     },
                     {
-                      title: "Період",
+                      title: t("Період"),
                       render: (p) => (
                         <>
                           {date(p.startAt)}
-                          <small>до {date(p.endAt)}</small>
+                          <small>
+                            {t("до ")}
+                            {date(p.endAt)}
+                          </small>
                         </>
                       ),
                     },
@@ -161,9 +171,9 @@ export default function Promotions({
             void save();
           }}
         >
-          <Card title="Умови акції">
+          <Card icon="gift" title={t("Умови акції")}>
             <div className="treba-admin-form-grid">
-              <Field label="Назва *" wide>
+              <Field label={t("Назва *")} wide>
                 <input
                   value={model.name}
                   required
@@ -171,23 +181,23 @@ export default function Promotions({
                   onChange={(e) => change("name", e.target.value)}
                 />
               </Field>
-              <Field label="Опис" wide>
+              <Field label={t("Опис")} wide>
                 <textarea
                   value={model.description}
                   maxLength={4000}
                   onChange={(e) => change("description", e.target.value)}
                 />
               </Field>
-              <Field label="Тип знижки">
+              <Field label={t("Тип знижки")}>
                 <select
                   value={model.type}
                   onChange={(e) => change("type", e.target.value)}
                 >
-                  <option value="PERCENTAGE">Відсоткова</option>
-                  <option value="FIXED_AMOUNT">Фіксована сума</option>
+                  <option value="PERCENTAGE">{t("Відсоткова")}</option>
+                  <option value="FIXED_AMOUNT">{t("Фіксована сума")}</option>
                 </select>
               </Field>
-              <Field label="Статус">
+              <Field label={t("Статус")}>
                 <select
                   value={model.status}
                   onChange={(e) => change("status", e.target.value)}
@@ -205,7 +215,7 @@ export default function Promotions({
                   ))}
                 </select>
               </Field>
-              <Field label="Початок (час вашого пристрою)">
+              <Field label={t("Початок (час вашого пристрою)")}>
                 <input
                   type="datetime-local"
                   required
@@ -216,7 +226,7 @@ export default function Promotions({
                   }}
                 />
               </Field>
-              <Field label="Завершення (час вашого пристрою)">
+              <Field label={t("Завершення (час вашого пристрою)")}>
                 <input
                   type="datetime-local"
                   required
@@ -227,7 +237,7 @@ export default function Promotions({
                   }}
                 />
               </Field>
-              <Field label="Значення знижки">
+              <Field label={t("Значення знижки")}>
                 <input
                   type="number"
                   min="0"
@@ -238,7 +248,7 @@ export default function Promotions({
                   }
                 />
               </Field>
-              <Field label="Максимальна знижка, ₴">
+              <Field label={t("Максимальна знижка, ₴")}>
                 <input
                   type="number"
                   min="0"
@@ -252,7 +262,7 @@ export default function Promotions({
                   }
                 />
               </Field>
-              <Field label="Мінімальна сума замовлення, ₴">
+              <Field label={t("Мінімальна сума замовлення, ₴")}>
                 <input
                   type="number"
                   min="0"
@@ -266,23 +276,27 @@ export default function Promotions({
                   }
                 />
               </Field>
-              <Field label="Пошук товару">
+              <Field label={t("Пошук товару")}>
                 <input
                   value={productSearch}
-                  placeholder="Назва або SKU"
+                  placeholder={t("Назва або SKU")}
                   onChange={(e) => setProductSearch(e.target.value)}
                 />
               </Field>
-              <Field label="Конкретний товар">
+              <Field label={t("Конкретний товар")}>
                 <select
                   value={model.productId ?? ""}
                   onChange={(e) => change("productId", e.target.value || null)}
                 >
-                  <option value="">Усі відповідні товари</option>
+                  <option value="">{t("Усі відповідні товари")}</option>
                   {model.productId &&
                     !products.data?.content.some(
                       (p) => p.id === model.productId,
-                    ) && <option value={model.productId}>Обраний товар</option>}
+                    ) && (
+                      <option value={model.productId}>
+                        {t("Обраний товар")}
+                      </option>
+                    )}
                   {products.data?.content.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name} · {p.sku}
@@ -292,9 +306,9 @@ export default function Promotions({
               </Field>
               {(
                 [
-                  ["categoryId", "Категорія", options.data?.categories],
-                  ["brandId", "Бренд", options.data?.brands],
-                  ["sellerId", "Продавець", options.data?.sellers],
+                  ["categoryId", t("Категорія"), options.data?.categories],
+                  ["brandId", t("Бренд"), options.data?.brands],
+                  ["sellerId", t("Продавець"), options.data?.sellers],
                 ] as [
                   "categoryId" | "brandId" | "sellerId",
                   string,
@@ -306,7 +320,7 @@ export default function Promotions({
                     value={model[key] ?? ""}
                     onChange={(e) => change(key, e.target.value || null)}
                   >
-                    <option value="">Без обмеження</option>
+                    <option value="">{t("Без обмеження")}</option>
                     {values?.map((v) => (
                       <option key={v.id} value={v.id}>
                         {v.name}
@@ -317,10 +331,10 @@ export default function Promotions({
               ))}
             </div>
           </Card>
-          <Card title="Промокоди">
+          <Card icon="file" title={t("Промокоди")}>
             {model.coupons.map((coupon, i) => (
               <div className="treba-admin-editor-row" key={coupon.id ?? i}>
-                <Field label="Код *">
+                <Field label={t("Код *")}>
                   <input
                     value={coupon.code}
                     readOnly={!!coupon.id}
@@ -336,7 +350,7 @@ export default function Promotions({
                     }
                   />
                 </Field>
-                <Field label="Загальний ліміт (0 — без ліміту)">
+                <Field label={t("Загальний ліміт (0 — без ліміту)")}>
                   <input
                     type="number"
                     min="0"
@@ -353,7 +367,7 @@ export default function Promotions({
                     }
                   />
                 </Field>
-                <Field label="На покупця (0 — без ліміту)">
+                <Field label={t("На покупця (0 — без ліміту)")}>
                   <input
                     type="number"
                     min="0"
@@ -386,11 +400,12 @@ export default function Promotions({
                       )
                     }
                   />
-                  Активний
+                  {t("Активний")}
                 </label>
                 {coupon.usedCount != null && (
                   <span className="treba-admin-note">
-                    Використано: {coupon.usedCount}
+                    {t("Використано: ")}
+                    {coupon.usedCount}
                   </span>
                 )}
               </div>
@@ -411,20 +426,24 @@ export default function Promotions({
                   ])
                 }
               >
-                Додати промокод
+                {t("Додати промокод")}
               </Button>
             </div>
             <p className="treba-admin-note">
-              Збережений код не перейменовується. Щоб припинити його
-              використання, вимкніть активність.
+              {t(
+                "Збережений код не перейменовується. Щоб припинити його використання, вимкніть активність.",
+              )}
             </p>
           </Card>
           <div className="treba-admin-actions">
             <Button type="submit" icon="check" disabled={action.busy}>
-              Зберегти акцію
+              {t("Зберегти акцію")}
             </Button>
-            <Link className="treba-admin-button secondary" href="/admin/loyalty">
-              До списку
+            <Link
+              className="treba-admin-button secondary"
+              href="/admin/loyalty"
+            >
+              {t("До списку")}
             </Link>
           </div>
         </form>

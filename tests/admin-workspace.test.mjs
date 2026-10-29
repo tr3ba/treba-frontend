@@ -208,13 +208,51 @@ test(
         assert.equal((await request("/shop-api/support", cookie)).status, 401);
       },
     );
-    await t.test("workspace documents expose a stable deployment marker", async () => {
-      for (const path of ["/admin", "/admin/products", "/admin/settings"]) {
-        const response = await request(path, cookie);
+    await t.test(
+      "workspace documents expose a stable deployment marker",
+      async () => {
+        for (const path of ["/admin", "/admin/products", "/admin/settings"]) {
+          const response = await request(path, cookie);
+          assert.equal(response.status, 200);
+          assert.match(await response.text(), /data-treba-workspace="loading"/);
+        }
+      },
+    );
+    await t.test(
+      "workspace language survives a fresh document request",
+      async () => {
+        const response = await request(
+          "/admin",
+          cookie + "; treba_workspace_language=en",
+        );
+        const html = await response.text();
         assert.equal(response.status, 200);
-        assert.match(await response.text(), /data-treba-workspace="loading"/);
-      }
-    });
+        assert.match(html, /lang="en" class="treba-admin-locale"/);
+        assert.match(html, /TREBA · Workspace/);
+        assert.match(html, /aria-label="Interface language"/);
+      },
+    );
+    await t.test(
+      "the profile language is saved through the existing profile endpoint",
+      async () => {
+        const profile = await (
+          await request("/admin-api/profile", cookie)
+        ).json();
+        const response = await request("/admin-api/profile", cookie, "PATCH", {
+          email: profile.email,
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          language: "en",
+          marketingEmailsEnabled: false,
+        });
+        assert.equal(response.status, 200);
+        assert.equal((await response.json()).profile.language, "en");
+        const session = await (
+          await request("/admin-api/session", cookie)
+        ).json();
+        assert.equal(session.user.profile.language, "en");
+      },
+    );
     await t.test("all migrated read resources are reachable", async () => {
       for (const path of [
         "dashboard",

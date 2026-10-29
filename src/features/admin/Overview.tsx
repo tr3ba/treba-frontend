@@ -1,4 +1,5 @@
 "use client";
+import { useAdminI18n } from "@/features/admin/i18n/provider";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useStaff } from "@/components/admin/AdminShell";
@@ -12,7 +13,7 @@ import {
   Loading,
   Table,
 } from "@/components/admin/ui";
-import { date, money, useResource } from "./api";
+import { useResource } from "./api";
 type Dashboard = {
   pendingSellers: number | null;
   pendingReviews: number;
@@ -44,6 +45,7 @@ type Stats = {
   outOfStock: number;
 };
 export default function Overview() {
+  const { date, money, t, label } = useAdminI18n();
   const user = useStaff(),
     params = useSearchParams(),
     days = params.get("days") ?? "30";
@@ -59,43 +61,53 @@ export default function Overview() {
   const cards =
     user.role === "Seller"
       ? [
-          ["box", "Товарів у каталозі", stats.data?.total, "/admin/products"],
+          [
+            "box",
+            t("Товарів у каталозі"),
+            stats.data?.total,
+            "/admin/products",
+          ],
           [
             "check",
-            "Активні товари",
+            t("Активні товари"),
             stats.data?.active,
             "/admin/products?status=ACTIVE",
           ],
           [
             "clock",
-            "На модерації",
+            t("На модерації"),
             stats.data?.pending,
             "/admin/products?status=PENDING_MODERATION",
           ],
           [
             "layers",
-            "Без залишку",
+            t("Без залишку"),
             stats.data?.outOfStock,
             "/admin/products?stock=out",
           ],
         ]
       : [
-          ["bag", "Нові замовлення", metrics.data?.newOrders, "/admin/orders"],
+          [
+            "bag",
+            t("Нові замовлення"),
+            metrics.data?.newOrders,
+            "/admin/orders",
+          ],
           [
             "shield",
-            "Очікують модерації",
+            t("Очікують модерації"),
             stats.data?.pending,
             "/admin/moderation",
           ],
           [
             "star",
-            "Відгуки на перевірці",
+            t("Відгуки на перевірці"),
             dashboard.data?.pendingReviews,
             "/admin/reviews?status=PENDING",
           ],
           [
             "chat",
-            "Відкриті звернення",
+            t("Відкриті звернення"),
             metrics.data?.openTickets,
             "/admin/support?status=OPEN",
           ],
@@ -103,76 +115,100 @@ export default function Overview() {
   return (
     <>
       <Hero
-        title={`Вітаємо, ${user.firstName || "колего"}`}
-        description="Усе важливе для роботи з маркетплейсом — в одному місці."
+        title={t("Вітаємо, {0}", [user.firstName || t("колего")])}
+        description={t(
+          "Усе важливе для роботи з маркетплейсом — в одному місці.",
+        )}
         action={
-          <div className="treba-admin-avatar">
-            <Icon name="grid" />
+          <div className="treba-admin-period">
+            <Icon name="calendar" size={21} />
+            <Filters search={false}>
+              <select name="days" aria-label={t("Період")} defaultValue={days}>
+                {[7, 30, 90].map((n) => (
+                  <option key={n} value={n}>
+                    {t("Останні {0} днів", [n])}
+                  </option>
+                ))}
+              </select>
+            </Filters>
           </div>
         }
       />
-      <Card>
-        <Filters search={false}>
-          <select name="days" aria-label="Період" defaultValue={days}>
-            {[7, 30, 90].map((n) => (
-              <option key={n} value={n}>
-                Останні {n} днів
-              </option>
-            ))}
-          </select>
-        </Filters>
-        <p className="treba-admin-note">
-          Показники за вибраний період. Черги відображають поточний стан.
-        </p>
-      </Card>
+      <p className="treba-admin-note">
+        {t("Показники за вибраний період. Черги відображають поточний стан.")}
+      </p>
       <Alert message={dashboard.error || metrics.error || stats.error} />
       <div className="treba-admin-stats">
         {cards
           .filter((c) => c[2] !== undefined && c[2] !== null)
           .map((c) => (
-            <Link className="treba-admin-stat" key={String(c[1])} href={String(c[3])}>
+            <Link
+              className={`treba-admin-stat tone-${String(c[0])}`}
+              key={String(c[1])}
+              href={String(c[3])}
+            >
               <div className="treba-admin-stat-icon">
                 <Icon name={String(c[0])} />
               </div>
               <small>{c[1]}</small>
               <b>{c[2]}</b>
-              <p>Відкрити розділ →</p>
+              <span className="treba-admin-stat-open" aria-hidden="true"><Icon name="chevron" size={16} /></span>
             </Link>
           ))}
       </div>
       {stats.loading && <Loading />}
       {metrics.data && (
         <div className="treba-admin-two-grid">
-          <Card title="Замовлення за період">
+          <Card title={t("Замовлення за період")} icon="bag">
             <div className="treba-admin-detail-list">
               <div>
-                <dt>Сума розміщених замовлень</dt>
+                <dt>
+                  <Icon name="coins" size={18} />
+                  {t("Сума розміщених замовлень")}
+                </dt>
                 <dd>
                   <strong>{money(metrics.data.orderedAmount)}</strong>
                 </dd>
               </div>
               <div>
-                <dt>Скасовані замовлення</dt>
+                <dt>
+                  <Icon name="close" size={18} />
+                  {t("Скасовані замовлення")}
+                </dt>
                 <dd>{metrics.data.cancelledOrders}</dd>
               </div>
             </div>
             <p className="treba-admin-note">
-              Без скасованих і повернутих замовлень. Цей показник не є
-              підтвердженою виручкою.
+              {t(
+                "Без скасованих і повернутих замовлень. Цей показник не є підтвердженою виручкою.",
+              )}
             </p>
           </Card>
-          <Card title="Потребує уваги">
+          <Card
+            title={t("Потребує уваги")}
+            icon="alert"
+            className="treba-admin-attention"
+          >
             <div className="treba-admin-detail-list">
               <div>
-                <dt>Звернення без відповіді понад 48 год</dt>
+                <dt>
+                  <Icon name="chat" size={19} />
+                  {t("Звернення без відповіді понад 48 год")}
+                </dt>
                 <dd>{metrics.data.overdueTickets}</dd>
               </div>
               <div>
-                <dt>Модерація понад 24 год</dt>
+                <dt>
+                  <Icon name="clock" size={19} />
+                  {t("Модерація понад 24 год")}
+                </dt>
                 <dd>{metrics.data.overdueModeration}</dd>
               </div>
               <div>
-                <dt>Товари без залишку</dt>
+                <dt>
+                  <Icon name="box" size={19} />
+                  {t("Товари без залишку")}
+                </dt>
                 <dd>{metrics.data.outOfStockProducts}</dd>
               </div>
             </div>
@@ -180,38 +216,67 @@ export default function Overview() {
         </div>
       )}
       {dashboard.data && (
-        <Card title="Останні зміни">
+        <Card title={t("Останні зміни")} icon="clock">
           <Table
             rows={dashboard.data.recentActivity}
             columns={[
-              { title: "Запис", render: (row) => <strong>{row.name}</strong> },
-              { title: "Розділ", render: (row) => row.kind },
               {
-                title: "Статус",
+                title: t("Запис"),
+                render: (row) => (
+                  <span className="treba-admin-activity-record">
+                    <Icon
+                      name={
+                        (
+                          {
+                            product: "box",
+                            seller: "shop",
+                            review: "star",
+                            user: "user",
+                          } as Record<string, string>
+                        )[row.kind] ?? "file"
+                      }
+                      size={22}
+                    />
+                    <strong>{row.name}</strong>
+                  </span>
+                ),
+              },
+              { title: t("Розділ"), render: (row) => label(row.kind) },
+              {
+                title: t("Статус"),
                 render: (row) => <Badge value={row.status} />,
               },
-              { title: "Час", render: (row) => date(row.occurredAt) },
+              { title: t("Час"), render: (row) => date(row.occurredAt) },
             ]}
           />
           <p className="treba-admin-note">
-            Останній стан записів. Повна історія дій доступна в журналі аудиту.
+            {t(
+              "Останній стан записів. Повна історія дій доступна в журналі аудиту.",
+            )}
           </p>
         </Card>
       )}
       {user.role === "Seller" && (
-        <Card title="Почніть з каталогу">
+        <Card icon="file" title={t("Почніть з каталогу")}>
           <p className="treba-admin-note">
-            Створюйте товари, завантажуйте фотографії та відправляйте картки на
-            перевірку.
+            {t(
+              "Створюйте товари, завантажуйте фотографії та відправляйте картки на перевірку.",
+            )}
           </p>
           <div className="treba-admin-actions">
-            <Link className="treba-admin-button primary" href="/admin/products/new">
+            <Link
+              className="treba-admin-button primary"
+              href="/admin/products/new"
+            >
               <Icon name="plus" />
-              Додати товар
+              {t("Додати товар")}
             </Link>
-            <Link className="treba-admin-button secondary" href="/admin/products/import">
+            <Link
+              className="treba-admin-button secondary"
+              href="/admin/products/import"
+            >
               <Icon name="upload" />
-              Імпорт за посиланням
+              {t("Імпорт за посиланням")}
             </Link>
           </div>
         </Card>

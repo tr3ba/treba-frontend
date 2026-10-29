@@ -106,13 +106,3 @@ export function useResource<T>(path: string | null, interval = 0) {
   }, [reload, interval, invalidate]);
   return { data, setData, error, loading, reload };
 }
-export const money = (value: number, currency = "UAH") =>
-  new Intl.NumberFormat("uk-UA", { style: "currency", currency }).format(value);
-export const date = (value?: string) =>
-  value
-    ? new Intl.DateTimeFormat("uk-UA", {
-        dateStyle: "medium",
-        timeStyle: "short",
-        timeZone: "Europe/Vilnius",
-      }).format(new Date(value))
-    : "—";

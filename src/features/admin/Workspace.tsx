@@ -1,4 +1,5 @@
 "use client";
+import { useAdminI18n } from "@/features/admin/i18n/provider";
 import { Empty } from "@/components/admin/ui";
 import Overview from "./Overview";
 import { Products, ProductEditor } from "./Catalog";
@@ -15,6 +16,7 @@ import Settings, { Categories } from "./Settings";
 import Profile, { Notifications } from "./Profile";
 import Imports from "./Imports";
 export default function Workspace({ segments }: { segments: string[] }) {
+  const { t } = useAdminI18n();
   const [section, id, action] = segments;
   if (!section) return <Overview />;
   if (section === "products") {
@@ -66,8 +68,8 @@ export default function Workspace({ segments }: { segments: string[] }) {
   if (section === "notifications" && !id) return <Notifications />;
   return (
     <Empty
-      title="Сторінку не знайдено"
-      description="Оберіть потрібний розділ у меню робочого простору."
+      title={t("Сторінку не знайдено")}
+      description={t("Оберіть потрібний розділ у меню робочого простору.")}
     />
   );
 }

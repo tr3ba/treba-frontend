@@ -1,4 +1,5 @@
 "use client";
+import { useAdminI18n } from "@/features/admin/i18n/provider";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
@@ -14,9 +15,12 @@ import {
 } from "@/components/admin/ui";
 import { useResource } from "./api";
 import type { Feed, User } from "./types";
-import { date } from "./api";
+import { normalizeLanguage, type AdminLanguage } from "./i18n/core";
 import { resolveMediaUrl } from "@/lib/api/client";
 export default function Profile() {
+  const { t, language, setLanguage } = useAdminI18n();
+  const [preferredLanguage, setPreferredLanguage] =
+    useState<AdminLanguage | null>(null);
   const resource = useResource<User>("profile"),
     [edited, setModel] = useState<User | null>(null),
     action = useAction(resource.reload);
@@ -24,8 +28,8 @@ export default function Profile() {
   return (
     <>
       <Hero
-        title="Мій профіль"
-        description="Особисті дані та захист облікового запису."
+        title={t("Мій профіль")}
+        description={t("Особисті дані та захист облікового запису.")}
       />
       <Alert message={resource.error} />
       <Feedback action={action} />
@@ -33,36 +37,44 @@ export default function Profile() {
         <Loading />
       ) : (
         <div className="treba-admin-two-grid">
-          <Card title="Особисті дані">
+          <Card icon="user" title={t("Особисті дані")}>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                void action.run(
-                  "profile",
-                  {
-                    email: model.email,
-                    firstName: model.firstName,
-                    lastName: model.lastName,
-                    middleName: model.middleName,
-                    phone: model.phone || null,
-                    birthDate: model.profile?.birthDate || null,
-                    gender: model.profile?.gender || null,
-                    language: model.profile?.language ?? "uk",
-                    marketingEmailsEnabled:
-                      model.profile?.marketingEmailsEnabled ?? false,
-                  },
-                  "PATCH",
-                );
+                void action
+                  .run<User>(
+                    "profile",
+                    {
+                      email: model.email,
+                      firstName: model.firstName,
+                      lastName: model.lastName,
+                      middleName: model.middleName,
+                      phone: model.phone || null,
+                      birthDate: model.profile?.birthDate || null,
+                      gender: model.profile?.gender || null,
+                      language: preferredLanguage ?? language,
+                      marketingEmailsEnabled:
+                        model.profile?.marketingEmailsEnabled ?? false,
+                    },
+                    "PATCH",
+                  )
+                  .then((result) => {
+                    if (result) {
+                      setModel(null);
+                      setPreferredLanguage(null);
+                      setLanguage(normalizeLanguage(result.profile?.language));
+                    }
+                  });
               }}
             >
               <div className="treba-admin-form-grid">
                 {(
                   [
-                    ["firstName", "Ім’я", "text"],
-                    ["lastName", "Прізвище", "text"],
-                    ["middleName", "По батькові", "text"],
+                    ["firstName", t("Ім’я"), "text"],
+                    ["lastName", t("Прізвище"), "text"],
+                    ["middleName", t("По батькові"), "text"],
                     ["email", "Email", "email"],
-                    ["phone", "Телефон", "tel"],
+                    ["phone", t("Телефон"), "tel"],
                   ] as const
                 ).map(([key, title, type]) => (
                   <Field key={key} label={title}>
@@ -78,7 +90,7 @@ export default function Profile() {
                     />
                   </Field>
                 ))}
-                <Field label="Дата народження">
+                <Field label={t("Дата народження")}>
                   <input
                     type="date"
                     value={model.profile?.birthDate ?? ""}
@@ -93,7 +105,18 @@ export default function Profile() {
                     }
                   />
                 </Field>
-                <Field label="Стать">
+                <Field label={t("Мова інтерфейсу")}>
+                  <select
+                    value={preferredLanguage ?? language}
+                    onChange={(e) =>
+                      setPreferredLanguage(normalizeLanguage(e.target.value))
+                    }
+                  >
+                    <option value="uk">Українська</option>
+                    <option value="en">English</option>
+                  </select>
+                </Field>
+                <Field label={t("Стать")}>
                   <select
                     value={model.profile?.gender ?? ""}
                     onChange={(e) =>
@@ -103,21 +126,21 @@ export default function Profile() {
                       })
                     }
                   >
-                    <option value="">Не вказано</option>
-                    <option value="female">Жіноча</option>
-                    <option value="male">Чоловіча</option>
-                    <option value="other">Інша</option>
+                    <option value="">{t("Не вказано")}</option>
+                    <option value="female">{t("Жіноча")}</option>
+                    <option value="male">{t("Чоловіча")}</option>
+                    <option value="other">{t("Інша")}</option>
                   </select>
                 </Field>
               </div>
               <div className="treba-admin-actions">
                 <Button type="submit" disabled={action.busy} icon="check">
-                  Зберегти профіль
+                  {t("Зберегти профіль")}
                 </Button>
               </div>
             </form>
           </Card>
-          <Card title="Фото профілю">
+          <Card icon="image" title={t("Фото профілю")}>
             {resource.data?.profile?.avatarUrl && (
               <Image
                 unoptimized
@@ -128,10 +151,10 @@ export default function Profile() {
                   resolveMediaUrl(resource.data?.profile?.avatarUrl) ??
                   "/icons/box.svg"
                 }
-                alt="Фото профілю"
+                alt={t("Фото профілю")}
               />
             )}
-            <Field label="Оберіть фото (до 5 МБ)">
+            <Field label={t("Оберіть фото (до 5 МБ)")}>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/gif"
@@ -139,7 +162,7 @@ export default function Profile() {
                   const file = e.target.files?.[0];
                   if (!file) return;
                   if (file.size > 5 * 1024 * 1024) {
-                    action.setError("Максимальний розмір фото — 5 МБ.");
+                    action.setError(t("Максимальний розмір фото — 5 МБ."));
                     return;
                   }
                   const form = new FormData();
@@ -151,12 +174,13 @@ export default function Profile() {
             {resource.data?.profile?.avatarUrl && (
               <div className="treba-admin-actions">
                 <Button
+                  icon="trash"
                   tone="danger"
                   onClick={() =>
                     void action.run("profile/avatar", undefined, "DELETE")
                   }
                 >
-                  Видалити фото
+                  {t("Видалити фото")}
                 </Button>
               </div>
             )}
@@ -171,6 +195,7 @@ export default function Profile() {
   );
 }
 function Security() {
+  const { t } = useAdminI18n();
   const resource = useResource<{
       authenticatorEnabled: boolean;
       emailTwoFactorEnabled: boolean;
@@ -189,18 +214,19 @@ function Security() {
     [code, setCode] = useState(""),
     [mode, setMode] = useState("");
   return (
-    <Card title="Захист облікового запису">
+    <Card icon="file" title={t("Захист облікового запису")}>
       <Alert message={resource.error} />
       <Feedback action={action} />
       <p className="treba-admin-note">
         Google Authenticator:{" "}
-        {resource.data?.authenticatorEnabled ? "увімкнено" : "вимкнено"}
+        {resource.data?.authenticatorEnabled ? t("увімкнено") : t("вимкнено")}
         <br />
-        Підтвердження поштою:{" "}
-        {resource.data?.emailTwoFactorEnabled ? "увімкнено" : "вимкнено"}
+        {t("Підтвердження поштою:")}{" "}
+        {resource.data?.emailTwoFactorEnabled ? t("увімкнено") : t("вимкнено")}
       </p>
       <div className="treba-admin-actions">
         <Button
+          icon="lock"
           tone="secondary"
           disabled={action.busy}
           onClick={() => {
@@ -221,10 +247,11 @@ function Security() {
           }}
         >
           {resource.data?.authenticatorEnabled
-            ? "Вимкнути Authenticator"
-            : "Підключити Authenticator"}
+            ? t("Вимкнути Authenticator")
+            : t("Підключити Authenticator")}
         </Button>
         <Button
+          icon="mail"
           tone="secondary"
           disabled={action.busy}
           onClick={() => {
@@ -232,9 +259,10 @@ function Security() {
             setSetup(null);
             const disabling = resource.data?.emailTwoFactorEnabled;
             void action
-              .run<
-                typeof emailChallenge
-              >(`security/email/${disabling ? "disable/start" : "setup"}`, {})
+              .run<typeof emailChallenge>(
+                `security/email/${disabling ? "disable/start" : "setup"}`,
+                {},
+              )
               .then((result) => {
                 if (result) {
                   setEmailChallenge(result);
@@ -246,8 +274,8 @@ function Security() {
           }}
         >
           {resource.data?.emailTwoFactorEnabled
-            ? "Вимкнути пошту"
-            : "Підключити пошту"}
+            ? t("Вимкнути пошту")
+            : t("Підключити пошту")}
         </Button>
       </div>
       {setup && (
@@ -255,16 +283,20 @@ function Security() {
           <Image
             unoptimized
             src={setup.qrCodeDataUrl}
-            alt="QR-код для Authenticator"
+            alt={t("QR-код для Authenticator")}
             width={180}
             height={180}
           />
-          <p className="treba-admin-note">Ключ: {setup.manualKey}</p>
+          <p className="treba-admin-note">
+            {t("Ключ: ")}
+            {setup.manualKey}
+          </p>
         </>
       )}
       {emailChallenge && (
         <p className="treba-admin-note">
-          Код надіслано на {emailChallenge.maskedEmail}.
+          {t("Код надіслано на ")}
+          {emailChallenge.maskedEmail}.
         </p>
       )}
       {mode && (
@@ -287,7 +319,7 @@ function Security() {
               });
           }}
         >
-          <Field label="Код підтвердження">
+          <Field label={t("Код підтвердження")}>
             <input
               inputMode="numeric"
               pattern="[0-9]{6}"
@@ -299,10 +331,11 @@ function Security() {
             />
           </Field>
           <div className="treba-admin-actions">
-            <Button type="submit" disabled={action.busy}>
-              Підтвердити
+            <Button icon="check" type="submit" disabled={action.busy}>
+              {t("Підтвердити")}
             </Button>
             <Button
+              icon="close"
               tone="secondary"
               onClick={() => {
                 setMode("");
@@ -310,7 +343,7 @@ function Security() {
                 setEmailChallenge(null);
               }}
             >
-              Скасувати
+              {t("Скасувати")}
             </Button>
           </div>
         </form>
@@ -319,6 +352,7 @@ function Security() {
   );
 }
 function TelegramLink() {
+  const { t } = useAdminI18n();
   const resource = useResource<{
       configured: boolean;
       linked: boolean;
@@ -327,32 +361,37 @@ function TelegramLink() {
       pendingTelegramName?: string;
     }>("telegram-account/link", 5000),
     action = useAction(resource.reload),
-    [start, setStart] = useState<{ botUrl: string; expiresAt: string } | null>(
-      null,
-    );
+    [start, setStart] = useState<{
+      botUrl: string;
+      expiresAt: string;
+    } | null>(null);
   return (
-    <Card title="Telegram Guard">
+    <Card icon="chat" title="Telegram Guard">
       <Alert message={resource.error} />
       <Feedback action={action} />
       <p className="treba-admin-note">
         {resource.data?.linked
-          ? `Підключено: ${resource.data.username ?? "Telegram"}`
-          : "Підключіть Telegram для підтвердження входу та робочих сповіщень."}
+          ? t("Підключено: {0}", [resource.data.username ?? "Telegram"])
+          : t(
+              "Підключіть Telegram для підтвердження входу та робочих сповіщень.",
+            )}
       </p>
       {resource.data?.configured ? (
         <div className="treba-admin-actions">
           {resource.data.linked ? (
             <Button
+              icon="chat"
               tone="danger"
               disabled={action.busy}
               onClick={() =>
                 void action.run("telegram-account/link", undefined, "DELETE")
               }
             >
-              Від’єднати Telegram
+              {t("Від’єднати Telegram")}
             </Button>
           ) : (
             <Button
+              icon="chat"
               tone="secondary"
               disabled={action.busy}
               onClick={() =>
@@ -363,7 +402,7 @@ function TelegramLink() {
                   })
               }
             >
-              Підключити Telegram
+              {t("Підключити Telegram")}
             </Button>
           )}
           {start && (
@@ -373,11 +412,12 @@ function TelegramLink() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Відкрити бота
+              {t("Відкрити бота")}
             </a>
           )}
           {resource.data.pendingId && (
             <Button
+              icon="chat"
               disabled={action.busy}
               onClick={() =>
                 void action.run("telegram-account/link/confirm", {
@@ -385,28 +425,31 @@ function TelegramLink() {
                 })
               }
             >
-              Підтвердити {resource.data.pendingTelegramName}
+              {t("Підтвердити ")}
+              {resource.data.pendingTelegramName}
             </Button>
           )}
         </div>
       ) : (
         <p className="treba-admin-note">
-          Інтеграція Telegram не налаштована на сервері.
+          {t("Інтеграція Telegram не налаштована на сервері.")}
         </p>
       )}
     </Card>
   );
 }
 export function Notifications() {
+  const { date, t } = useAdminI18n();
   const resource = useResource<Feed>("notifications", 30000),
     action = useAction(resource.reload);
   return (
     <>
       <Hero
-        title="Сповіщення"
-        description="Нові події та робочі завдання."
+        title={t("Сповіщення")}
+        description={t("Нові події та робочі завдання.")}
         action={
           <Button
+            icon="check"
             tone="secondary"
             disabled={action.busy || !resource.data?.unreadCount}
             onClick={() =>
@@ -418,7 +461,7 @@ export function Notifications() {
               })
             }
           >
-            Прочитати всі
+            {t("Прочитати всі")}
           </Button>
         }
       />
@@ -433,7 +476,7 @@ export function Notifications() {
               <div>
                 <h3>
                   {!n.read && "• "}
-                  {n.title}
+                  {t(n.title)}
                 </h3>
                 <p>{n.text}</p>
                 <small>{date(n.createdAt)}</small>
@@ -452,13 +495,13 @@ export function Notifications() {
                     void action.run("notifications/read", { keys: [n.key] });
                 }}
               >
-                Відкрити →
+                {t("Відкрити →")}
               </Link>
             </article>
           ))
         )}
         {resource.data?.items.length === 0 && (
-          <p className="treba-admin-note">Нових сповіщень немає.</p>
+          <p className="treba-admin-note">{t("Нових сповіщень немає.")}</p>
         )}
       </Card>
     </>

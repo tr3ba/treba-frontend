@@ -3,12 +3,12 @@
 .treba-admin-boot {
   --treba-admin-blue: #2457ee;
   --treba-admin-ink: #17233c;
-  --treba-admin-muted: #758098;
-  --treba-admin-line: #e9edf4;
-  --treba-admin-bg: #f6f8fc;
+  --treba-admin-muted: #536277;
+  --treba-admin-line: #ccd6e3;
+  --treba-admin-bg: #e9eef5;
   color: var(--treba-admin-ink);
   font-family: var(--font-montserrat), Arial, sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
   background: var(--treba-admin-bg);
   min-height: 100dvh;
@@ -54,8 +54,9 @@
   width: 250px;
   position: fixed;
   inset: 0 auto 0 0;
-  background: white;
-  border-right: 1px solid var(--treba-admin-line);
+  background: #14223b;
+  color: #edf3ff;
+  border-right: 1px solid #253956;
   display: flex;
   flex-direction: column;
   z-index: 40;
@@ -93,8 +94,8 @@
 }
 .treba-admin-brand small {
   display: block;
-  font-size: 10px;
-  color: var(--treba-admin-muted);
+  font-size: 12px;
+  color: #aabbd6;
   margin-top: 2px;
 }
 .treba-admin-nav-scroll {
@@ -106,8 +107,8 @@
   text-transform: uppercase;
   letter-spacing: 1.6px;
   font-weight: 600;
-  font-size: 9px;
-  color: #9aa3b5;
+  font-size: 11px;
+  color: #9fb1ce;
   padding: 24px 14px 10px;
 }
 .treba-admin-nav-link {
@@ -116,29 +117,30 @@
   align-items: center;
   min-height: 43px;
   padding: 10px 13px;
-  color: #65708a;
+  color: #cedaf0;
   border-radius: 9px;
   margin-bottom: 3px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
 }
 .treba-admin-nav-link:hover {
-  background: #f5f7fc;
-  color: var(--treba-admin-blue);
+  background: #223652;
+  color: #fff;
 }
 .treba-admin-nav-link.active {
-  color: var(--treba-admin-blue);
-  background: #edf2ff;
+  color: #fff;
+  background: #2457ee;
+  box-shadow: 0 4px 12px #07142d44;
 }
 .treba-admin-sidebar-bottom {
   padding: 18px;
-  border-top: 1px solid var(--treba-admin-line);
+  border-top: 1px solid #31425d;
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  font-size: 9px;
-  color: var(--treba-admin-muted);
+  font-size: 11px;
+  color: #b2c2dc;
 }
 .treba-admin-online-dot {
   width: 6px;
@@ -150,7 +152,8 @@
   width: 100%;
   margin-top: 6px;
   justify-content: flex-start;
-  font-size: 11px;
+  color: #d5e3fb;
+  font-size: 13px;
 }
 .treba-admin-main {
   margin-left: 250px;
@@ -164,7 +167,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 40px;
-  background: #ffffffd9;
+  background: #fff;
   border-bottom: 1px solid var(--treba-admin-line);
   gap: 18px;
 }
@@ -173,7 +176,7 @@
   align-items: center;
   gap: 10px;
   color: var(--treba-admin-muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 .treba-admin-topbar-title i {
   margin: 0 12px;
@@ -202,7 +205,7 @@
   background: #ff824a;
   color: #fff;
   text-align: center;
-  font-size: 9px;
+  font-size: 11px;
   padding: 1px 4px;
 }
 .treba-admin-profile-link {
@@ -222,12 +225,12 @@
 }
 .treba-admin-profile-link b {
   display: block;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
 }
 .treba-admin-profile-link small {
   display: block;
-  font-size: 9px;
+  font-size: 11px;
   color: var(--treba-admin-muted);
 }
 .treba-admin-icon-button,
@@ -258,8 +261,8 @@
   display: flex;
   justify-content: space-between;
   padding: 20px 40px;
-  color: #949db0;
-  font-size: 9px;
+  color: #61718a;
+  font-size: 11px;
   border-top: 1px solid var(--treba-admin-line);
 }
 .treba-admin-hero {
@@ -268,10 +271,11 @@
   align-items: center;
   gap: 20px;
   margin-bottom: 28px;
+  flex-wrap: wrap;
 }
 .treba-admin-eyebrow {
-  color: #8b97ad;
-  font-size: 9px;
+  color: #536787;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 1.8px;
   margin-bottom: 6px;
@@ -284,27 +288,30 @@
 }
 .treba-admin-hero p {
   color: var(--treba-admin-muted);
-  font-size: 11px;
+  font-size: 13px;
   margin-top: 8px;
   max-width: 650px;
 }
 .treba-admin-card {
   background: white;
   border: 1px solid var(--treba-admin-line);
-  border-radius: 15px;
-  box-shadow: 0 3px 10px #263b5b03;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px #203d6810;
   padding: 24px;
   margin-bottom: 22px;
   min-width: 0;
 }
 .treba-admin-card h2 {
-  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.5;
   margin-bottom: 20px;
 }
 .treba-admin-card h3 {
-  font-size: 13px;
+  font-size: 14px;
   margin: 0 0 10px;
 }
 .treba-admin-button {
@@ -315,10 +322,12 @@
   padding: 11px 16px;
   border: 1px solid transparent;
   border-radius: 9px;
-  font-size: 11px !important;
+  font-size: 13px !important;
   font-weight: 600;
   line-height: 1.5;
-  white-space: nowrap;
+  white-space: normal;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   text-decoration: none;
 }
 .treba-admin-button.primary {
@@ -331,8 +340,8 @@
 }
 .treba-admin-button.secondary {
   background: white;
-  border-color: #e2e7f0;
-  color: #5c6983;
+  border-color: #c5d1e2;
+  color: #374b6b;
 }
 .treba-admin-button.secondary:hover {
   background: #f5f7fc;
@@ -358,7 +367,7 @@
 .treba-admin-text-link {
   color: var(--treba-admin-blue);
   font-weight: 600;
-  font-size: 11px;
+  font-size: 13px;
 }
 .treba-admin-filters {
   display: flex;
@@ -376,7 +385,7 @@
   border: 1px solid #e4e9f2;
   border-radius: 9px;
   padding: 0 12px;
-  color: #9aa6bb;
+  color: #65758d;
   background: #fff;
 }
 .treba-admin-search input {
@@ -390,16 +399,16 @@
 .treba-admin-shell select,
 .treba-admin-shell textarea {
   background: #fff;
-  border: 1px solid #e0e6f0;
+  border: 1px solid #bac8dc;
   border-radius: 8px;
   padding: 11px 12px;
   min-height: 41px;
   color: var(--treba-admin-ink);
-  font-size: 11px;
+  font-size: 13px;
 }
 .treba-admin-shell input::placeholder,
 .treba-admin-shell textarea::placeholder {
-  color: #9ca7b8;
+  color: #66758c;
 }
 .treba-admin-shell textarea {
   resize: vertical;
@@ -420,7 +429,7 @@
   display: flex;
   flex-direction: column;
   gap: 7px;
-  font-size: 11px;
+  font-size: 13px;
   min-width: 0;
 }
 .treba-admin-field > span {
@@ -459,30 +468,30 @@
   border-collapse: collapse;
   white-space: nowrap;
   text-align: left;
-  font-size: 11px;
+  font-size: 13px;
 }
 .treba-admin-table-wrap th {
-  background: #fafbfe;
+  background: #edf2f8;
   padding: 13px 24px;
-  font-size: 9px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.7px;
-  color: #8a95aa;
+  color: #566782;
   font-weight: 600;
   border-top: 1px solid var(--treba-admin-line);
   border-bottom: 1px solid var(--treba-admin-line);
 }
 .treba-admin-table-wrap td {
   padding: 17px 24px;
-  border-bottom: 1px solid #eff2f7;
-  color: #59677f;
+  border-bottom: 1px solid #dfe6f0;
+  color: #405471;
   vertical-align: middle;
 }
 .treba-admin-table-wrap tr:last-child td {
   border-bottom: 0;
 }
 .treba-admin-table-wrap tbody tr:hover {
-  background: #fcfdff;
+  background: #f2f6ff;
 }
 .treba-admin-table-wrap strong {
   color: #263650;
@@ -490,8 +499,8 @@
 }
 .treba-admin-table-wrap small {
   display: block;
-  color: #98a2b4;
-  font-size: 9px;
+  color: #637189;
+  font-size: 11px;
   margin-top: 3px;
 }
 .treba-admin-product-cell {
@@ -524,7 +533,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 9px;
+  font-size: 11px;
   padding: 4px 9px;
   border-radius: 6px;
   white-space: nowrap;
@@ -538,19 +547,19 @@
 }
 .treba-admin-badge.green {
   background: #eaf8f1;
-  color: #24916a;
+  color: #14704c;
 }
 .treba-admin-badge.orange {
   background: #fff3e7;
-  color: #d68a33;
+  color: #95510e;
 }
 .treba-admin-badge.red {
   background: #fff0ed;
-  color: #ce6559;
+  color: #a63e36;
 }
 .treba-admin-badge.gray {
   background: #f0f3f8;
-  color: #7a879d;
+  color: #53627a;
 }
 .treba-admin-pagination {
   display: flex;
@@ -559,7 +568,7 @@
   gap: 15px;
   margin-top: 22px;
   color: #8b96aa;
-  font-size: 10px;
+  font-size: 12px;
 }
 .treba-admin-pagination > div {
   display: flex;
@@ -568,7 +577,7 @@
 }
 .treba-admin-pagination .treba-admin-button {
   padding: 6px 10px;
-  font-size: 10px !important;
+  font-size: 12px !important;
 }
 .treba-admin-stats {
   display: grid;
@@ -580,19 +589,28 @@
   position: relative;
   background: white;
   border: 1px solid var(--treba-admin-line);
-  border-radius: 14px;
+  border-radius: 12px;
+  border-top: 3px solid #2457ee;
+  box-shadow: 0 3px 12px #203d6810;
   padding: 23px;
   overflow: hidden;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  column-gap: 14px;
+  align-content: center;
+  min-height: 145px;
 }
 .treba-admin-stat-icon {
-  width: 38px;
-  height: 38px;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
   border-radius: 11px;
   background: #edf2ff;
   color: var(--treba-admin-blue);
-  margin-bottom: 17px;
+  margin-bottom: 0;
+  grid-row: 1 / 4;
+  align-self: center;
 }
 .treba-admin-stat:nth-child(2) .treba-admin-stat-icon {
   background: #fff3e9;
@@ -603,23 +621,121 @@
   color: #35a078;
 }
 .treba-admin-stat:nth-child(4) .treba-admin-stat-icon {
-  background: #f1edff;
-  color: #9470dc;
+  background: #fff0f2;
+  color: #c93554;
+}
+.treba-admin-stat:nth-child(2) {
+  border-top-color: #e98c24;
+}
+.treba-admin-stat:nth-child(3) {
+  border-top-color: #21946b;
+}
+.treba-admin-stat:nth-child(4) {
+  border-top-color: #d74664;
 }
 .treba-admin-stat small {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--treba-admin-muted);
+  grid-column: 2;
 }
 .treba-admin-stat b {
   display: block;
-  font-size: 26px;
+  font-size: 32px;
   letter-spacing: -0.8px;
   line-height: 1.5;
   margin: 3px 0;
+  grid-column: 2;
 }
 .treba-admin-stat p {
-  font-size: 9px;
-  color: #9ba5b5;
+  font-size: 11px;
+  color: #62728a;
+  grid-column: 2;
+}
+.treba-admin-stat-open {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  color: #637593;
+}
+.treba-admin-period {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #2457ee;
+}
+.treba-admin-period .treba-admin-filters {
+  padding-bottom: 0;
+  gap: 8px;
+}
+.treba-admin-period .treba-admin-button {
+  padding: 10px 12px;
+}
+.treba-admin-hero + .treba-admin-note {
+  margin-bottom: 20px;
+}
+.treba-admin-hero-copy {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  min-width: 0;
+}
+.treba-admin-section-icon,
+.treba-admin-heading-icon {
+  display: inline-grid;
+  place-items: center;
+  background: #e8efff;
+  color: #2457ee;
+  flex-shrink: 0;
+  border-radius: 10px;
+}
+.treba-admin-section-icon {
+  width: 48px;
+  height: 48px;
+  margin-top: 3px;
+  border: 1px solid #cbd9fd;
+}
+.treba-admin-heading-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+}
+.treba-admin-activity-record {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.treba-admin-activity-record > svg {
+  color: #2457ee;
+  flex-shrink: 0;
+}
+.treba-admin-detail-list dt {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.treba-admin-detail-list dt > svg {
+  color: #2457ee;
+  flex-shrink: 0;
+}
+.treba-admin-attention .treba-admin-heading-icon {
+  color: #b66a12;
+  background: #fff2dd;
+}
+.treba-admin-attention .treba-admin-detail-list dd {
+  background: #fff0dc;
+  color: #9b510c;
+  padding: 2px 10px;
+  border-radius: 7px;
+  font-weight: 700;
+}
+.treba-admin-alert details {
+  font-size: 12px;
+  margin-top: 6px;
+  overflow-wrap: anywhere;
+}
+.treba-admin-alert summary {
+  cursor: pointer;
+  font-weight: 600;
 }
 .treba-admin-empty {
   text-align: center;
@@ -637,12 +753,12 @@
   color: #91a6d7;
 }
 .treba-admin-empty h3 {
-  font-size: 15px;
+  font-size: 16px;
   color: #53647e;
   margin-bottom: 8px;
 }
 .treba-admin-empty p {
-  font-size: 11px;
+  font-size: 13px;
   max-width: 390px;
   margin: auto;
 }
@@ -653,7 +769,7 @@
   align-items: center;
   padding: 14px 17px;
   border-radius: 10px;
-  font-size: 11px;
+  font-size: 13px;
   margin-bottom: 18px;
 }
 .treba-admin-alert {
@@ -752,10 +868,10 @@
 }
 .treba-admin-detail-list dt {
   color: var(--treba-admin-muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 .treba-admin-detail-list dd {
-  font-size: 11px;
+  font-size: 13px;
   text-align: right;
   overflow-wrap: anywhere;
 }
@@ -783,17 +899,17 @@
 }
 .treba-admin-timeline small {
   color: var(--treba-admin-muted);
-  font-size: 9px;
+  font-size: 11px;
   display: block;
 }
 .treba-admin-timeline p {
-  font-size: 11px;
+  font-size: 13px;
   color: #71809b;
   white-space: pre-wrap;
 }
 .treba-admin-note {
   color: var(--treba-admin-muted);
-  font-size: 11px;
+  font-size: 13px;
   margin: 12px 0;
   white-space: pre-wrap;
 }
@@ -837,7 +953,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 9px;
+  font-size: 11px;
   color: var(--treba-admin-muted);
 }
 .treba-admin-upload {
@@ -848,7 +964,7 @@
   border-radius: 12px;
   padding: 20px;
   color: #6981b1;
-  font-size: 11px;
+  font-size: 13px;
 }
 .treba-admin-upload input {
   max-width: 100%;
@@ -893,7 +1009,7 @@
   display: flex;
   gap: 15px;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: 12px;
   color: #647798;
   margin-bottom: 7px;
 }
@@ -902,7 +1018,7 @@
   font-size: 12px;
 }
 .treba-admin-message small {
-  font-size: 9px;
+  font-size: 11px;
   color: #a08959;
 }
 .treba-admin-tabs {
@@ -949,7 +1065,7 @@
   margin-bottom: 7px;
 }
 .treba-admin-setting-link p {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--treba-admin-muted);
 }
 .treba-admin-setting-link:hover {
@@ -960,7 +1076,7 @@
   display: flex;
   gap: 10px;
   align-items: center;
-  font-size: 11px;
+  font-size: 13px;
   color: #64718a;
   margin: 12px 0;
 }
@@ -990,10 +1106,10 @@
 }
 .treba-admin-notification-card p {
   color: var(--treba-admin-muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 .treba-admin-notification-card small {
-  font-size: 9px;
+  font-size: 11px;
   color: #95a0b4;
 }
 .treba-admin-profile-photo {
@@ -1012,7 +1128,7 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 12px;
   background: #fff1ee;
   padding: 12px;
   border-radius: 8px;
@@ -1051,7 +1167,7 @@
     padding-left: 20px;
   }
   .treba-admin-nav-link {
-    font-size: 10px;
+    font-size: 12px;
   }
   .treba-admin-two-grid {
     grid-template-columns: 1fr;
@@ -1094,7 +1210,49 @@
     display: none;
   }
   .treba-admin-topbar-actions {
-    gap: 12px;
+    gap: 8px;
+  }
+  .treba-admin-stat {
+    padding: 16px;
+    grid-template-columns: 32px minmax(0, 1fr);
+    column-gap: 10px;
+    min-height: 145px;
+  }
+  .treba-admin-stat-icon {
+    width: 32px;
+    height: 38px;
+  }
+  .treba-admin-stat-icon > svg {
+    width: 19px;
+    height: 19px;
+  }
+  .treba-admin-stat small {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .treba-admin-stat b {
+    font-size: 28px;
+  }
+  .treba-admin-period {
+    width: 100%;
+    align-items: flex-start;
+  }
+  .treba-admin-period > svg {
+    margin-top: 12px;
+  }
+  .treba-admin-period .treba-admin-filters {
+    flex: 1;
+  }
+  .treba-admin-section-icon {
+    width: 38px;
+    height: 38px;
+  }
+  .treba-admin-section-icon > svg {
+    width: 22px;
+    height: 22px;
+  }
+  .treba-admin-hero-copy {
+    gap: 10px;
   }
   .treba-admin-profile-link > span:last-child {
     display: none;
@@ -1149,10 +1307,10 @@
     padding: 18px 16px;
     gap: 10px;
     flex-wrap: wrap;
-    font-size: 8px;
+    font-size: 11px;
   }
   .treba-admin-pagination {
-    font-size: 9px;
+    font-size: 11px;
   }
   .treba-admin-pagination > div {
     gap: 8px;
@@ -1164,7 +1322,7 @@
     padding: 22px;
   }
   .treba-admin-hero p {
-    font-size: 10px;
+    font-size: 12px;
   }
   .treba-admin-message {
     max-width: 96%;
