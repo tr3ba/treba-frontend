@@ -87,7 +87,7 @@ const orderColumns = [
   {
     title: "Замовлення",
     render: (r: OrderRow) => (
-      <Link className="ad-text-link" href={`/admin/orders/${r.id}`}>
+      <Link className="treba-admin-text-link" href={`/admin/orders/${r.id}`}>
         {r.orderNumber}
       </Link>
     ),
@@ -110,7 +110,7 @@ export function OrderDetails({ id }: { id: string }) {
       <Hero
         title={order ? "Замовлення " + order.summary.orderNumber : "Замовлення"}
         action={
-          <Link className="ad-button secondary" href="/admin/orders">
+          <Link className="treba-admin-button secondary" href="/admin/orders">
             До списку
           </Link>
         }
@@ -120,10 +120,10 @@ export function OrderDetails({ id }: { id: string }) {
       {resource.loading && <Loading />}
       {order && (
         <>
-          <div className="ad-two-grid">
+          <div className="treba-admin-two-grid">
             <Card title="Склад замовлення">
               {order.partialOrder && (
-                <p className="ad-note">
+                <p className="treba-admin-note">
                   Показано тільки ваші позиції замовлення. Доступні дії визначає
                   сервер.
                 </p>
@@ -147,7 +147,7 @@ export function OrderDetails({ id }: { id: string }) {
                   { title: "Сума", render: (r) => money(r.totalPrice) },
                 ]}
               />
-              <div className="ad-detail-list">
+              <div className="treba-admin-detail-list">
                 <div>
                   <dt>Вартість товарів</dt>
                   <dd>{money(order.subtotal)}</dd>
@@ -171,7 +171,7 @@ export function OrderDetails({ id }: { id: string }) {
               </div>
             </Card>
             <Card title="Покупець і доставка">
-              <div className="ad-detail-list">
+              <div className="treba-admin-detail-list">
                 <div>
                   <dt>Покупець</dt>
                   <dd>{order.summary.customerName}</dd>
@@ -200,18 +200,18 @@ export function OrderDetails({ id }: { id: string }) {
                 </div>
               </div>
               {order.customerComment && (
-                <p className="ad-note">Коментар: {order.customerComment}</p>
+                <p className="treba-admin-note">Коментар: {order.customerComment}</p>
               )}
               {["Administrator", "Manager"].includes(staff.role) && (
-                <div className="ad-actions">
+                <div className="treba-admin-actions">
                   <Link
-                    className="ad-text-link"
+                    className="treba-admin-text-link"
                     href={`/admin/customer-activity/${order.summary.customerId}`}
                   >
                     Історія покупця →
                   </Link>
                   <Link
-                    className="ad-text-link"
+                    className="treba-admin-text-link"
                     href={`/admin/support?orderId=${id}`}
                   >
                     Створити звернення →
@@ -220,9 +220,9 @@ export function OrderDetails({ id }: { id: string }) {
               )}
             </Card>
           </div>
-          <div className="ad-two-grid">
+          <div className="treba-admin-two-grid">
             <Card title="Історія замовлення">
-              <div className="ad-timeline">
+              <div className="treba-admin-timeline">
                 {order.history.map((e, i) => (
                   <div key={i}>
                     <Badge value={e.newStatus} />
@@ -255,7 +255,7 @@ export function OrderDetails({ id }: { id: string }) {
                       onChange={(e) => setReason(e.target.value)}
                     />
                   </Field>
-                  <div className="ad-actions">
+                  <div className="treba-admin-actions">
                     <Button
                       disabled={
                         !status ||
@@ -269,7 +269,7 @@ export function OrderDetails({ id }: { id: string }) {
                   </div>
                 </>
               ) : (
-                <p className="ad-note">
+                <p className="treba-admin-note">
                   Для поточного статусу та вашої ролі немає доступних переходів.
                 </p>
               )}
@@ -299,7 +299,7 @@ export function OrderDetails({ id }: { id: string }) {
             {label(order.summary.status)} → {label(status)}
           </p>
           {status === "PAID" && (
-            <p className="ad-note">
+            <p className="treba-admin-note">
               Підтверджуйте лише фактично отриману оплату.
             </p>
           )}
@@ -312,7 +312,7 @@ const ticketColumns = [
   {
     title: "Звернення",
     render: (r: TicketRow) => (
-      <Link className="ad-text-link" href={`/admin/support/${r.id}`}>
+      <Link className="treba-admin-text-link" href={`/admin/support/${r.id}`}>
         {r.subject}
         {r.unreadCount > 0 && ` · ${r.unreadCount} нових`}
         <small>{r.lastMessage?.slice(0, 100)}</small>
@@ -373,12 +373,12 @@ export function Support({ trash = false }: { trash?: boolean }) {
       />
       <Alert message={resource.error || capabilities.error} />
       <Feedback action={action} />
-      <div className="ad-tabs">
-        <Link className="ad-button secondary" href="/admin/support">
+      <div className="treba-admin-tabs">
+        <Link className="treba-admin-button secondary" href="/admin/support">
           Вхідні
         </Link>
         {capabilities.data?.canRestore && (
-          <Link className="ad-button secondary" href="/admin/support/trash">
+          <Link className="treba-admin-button secondary" href="/admin/support/trash">
             Кошик чатів
           </Link>
         )}
@@ -458,7 +458,7 @@ export function Support({ trash = false }: { trash?: boolean }) {
           }
         >
           <p>{selected.subject}</p>
-          <p className="ad-note">
+          <p className="treba-admin-note">
             {trash
               ? "Повідомлення та попередній статус буде відновлено."
               : "Чат зникне з активної черги та кабінету покупця. Історія зберігається."}
@@ -494,7 +494,7 @@ export function Support({ trash = false }: { trash?: boolean }) {
               });
           }}
         >
-          <div className="ad-form-grid">
+          <div className="treba-admin-form-grid">
             <Field label="Тип">
               <select value={kind} onChange={(e) => setKind(e.target.value)}>
                 <option value="QUESTION">Питання</option>
@@ -600,7 +600,7 @@ export function TicketDetails({ id }: { id: string }) {
             : undefined
         }
         action={
-          <Link className="ad-button secondary" href="/admin/support">
+          <Link className="treba-admin-button secondary" href="/admin/support">
             До звернень
           </Link>
         }
@@ -609,21 +609,21 @@ export function TicketDetails({ id }: { id: string }) {
       <Feedback action={action} />
       {resource.loading && <Loading />}
       {ticket && (
-        <div className="ad-two-grid">
+        <div className="treba-admin-two-grid">
           <Card title="Переписка">
             {ticket.hasEarlierMessages && hasMore && (
               <Button tone="secondary" onClick={() => void earlier()}>
                 Завантажити попередні повідомлення
               </Button>
             )}
-            <div className="ad-message-list">
+            <div className="treba-admin-message-list">
               {[...older, ...ticket.messages]
                 .filter(
                   (m, i, all) => all.findIndex((v) => v.id === m.id) === i,
                 )
                 .map((m) => (
                   <article
-                    className={`ad-message ${m.internal ? "internal" : m.authorRole === "Customer" ? "" : "staff"}`}
+                    className={`treba-admin-message ${m.internal ? "internal" : m.authorRole === "Customer" ? "" : "staff"}`}
                     key={m.id}
                   >
                     <header>
@@ -656,7 +656,7 @@ export function TicketDetails({ id }: { id: string }) {
                 />
               </Field>
               {staff.role !== "Seller" && (
-                <label className="ad-check">
+                <label className="treba-admin-check">
                   <input
                     type="checkbox"
                     checked={internal}
@@ -668,7 +668,7 @@ export function TicketDetails({ id }: { id: string }) {
                   Внутрішня нотатка
                 </label>
               )}
-              <div className="ad-actions">
+              <div className="treba-admin-actions">
                 <Button type="submit" icon="arrow" disabled={!text.trim()}>
                   Надіслати
                 </Button>
@@ -689,7 +689,7 @@ export function TicketDetails({ id }: { id: string }) {
           </Card>
           <div>
             <Card title="Деталі звернення">
-              <div className="ad-detail-list">
+              <div className="treba-admin-detail-list">
                 <div>
                   <dt>Статус</dt>
                   <dd>
@@ -705,7 +705,7 @@ export function TicketDetails({ id }: { id: string }) {
                   <dd>
                     {ticket.summary.orderId ? (
                       <Link
-                        className="ad-text-link"
+                        className="treba-admin-text-link"
                         href={`/admin/orders/${ticket.summary.orderId}`}
                       >
                         {ticket.summary.orderNumber ?? "Відкрити"}
@@ -737,7 +737,7 @@ export function TicketDetails({ id }: { id: string }) {
                       ))}
                     </select>
                   </Field>
-                  <div className="ad-actions">
+                  <div className="treba-admin-actions">
                     <Button
                       disabled={!status || action.busy}
                       onClick={() => setConfirm(true)}
@@ -747,7 +747,7 @@ export function TicketDetails({ id }: { id: string }) {
                   </div>
                 </>
               ) : (
-                <p className="ad-note">Немає доступних дій.</p>
+                <p className="treba-admin-note">Немає доступних дій.</p>
               )}
             </Card>
           </div>
@@ -775,7 +775,7 @@ export function TicketDetails({ id }: { id: string }) {
           {ticket.summary.kind === "RETURN" &&
             status === "CLOSED" &&
             ticket.summary.status === "APPROVED" && (
-              <p className="ad-note">
+              <p className="treba-admin-note">
                 Ви підтверджуєте фактичне отримання всіх повернутих товарів,
                 придатних до продажу. Залишки буде відновлено. Це не виконує
                 грошовий переказ покупцю.
@@ -816,7 +816,7 @@ export function Customers({ id }: { id?: string }) {
                       title: "Покупець",
                       render: (r) => (
                         <Link
-                          className="ad-text-link"
+                          className="treba-admin-text-link"
                           href={`/admin/customer-activity/${r.id}`}
                         >
                           {r.name}

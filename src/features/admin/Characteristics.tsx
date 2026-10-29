@@ -38,7 +38,7 @@ export default function Characteristics({
           ))}
         </select>
       </Field>
-      <div className="ad-form-grid" style={{ marginTop: 18 }}>
+      <div className="treba-admin-form-grid" style={{ marginTop: 18 }}>
         {definitions.map((def) => {
           const rows = values.filter(
               (a) => a.attributeId === def.id && (a.variantId ?? "") === scope,

@@ -208,6 +208,13 @@ test(
         assert.equal((await request("/shop-api/support", cookie)).status, 401);
       },
     );
+    await t.test("workspace documents expose a stable deployment marker", async () => {
+      for (const path of ["/admin", "/admin/products", "/admin/settings"]) {
+        const response = await request(path, cookie);
+        assert.equal(response.status, 200);
+        assert.match(await response.text(), /data-treba-workspace="loading"/);
+      }
+    });
     await t.test("all migrated read resources are reachable", async () => {
       for (const path of [
         "dashboard",

@@ -117,7 +117,7 @@ export default function Promotions({
                       title: "Акція",
                       render: (p) => (
                         <Link
-                          className="ad-text-link"
+                          className="treba-admin-text-link"
                           href={`/admin/loyalty/${p.id}`}
                         >
                           {p.name}
@@ -162,7 +162,7 @@ export default function Promotions({
           }}
         >
           <Card title="Умови акції">
-            <div className="ad-form-grid">
+            <div className="treba-admin-form-grid">
               <Field label="Назва *" wide>
                 <input
                   value={model.name}
@@ -319,7 +319,7 @@ export default function Promotions({
           </Card>
           <Card title="Промокоди">
             {model.coupons.map((coupon, i) => (
-              <div className="ad-editor-row" key={coupon.id ?? i}>
+              <div className="treba-admin-editor-row" key={coupon.id ?? i}>
                 <Field label="Код *">
                   <input
                     value={coupon.code}
@@ -373,7 +373,7 @@ export default function Promotions({
                     }
                   />
                 </Field>
-                <label className="ad-check">
+                <label className="treba-admin-check">
                   <input
                     type="checkbox"
                     checked={coupon.active}
@@ -389,13 +389,13 @@ export default function Promotions({
                   Активний
                 </label>
                 {coupon.usedCount != null && (
-                  <span className="ad-note">
+                  <span className="treba-admin-note">
                     Використано: {coupon.usedCount}
                   </span>
                 )}
               </div>
             ))}
-            <div className="ad-actions">
+            <div className="treba-admin-actions">
               <Button
                 tone="secondary"
                 icon="plus"
@@ -414,16 +414,16 @@ export default function Promotions({
                 Додати промокод
               </Button>
             </div>
-            <p className="ad-note">
+            <p className="treba-admin-note">
               Збережений код не перейменовується. Щоб припинити його
               використання, вимкніть активність.
             </p>
           </Card>
-          <div className="ad-actions">
+          <div className="treba-admin-actions">
             <Button type="submit" icon="check" disabled={action.busy}>
               Зберегти акцію
             </Button>
-            <Link className="ad-button secondary" href="/admin/loyalty">
+            <Link className="treba-admin-button secondary" href="/admin/loyalty">
               До списку
             </Link>
           </div>

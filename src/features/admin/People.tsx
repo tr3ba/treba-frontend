@@ -93,7 +93,7 @@ export function Reviews() {
                   {
                     title: "Дії",
                     render: (r) => (
-                      <div className="ad-actions">
+                      <div className="treba-admin-actions">
                         {r.status !== "PUBLISHED" && (
                           <Button
                             tone="secondary"
@@ -244,7 +244,7 @@ export function Sellers({
       {create ? (
         <Card title="Обліковий запис та магазин">
           <form action={createSeller}>
-            <div className="ad-form-grid">
+            <div className="treba-admin-form-grid">
               {[
                 ["email", "Email", "email"],
                 ["password", "Початковий пароль (від 12 символів)", "password"],
@@ -274,15 +274,15 @@ export function Sellers({
                 <textarea name="description" maxLength={2000} />
               </Field>
             </div>
-            <label className="ad-check">
+            <label className="treba-admin-check">
               <input type="checkbox" name="active" />
               Активувати одразу
             </label>
-            <label className="ad-check">
+            <label className="treba-admin-check">
               <input type="checkbox" name="testSeller" />
               Тестовий продавець без ЄДРПОУ / ІПН
             </label>
-            <label className="ad-check">
+            <label className="treba-admin-check">
               <input type="checkbox" name="allCategories" defaultChecked />
               Дозволити всі категорії
             </label>
@@ -295,7 +295,7 @@ export function Sellers({
                 ))}
               </select>
             </Field>
-            <div className="ad-actions">
+            <div className="treba-admin-actions">
               <Button type="submit" disabled={action.busy}>
                 Створити продавця
               </Button>
@@ -363,7 +363,7 @@ export function Sellers({
                             {a.reviewNote}
                             {a.sellerId && (
                               <Link
-                                className="ad-text-link"
+                                className="treba-admin-text-link"
                                 href={`/admin/sellers/review/${a.sellerId}`}
                               >
                                 Відкрити продавця →
@@ -386,7 +386,7 @@ export function Sellers({
           detail.data && (
             <>
               <Card title="Профіль продавця">
-                <div className="ad-detail-list">
+                <div className="treba-admin-detail-list">
                   {[
                     ["Компанія", detail.data.companyName],
                     ["ЄДРПОУ / ІПН", detail.data.taxNumber],
@@ -400,14 +400,14 @@ export function Sellers({
                     </div>
                   ))}
                 </div>
-                <p className="ad-note">{detail.data.description}</p>
+                <p className="treba-admin-note">{detail.data.description}</p>
                 <Badge
                   value={
                     ["PENDING", "ACTIVE", "SUSPENDED"][detail.data.status] ??
                     String(detail.data.status)
                   }
                 />
-                <div className="ad-actions">
+                <div className="treba-admin-actions">
                   <Button
                     disabled={action.busy}
                     onClick={() =>
@@ -445,7 +445,7 @@ export function Sellers({
                   </Field>
                   {(allowed ?? grants.data?.map((g) => g.categoryId) ?? []).map(
                     (categoryId) => (
-                      <label className="ad-check" key={categoryId}>
+                      <label className="treba-admin-check" key={categoryId}>
                         <input
                           type="checkbox"
                           checked={
@@ -470,7 +470,7 @@ export function Sellers({
                       </label>
                     ),
                   )}
-                  <div className="ad-actions">
+                  <div className="treba-admin-actions">
                     <Button
                       disabled={
                         action.busy ||
@@ -530,7 +530,7 @@ export function Sellers({
                   title: "Продавець",
                   render: (s) => (
                     <Link
-                      className="ad-text-link"
+                      className="treba-admin-text-link"
                       href={`/admin/sellers/review/${s.id}`}
                     >
                       {s.companyName}
@@ -625,7 +625,7 @@ export function Sellers({
               onChange={(e) => setNote(e.target.value)}
             />
           </Field>
-          <p className="ad-note">
+          <p className="treba-admin-note">
             При схваленні продавець отримає доступ до всіх категорій.
           </p>
         </Confirm>
@@ -673,7 +673,7 @@ export function Users({
       {create ? (
         <Card>
           <form action={submit}>
-            <div className="ad-form-grid">
+            <div className="treba-admin-form-grid">
               {[
                 ["email", "Email", "email"],
                 ["firstName", "Ім’я", "text"],
@@ -690,7 +690,7 @@ export function Users({
                 </Field>
               ))}
             </div>
-            <div className="ad-actions">
+            <div className="treba-admin-actions">
               <Button type="submit" disabled={action.busy}>
                 Створити
               </Button>
@@ -703,7 +703,7 @@ export function Users({
         ) : (
           detail.data && (
             <Card title="Обліковий запис">
-              <div className="ad-detail-list">
+              <div className="treba-admin-detail-list">
                 {[
                   ["Email", detail.data.email],
                   ["Телефон", detail.data.phone],
@@ -716,7 +716,7 @@ export function Users({
                   </div>
                 ))}
               </div>
-              <div className="ad-actions">
+              <div className="treba-admin-actions">
                 <Badge value={detail.data.status} />
                 <Button
                   tone="danger"
@@ -729,7 +729,7 @@ export function Users({
                 </Button>
               </div>
               {detail.data.addresses?.map((a) => (
-                <p className="ad-note" key={a.id}>
+                <p className="treba-admin-note" key={a.id}>
                   {a.city}, {a.street}, {a.building} · {a.recipientName}
                 </p>
               ))}
@@ -751,7 +751,7 @@ export function Users({
                       title: "Ім’я",
                       render: (u) => (
                         <Link
-                          className="ad-text-link"
+                          className="treba-admin-text-link"
                           href={`/admin/users/${u.id}`}
                         >
                           {u.firstName} {u.lastName}

@@ -48,8 +48,8 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   }
   if (session.loading)
     return (
-      <div className="ad-boot">
-        <div className="ad-brand-mark">
+      <div className="treba-admin-boot" data-treba-workspace="loading">
+        <div className="treba-admin-brand-mark">
           T<span>•</span>
         </div>
         <Loading />
@@ -57,15 +57,15 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     );
   if (!user)
     return (
-      <div className="ad-boot">
-        <div className="ad-brand-mark">
+      <div className="treba-admin-boot" data-treba-workspace="sign-in">
+        <div className="treba-admin-brand-mark">
           T<span>•</span>
         </div>
         <h1>Робочий простір TREBA</h1>
         <Alert message={session.error} />
         <p>Увійдіть як співробітник або продавець.</p>
         <Link
-          className="ad-button primary"
+          className="treba-admin-button primary"
           href={"/login?next=" + encodeURIComponent(path)}
         >
           Увійти
@@ -80,21 +80,21 @@ export default function AdminShell({ children }: { children: ReactNode }) {
     nav.find((n) => n[2] && path.startsWith("/admin" + n[2])) ?? nav[0];
   return (
     <StaffContext.Provider value={user}>
-      <div className="ad-shell">
+      <div className="treba-admin-shell" data-treba-workspace="ready">
         {open && (
           <button
-            className="ad-nav-scrim"
+            className="treba-admin-nav-scrim"
             aria-label="Закрити меню"
             onClick={() => setOpen(false)}
           />
         )}
-        <aside className={`ad-sidebar ${open ? "is-open" : ""}`}>
+        <aside className={`treba-admin-sidebar ${open ? "is-open" : ""}`}>
           <Link
             href="/admin"
-            className="ad-brand"
+            className="treba-admin-brand"
             onClick={() => setOpen(false)}
           >
-            <div className="ad-brand-mark">
+            <div className="treba-admin-brand-mark">
               T<span>•</span>
             </div>
             <div>
@@ -102,19 +102,19 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               <small>{workspaceLabel(user.role)}</small>
             </div>
           </Link>
-          <div className="ad-nav-scroll">
+          <div className="treba-admin-nav-scroll">
             <nav>
               {nav
                 .filter((n) => canAccessAdmin(user.role, "/admin" + n[2]))
                 .map((item, index, visible) => (
                   <div key={item[2]}>
                     {(index === 0 || visible[index - 1][0] !== item[0]) && (
-                      <div className="ad-nav-label">{item[0]}</div>
+                      <div className="treba-admin-nav-label">{item[0]}</div>
                     )}
                     <Link
                       href={"/admin" + item[2]}
                       onClick={() => setOpen(false)}
-                      className={`ad-nav-link ${(item[2] ? path.startsWith("/admin" + item[2]) && !(item[2] === "/sellers" && path.includes("applications")) : path === "/admin") ? "active" : ""}`}
+                      className={`treba-admin-nav-link ${(item[2] ? path.startsWith("/admin" + item[2]) && !(item[2] === "/sellers" && path.includes("applications")) : path === "/admin") ? "active" : ""}`}
                     >
                       <Icon name={item[3]} />
                       <span>
@@ -127,14 +127,14 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                 ))}
             </nav>
             {user.role === "Seller" && (
-              <Link className="ad-nav-link" href="/admin/products/import">
+              <Link className="treba-admin-nav-link" href="/admin/products/import">
                 <Icon name="upload" />
                 Імпорт товарів
               </Link>
             )}
           </div>
-          <div className="ad-sidebar-bottom">
-            <span className="ad-online-dot" />
+          <div className="treba-admin-sidebar-bottom">
+            <span className="treba-admin-online-dot" />
             <span>Робочий простір TREBA</span>
             <Button
               tone="icon"
@@ -146,11 +146,11 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             </Button>
           </div>
         </aside>
-        <div className="ad-main">
-          <header className="ad-topbar">
-            <div className="ad-topbar-title">
+        <div className="treba-admin-main">
+          <header className="treba-admin-topbar">
+            <div className="treba-admin-topbar-title">
               <button
-                className="ad-mobile-menu"
+                className="treba-admin-mobile-menu"
                 aria-label="Відкрити меню"
                 onClick={() => setOpen(true)}
               >
@@ -160,9 +160,9 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                 TREBA <i>/</i> <b>{active[1]}</b>
               </span>
             </div>
-            <div className="ad-topbar-actions">
+            <div className="treba-admin-topbar-actions">
               <Link
-                className="ad-notification"
+                className="treba-admin-notification"
                 href="/admin/notifications"
                 aria-label={`Сповіщення: ${feed.data?.unreadCount ?? 0}`}
               >
@@ -173,8 +173,8 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                   </span>
                 )}
               </Link>
-              <Link className="ad-profile-link" href="/admin/profile">
-                <span className="ad-avatar">
+              <Link className="treba-admin-profile-link" href="/admin/profile">
+                <span className="treba-admin-avatar">
                   {user.firstName?.[0]}
                   {user.lastName?.[0]}
                 </span>
@@ -186,7 +186,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                 </span>
               </Link>
               <button
-                className="ad-icon-button"
+                className="treba-admin-icon-button"
                 aria-label="Вийти"
                 onClick={() => void logout()}
                 disabled={leaving}
@@ -195,7 +195,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               </button>
             </div>
           </header>
-          <main className="ad-content">
+          <main className="treba-admin-content">
             {canAccessAdmin(user.role, path) ? (
               children
             ) : (
@@ -205,7 +205,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               />
             )}
           </main>
-          <footer className="ad-footer">
+          <footer className="treba-admin-footer">
             <span>© TREBA · Робочий простір</span>
             <span>Часовий пояс: Europe/Vilnius</span>
           </footer>

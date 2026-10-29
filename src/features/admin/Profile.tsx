@@ -32,7 +32,7 @@ export default function Profile() {
       {!model ? (
         <Loading />
       ) : (
-        <div className="ad-two-grid">
+        <div className="treba-admin-two-grid">
           <Card title="Особисті дані">
             <form
               onSubmit={(e) => {
@@ -55,7 +55,7 @@ export default function Profile() {
                 );
               }}
             >
-              <div className="ad-form-grid">
+              <div className="treba-admin-form-grid">
                 {(
                   [
                     ["firstName", "Ім’я", "text"],
@@ -110,7 +110,7 @@ export default function Profile() {
                   </select>
                 </Field>
               </div>
-              <div className="ad-actions">
+              <div className="treba-admin-actions">
                 <Button type="submit" disabled={action.busy} icon="check">
                   Зберегти профіль
                 </Button>
@@ -123,7 +123,7 @@ export default function Profile() {
                 unoptimized
                 width={80}
                 height={80}
-                className="ad-profile-photo"
+                className="treba-admin-profile-photo"
                 src={
                   resolveMediaUrl(resource.data?.profile?.avatarUrl) ??
                   "/icons/box.svg"
@@ -149,7 +149,7 @@ export default function Profile() {
               />
             </Field>
             {resource.data?.profile?.avatarUrl && (
-              <div className="ad-actions">
+              <div className="treba-admin-actions">
                 <Button
                   tone="danger"
                   onClick={() =>
@@ -163,7 +163,7 @@ export default function Profile() {
           </Card>
         </div>
       )}
-      <div className="ad-two-grid">
+      <div className="treba-admin-two-grid">
         <Security />
         <TelegramLink />
       </div>
@@ -192,14 +192,14 @@ function Security() {
     <Card title="Захист облікового запису">
       <Alert message={resource.error} />
       <Feedback action={action} />
-      <p className="ad-note">
+      <p className="treba-admin-note">
         Google Authenticator:{" "}
         {resource.data?.authenticatorEnabled ? "увімкнено" : "вимкнено"}
         <br />
         Підтвердження поштою:{" "}
         {resource.data?.emailTwoFactorEnabled ? "увімкнено" : "вимкнено"}
       </p>
-      <div className="ad-actions">
+      <div className="treba-admin-actions">
         <Button
           tone="secondary"
           disabled={action.busy}
@@ -259,11 +259,11 @@ function Security() {
             width={180}
             height={180}
           />
-          <p className="ad-note">Ключ: {setup.manualKey}</p>
+          <p className="treba-admin-note">Ключ: {setup.manualKey}</p>
         </>
       )}
       {emailChallenge && (
-        <p className="ad-note">
+        <p className="treba-admin-note">
           Код надіслано на {emailChallenge.maskedEmail}.
         </p>
       )}
@@ -298,7 +298,7 @@ function Security() {
               maxLength={6}
             />
           </Field>
-          <div className="ad-actions">
+          <div className="treba-admin-actions">
             <Button type="submit" disabled={action.busy}>
               Підтвердити
             </Button>
@@ -334,13 +334,13 @@ function TelegramLink() {
     <Card title="Telegram Guard">
       <Alert message={resource.error} />
       <Feedback action={action} />
-      <p className="ad-note">
+      <p className="treba-admin-note">
         {resource.data?.linked
           ? `Підключено: ${resource.data.username ?? "Telegram"}`
           : "Підключіть Telegram для підтвердження входу та робочих сповіщень."}
       </p>
       {resource.data?.configured ? (
-        <div className="ad-actions">
+        <div className="treba-admin-actions">
           {resource.data.linked ? (
             <Button
               tone="danger"
@@ -368,7 +368,7 @@ function TelegramLink() {
           )}
           {start && (
             <a
-              className="ad-button primary"
+              className="treba-admin-button primary"
               href={start.botUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -390,7 +390,7 @@ function TelegramLink() {
           )}
         </div>
       ) : (
-        <p className="ad-note">
+        <p className="treba-admin-note">
           Інтеграція Telegram не налаштована на сервері.
         </p>
       )}
@@ -429,7 +429,7 @@ export function Notifications() {
           <Loading />
         ) : (
           resource.data?.items.map((n) => (
-            <article className="ad-notification-card" key={n.key}>
+            <article className="treba-admin-notification-card" key={n.key}>
               <div>
                 <h3>
                   {!n.read && "• "}
@@ -439,7 +439,7 @@ export function Notifications() {
                 <small>{date(n.createdAt)}</small>
               </div>
               <Link
-                className="ad-text-link"
+                className="treba-admin-text-link"
                 href={
                   n.scope === "admin"
                     ? "/admin" + (n.path === "/" ? "" : n.path)
@@ -458,7 +458,7 @@ export function Notifications() {
           ))
         )}
         {resource.data?.items.length === 0 && (
-          <p className="ad-note">Нових сповіщень немає.</p>
+          <p className="treba-admin-note">Нових сповіщень немає.</p>
         )}
       </Card>
     </>
