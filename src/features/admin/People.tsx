@@ -1,4 +1,5 @@
 "use client";
+import { useAdminI18n } from "@/features/admin/i18n/provider";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -19,7 +20,7 @@ import {
   Table,
   useAction,
 } from "@/components/admin/ui";
-import { date, useResource } from "./api";
+import { useResource } from "./api";
 import type {
   Lookup,
   Paged,
@@ -28,8 +29,8 @@ import type {
   SellerApplication,
   User,
 } from "./types";
-
 export function Reviews() {
+  const { t } = useAdminI18n();
   const params = useSearchParams(),
     resource = useResource<Paged<Review>>("reviews?" + params),
     action = useAction(resource.reload);
@@ -40,8 +41,8 @@ export function Reviews() {
   return (
     <>
       <Hero
-        title="Відгуки"
-        description="Перевіряйте відгуки покупців перед публікацією."
+        title={t("Відгуки")}
+        description={t("Перевіряйте відгуки покупців перед публікацією.")}
       />
       <Alert message={resource.error} />
       <Feedback action={action} />
@@ -56,29 +57,31 @@ export function Reviews() {
                 rows={resource.data.content}
                 columns={[
                   {
-                    title: "Товар",
+                    title: t("Товар"),
                     render: (r) => <strong>{r.productName}</strong>,
                   },
                   {
-                    title: "Автор",
+                    title: t("Автор"),
                     render: (r) => (
                       <>
                         {r.authorName}
                         <small>
                           {r.authorEmail}
-                          {r.verifiedPurchase ? " · Покупку підтверджено" : ""}
+                          {r.verifiedPurchase
+                            ? t(" · Покупку підтверджено")
+                            : ""}
                         </small>
                       </>
                     ),
                   },
                   {
-                    title: "Оцінка",
+                    title: t("Оцінка"),
                     render: (r) => (
                       <span style={{ color: "#d99b43" }}>{r.rating} ★</span>
                     ),
                   },
                   {
-                    title: "Відгук",
+                    title: t("Відгук"),
                     render: (r) => (
                       <div style={{ maxWidth: 350, whiteSpace: "normal" }}>
                         <strong>{r.title}</strong>
@@ -87,11 +90,11 @@ export function Reviews() {
                     ),
                   },
                   {
-                    title: "Статус",
+                    title: t("Статус"),
                     render: (r) => <Badge value={r.status} />,
                   },
                   {
-                    title: "Дії",
+                    title: t("Дії"),
                     render: (r) => (
                       <div className="treba-admin-actions">
                         {r.status !== "PUBLISHED" && (
@@ -102,18 +105,19 @@ export function Reviews() {
                               setSelected({ review: r, status: "PUBLISHED" })
                             }
                           >
-                            Опублікувати
+                            {t("Опублікувати")}
                           </Button>
                         )}
                         {r.status !== "REJECTED" && (
                           <Button
+                            icon="close"
                             tone="danger"
                             disabled={action.busy}
                             onClick={() =>
                               setSelected({ review: r, status: "REJECTED" })
                             }
                           >
-                            Відхилити
+                            {t("Відхилити")}
                           </Button>
                         )}
                       </div>
@@ -131,8 +135,8 @@ export function Reviews() {
           error={action.error}
           title={
             selected.status === "PUBLISHED"
-              ? "Опублікувати відгук?"
-              : "Відхилити відгук?"
+              ? t("Опублікувати відгук?")
+              : t("Відхилити відгук?")
           }
           onClose={() => setSelected(null)}
           busy={action.busy}
@@ -163,6 +167,7 @@ export function Sellers({
   create?: boolean;
   applications?: boolean;
 }) {
+  const { date, t } = useAdminI18n();
   const staff = useStaff(),
     params = useSearchParams();
   const list = useResource<Seller[]>(
@@ -178,7 +183,11 @@ export function Sellers({
         : null,
     );
   const grants = useResource<
-    { categoryId: string; name: string; includeDescendants: boolean }[]
+    {
+      categoryId: string;
+      name: string;
+      includeDescendants: boolean;
+    }[]
   >(
     id && staff.role === "Administrator"
       ? `telegram/sellers/${id}/categories`
@@ -202,7 +211,9 @@ export function Sellers({
     [descendants, setDescendants] = useState<Record<string, boolean>>({});
   async function createSeller(form: FormData) {
     const body = Object.fromEntries(form);
-    const result = await action.run<{ sellerId: string }>("sellers", {
+    const result = await action.run<{
+      sellerId: string;
+    }>("sellers", {
       ...body,
       active: form.has("active"),
       allCategories: form.has("allCategories"),
@@ -225,15 +236,17 @@ export function Sellers({
       <Hero
         title={
           create
-            ? "Новий продавець"
+            ? t("Новий продавець")
             : applications
-              ? "Заявки продавців"
-              : (detail.data?.companyName ?? "Продавці")
+              ? t("Заявки продавців")
+              : (detail.data?.companyName ?? t("Продавці"))
         }
-        description="Партнери маркетплейсу та доступ до продажів."
+        description={t("Партнери маркетплейсу та доступ до продажів.")}
         action={
           !create && staff.role === "Administrator" ? (
-            <ActionLink href="/admin/sellers/new">Створити продавця</ActionLink>
+            <ActionLink href="/admin/sellers/new">
+              {t("Створити продавця")}
+            </ActionLink>
           ) : undefined
         }
       />
@@ -242,19 +255,23 @@ export function Sellers({
       />
       <Feedback action={action} />
       {create ? (
-        <Card title="Обліковий запис та магазин">
+        <Card icon="user" title={t("Обліковий запис та магазин")}>
           <form action={createSeller}>
             <div className="treba-admin-form-grid">
               {[
                 ["email", "Email", "email"],
-                ["password", "Початковий пароль (від 12 символів)", "password"],
-                ["firstName", "Ім’я", "text"],
-                ["lastName", "Прізвище", "text"],
-                ["companyName", "Назва компанії", "text"],
-                ["taxNumber", "ЄДРПОУ / ІПН", "text"],
-                ["phone", "Телефон", "tel"],
-                ["storeName", "Назва магазину", "text"],
-                ["storeSlug", "Адреса магазину (slug)", "text"],
+                [
+                  "password",
+                  t("Початковий пароль (від 12 символів)"),
+                  "password",
+                ],
+                ["firstName", t("Ім’я"), "text"],
+                ["lastName", t("Прізвище"), "text"],
+                ["companyName", t("Назва компанії"), "text"],
+                ["taxNumber", t("ЄДРПОУ / ІПН"), "text"],
+                ["phone", t("Телефон"), "tel"],
+                ["storeName", t("Назва магазину"), "text"],
+                ["storeSlug", t("Адреса магазину (slug)"), "text"],
               ].map(([name, title, type]) => (
                 <Field key={name} label={title}>
                   <input
@@ -270,23 +287,23 @@ export function Sellers({
                   />
                 </Field>
               ))}
-              <Field label="Опис" wide>
+              <Field label={t("Опис")} wide>
                 <textarea name="description" maxLength={2000} />
               </Field>
             </div>
             <label className="treba-admin-check">
               <input type="checkbox" name="active" />
-              Активувати одразу
+              {t("Активувати одразу")}
             </label>
             <label className="treba-admin-check">
               <input type="checkbox" name="testSeller" />
-              Тестовий продавець без ЄДРПОУ / ІПН
+              {t("Тестовий продавець без ЄДРПОУ / ІПН")}
             </label>
             <label className="treba-admin-check">
               <input type="checkbox" name="allCategories" defaultChecked />
-              Дозволити всі категорії
+              {t("Дозволити всі категорії")}
             </label>
-            <Field label="Або виберіть дозволені категорії">
+            <Field label={t("Або виберіть дозволені категорії")}>
               <select name="categoryIds" multiple size={6}>
                 {categories.data?.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -296,8 +313,8 @@ export function Sellers({
               </select>
             </Field>
             <div className="treba-admin-actions">
-              <Button type="submit" disabled={action.busy}>
-                Створити продавця
+              <Button icon="plus" type="submit" disabled={action.busy}>
+                {t("Створити продавця")}
               </Button>
             </div>
           </form>
@@ -317,7 +334,7 @@ export function Sellers({
                   rows={apps.data.content}
                   columns={[
                     {
-                      title: "Магазин",
+                      title: t("Магазин"),
                       render: (a) => (
                         <>
                           <strong>{a.storeName}</strong>
@@ -328,7 +345,7 @@ export function Sellers({
                       ),
                     },
                     {
-                      title: "Контакт",
+                      title: t("Контакт"),
                       render: (a) => (
                         <>
                           {a.contactName}
@@ -339,11 +356,11 @@ export function Sellers({
                       ),
                     },
                     {
-                      title: "Статус",
+                      title: t("Статус"),
                       render: (a) => <Badge value={a.status} />,
                     },
                     {
-                      title: "Рішення",
+                      title: t("Рішення"),
                       render: (a) =>
                         a.status === "pending" ? (
                           <Button
@@ -356,7 +373,7 @@ export function Sellers({
                               setNote("");
                             }}
                           >
-                            Розглянути
+                            {t("Розглянути")}
                           </Button>
                         ) : (
                           <>
@@ -366,7 +383,7 @@ export function Sellers({
                                 className="treba-admin-text-link"
                                 href={`/admin/sellers/review/${a.sellerId}`}
                               >
-                                Відкрити продавця →
+                                {t("Відкрити продавця →")}
                               </Link>
                             )}
                           </>
@@ -385,14 +402,14 @@ export function Sellers({
         ) : (
           detail.data && (
             <>
-              <Card title="Профіль продавця">
+              <Card icon="file" title={t("Профіль продавця")}>
                 <div className="treba-admin-detail-list">
                   {[
-                    ["Компанія", detail.data.companyName],
-                    ["ЄДРПОУ / ІПН", detail.data.taxNumber],
+                    [t("Компанія"), detail.data.companyName],
+                    [t("ЄДРПОУ / ІПН"), detail.data.taxNumber],
                     ["Email", detail.data.email],
-                    ["Телефон", detail.data.phone],
-                    ["Створено", date(detail.data.createdAt)],
+                    [t("Телефон"), detail.data.phone],
+                    [t("Створено"), date(detail.data.createdAt)],
                   ].map(([title, value]) => (
                     <div key={title}>
                       <dt>{title}</dt>
@@ -409,6 +426,7 @@ export function Sellers({
                 />
                 <div className="treba-admin-actions">
                   <Button
+                    icon="check"
                     disabled={action.busy}
                     onClick={() =>
                       setDecision({
@@ -417,13 +435,15 @@ export function Sellers({
                       })
                     }
                   >
-                    {detail.data.status === 1 ? "Призупинити" : "Активувати"}
+                    {detail.data.status === 1
+                      ? t("Призупинити")
+                      : t("Активувати")}
                   </Button>
                 </div>
               </Card>
               {staff.role === "Administrator" && (
-                <Card title="Дозволені категорії">
-                  <Field label="Категорії продавця">
+                <Card icon="layers" title={t("Дозволені категорії")}>
+                  <Field label={t("Категорії продавця")}>
                     <select
                       multiple
                       size={8}
@@ -466,12 +486,13 @@ export function Sellers({
                           categories.data?.find((c) => c.id === categoryId)
                             ?.name
                         }{" "}
-                        · включати підкатегорії
+                        {t("· включати підкатегорії")}
                       </label>
                     ),
                   )}
                   <div className="treba-admin-actions">
                     <Button
+                      icon="lock"
                       disabled={
                         action.busy ||
                         (!allowed && !Object.keys(descendants).length)
@@ -498,7 +519,7 @@ export function Sellers({
                         )
                       }
                     >
-                      Зберегти доступ
+                      {t("Зберегти доступ")}
                     </Button>
                   </div>
                 </Card>
@@ -511,13 +532,13 @@ export function Sellers({
           <Filters>
             <select
               name="status"
-              aria-label="Статус продавця"
+              aria-label={t("Статус продавця")}
               defaultValue={params.get("status") ?? ""}
             >
-              <option value="">Усі статуси</option>
-              <option value="0">Очікує</option>
-              <option value="1">Активний</option>
-              <option value="2">Призупинено</option>
+              <option value="">{t("Усі статуси")}</option>
+              <option value="0">{t("Очікує")}</option>
+              <option value="1">{t("Активний")}</option>
+              <option value="2">{t("Призупинено")}</option>
             </select>
           </Filters>
           {list.loading ? (
@@ -527,7 +548,7 @@ export function Sellers({
               rows={visible}
               columns={[
                 {
-                  title: "Продавець",
+                  title: t("Продавець"),
                   render: (s) => (
                     <Link
                       className="treba-admin-text-link"
@@ -539,7 +560,7 @@ export function Sellers({
                   ),
                 },
                 {
-                  title: "Контакт",
+                  title: t("Контакт"),
                   render: (s) => (
                     <>
                       {s.email}
@@ -548,7 +569,7 @@ export function Sellers({
                   ),
                 },
                 {
-                  title: "Статус",
+                  title: t("Статус"),
                   render: (s) => (
                     <Badge
                       value={
@@ -558,7 +579,7 @@ export function Sellers({
                     />
                   ),
                 },
-                { title: "Дата", render: (s) => date(s.createdAt) },
+                { title: t("Дата"), render: (s) => date(s.createdAt) },
               ]}
             />
           )}
@@ -569,8 +590,8 @@ export function Sellers({
           error={action.error}
           title={
             decision.type === "approve"
-              ? "Активувати продавця?"
-              : "Призупинити продавця?"
+              ? t("Активувати продавця?")
+              : t("Призупинити продавця?")
           }
           onClose={() => setDecision(null)}
           busy={action.busy}
@@ -588,7 +609,7 @@ export function Sellers({
       {application && (
         <Confirm
           error={action.error}
-          title="Рішення щодо заявки"
+          title={t("Рішення щодо заявки")}
           busy={action.busy}
           onClose={() => setApplication(null)}
           onConfirm={() =>
@@ -606,19 +627,19 @@ export function Sellers({
           }
         >
           <h3>{application.storeName}</h3>
-          <Field label="Рішення">
+          <Field label={t("Рішення")}>
             <select
               value={String(approve)}
               onChange={(e) => setApprove(e.target.value === "true")}
             >
-              <option value="true">Схвалити</option>
-              <option value="false">Відхилити</option>
+              <option value="true">{t("Схвалити")}</option>
+              <option value="false">{t("Відхилити")}</option>
             </select>
           </Field>
-          <Field label="Адреса магазину">
+          <Field label={t("Адреса магазину")}>
             <input value={slug} onChange={(e) => setSlug(e.target.value)} />
           </Field>
-          <Field label="Примітка">
+          <Field label={t("Примітка")}>
             <textarea
               value={note}
               maxLength={2000}
@@ -626,7 +647,7 @@ export function Sellers({
             />
           </Field>
           <p className="treba-admin-note">
-            При схваленні продавець отримає доступ до всіх категорій.
+            {t("При схваленні продавець отримає доступ до всіх категорій.")}
           </p>
         </Confirm>
       )}
@@ -640,6 +661,7 @@ export function Users({
   id?: string;
   create?: boolean;
 }) {
+  const { date, t } = useAdminI18n();
   const params = useSearchParams(),
     list = useResource<Paged<User>>(!id && !create ? "users?" + params : null),
     detail = useResource<User>(id ? "users/" + id : null),
@@ -654,16 +676,16 @@ export function Users({
       <Hero
         title={
           create
-            ? "Новий користувач"
+            ? t("Новий користувач")
             : detail.data
               ? `${detail.data.firstName} ${detail.data.lastName}`
-              : "Користувачі"
+              : t("Користувачі")
         }
-        description="Облікові записи та контроль доступу."
+        description={t("Облікові записи та контроль доступу.")}
         action={
           !create && (
             <ActionLink href="/admin/users/create">
-              Створити користувача
+              {t("Створити користувача")}
             </ActionLink>
           )
         }
@@ -676,10 +698,10 @@ export function Users({
             <div className="treba-admin-form-grid">
               {[
                 ["email", "Email", "email"],
-                ["firstName", "Ім’я", "text"],
-                ["lastName", "Прізвище", "text"],
-                ["middleName", "По батькові", "text"],
-                ["phone", "Телефон", "tel"],
+                ["firstName", t("Ім’я"), "text"],
+                ["lastName", t("Прізвище"), "text"],
+                ["middleName", t("По батькові"), "text"],
+                ["phone", t("Телефон"), "tel"],
               ].map(([name, title, type]) => (
                 <Field key={name} label={title}>
                   <input
@@ -691,8 +713,8 @@ export function Users({
               ))}
             </div>
             <div className="treba-admin-actions">
-              <Button type="submit" disabled={action.busy}>
-                Створити
+              <Button icon="plus" type="submit" disabled={action.busy}>
+                {t("Створити")}
               </Button>
             </div>
           </form>
@@ -702,13 +724,13 @@ export function Users({
           <Loading />
         ) : (
           detail.data && (
-            <Card title="Обліковий запис">
+            <Card icon="user" title={t("Обліковий запис")}>
               <div className="treba-admin-detail-list">
                 {[
                   ["Email", detail.data.email],
-                  ["Телефон", detail.data.phone],
-                  ["Дата реєстрації", date(detail.data.createdAt)],
-                  ["Останній вхід", date(detail.data.lastLoginAt)],
+                  [t("Телефон"), detail.data.phone],
+                  [t("Дата реєстрації"), date(detail.data.createdAt)],
+                  [t("Останній вхід"), date(detail.data.lastLoginAt)],
                 ].map(([title, value]) => (
                   <div key={title}>
                     <dt>{title}</dt>
@@ -724,8 +746,8 @@ export function Users({
                   onClick={() => setConfirm(true)}
                 >
                   {detail.data.status === "BLOCKED"
-                    ? "Розблокувати"
-                    : "Заблокувати"}
+                    ? t("Розблокувати")
+                    : t("Заблокувати")}
                 </Button>
               </div>
               {detail.data.addresses?.map((a) => (
@@ -748,7 +770,7 @@ export function Users({
                   rows={list.data.content}
                   columns={[
                     {
-                      title: "Ім’я",
+                      title: t("Ім’я"),
                       render: (u) => (
                         <Link
                           className="treba-admin-text-link"
@@ -759,7 +781,7 @@ export function Users({
                       ),
                     },
                     {
-                      title: "Контакти",
+                      title: t("Контакти"),
                       render: (u) => (
                         <>
                           {u.email}
@@ -768,10 +790,10 @@ export function Users({
                       ),
                     },
                     {
-                      title: "Статус",
+                      title: t("Статус"),
                       render: (u) => <Badge value={u.status} />,
                     },
-                    { title: "Дата", render: (u) => date(u.createdAt) },
+                    { title: t("Дата"), render: (u) => date(u.createdAt) },
                   ]}
                 />
                 <Pagination data={list.data} />
@@ -783,7 +805,7 @@ export function Users({
       {confirm && detail.data && (
         <Confirm
           error={action.error}
-          title="Змінити доступ користувача?"
+          title={t("Змінити доступ користувача?")}
           busy={action.busy}
           onClose={() => setConfirm(false)}
           onConfirm={() =>

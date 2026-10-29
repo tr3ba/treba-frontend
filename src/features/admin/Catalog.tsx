@@ -1,4 +1,6 @@
 "use client";
+import { useAdminI18n } from "@/features/admin/i18n/provider";
+import { message } from "@/features/admin/i18n/core";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -21,7 +23,7 @@ import {
   Table,
   useAction,
 } from "@/components/admin/ui";
-import { adminRequest, date, money, useResource } from "./api";
+import { adminRequest, useResource } from "./api";
 import type {
   AttributeDefinition,
   Change,
@@ -35,7 +37,6 @@ import type {
 import { loadDraft, saveDraft, type EditorDraft } from "./drafts";
 import Characteristics from "./Characteristics";
 import { resolveMediaUrl } from "@/lib/api/client";
-
 function Thumbnail({ images }: { images: ProductImage[] }) {
   const [failed, setFailed] = useState(false);
   const image = images.find((i) => i.isMain) ?? images[0];
@@ -56,6 +57,7 @@ function Thumbnail({ images }: { images: ProductImage[] }) {
   );
 }
 export function Products({ moderation = false }: { moderation?: boolean }) {
+  const { money, t } = useAdminI18n();
   const params = useSearchParams(),
     staff = useStaff();
   const query = new URLSearchParams(params);
@@ -68,9 +70,10 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
   }>("catalog/filter-options");
   const action = useAction(resource.reload),
     [selected, setSelected] = useState<string[]>([]),
-    [decision, setDecision] = useState<{ id: string; type: string } | null>(
-      null,
-    ),
+    [decision, setDecision] = useState<{
+      id: string;
+      type: string;
+    } | null>(null),
     [reason, setReason] = useState("");
   const [bulkPrice, setBulkPrice] = useState(""),
     [bulkStock, setBulkStock] = useState(""),
@@ -91,7 +94,7 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
   async function decide() {
     if (!decision) return;
     if (decision.type === "reject" && !reason.trim()) {
-      action.setError("Укажіть причину відхилення.");
+      action.setError(t("Укажіть причину відхилення."));
       return;
     }
     const result = await action.run(
@@ -108,15 +111,19 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
   return (
     <>
       <Hero
-        title={moderation ? "Модерація товарів" : "Товари"}
+        title={moderation ? t("Модерація товарів") : t("Товари")}
         description={
           moderation
-            ? "Перевіряйте картки та порівнюйте зміни після повторної подачі."
-            : "Керуйте каталогом, цінами та доступними залишками."
+            ? t(
+                "Перевіряйте картки та порівнюйте зміни після повторної подачі.",
+              )
+            : t("Керуйте каталогом, цінами та доступними залишками.")
         }
         action={
           staff.role !== "Moderator" && (
-            <ActionLink href="/admin/products/new">Додати товар</ActionLink>
+            <ActionLink href="/admin/products/new">
+              {t("Додати товар")}
+            </ActionLink>
           )
         }
       />
@@ -132,10 +139,10 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
         >
           <select
             name="categoryId"
-            aria-label="Категорія"
+            aria-label={t("Категорія")}
             defaultValue={params.get("categoryId") ?? ""}
           >
-            <option value="">Усі категорії</option>
+            <option value="">{t("Усі категорії")}</option>
             {options.data?.categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -144,10 +151,10 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
           </select>
           <select
             name="brandId"
-            aria-label="Бренд"
+            aria-label={t("Бренд")}
             defaultValue={params.get("brandId") ?? ""}
           >
-            <option value="">Усі бренди</option>
+            <option value="">{t("Усі бренди")}</option>
             {options.data?.brands.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -157,10 +164,10 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
           {staff.role !== "Seller" && (
             <select
               name="sellerId"
-              aria-label="Продавець"
+              aria-label={t("Продавець")}
               defaultValue={params.get("sellerId") ?? ""}
             >
-              <option value="">Усі продавці</option>
+              <option value="">{t("Усі продавці")}</option>
               {options.data?.sellers.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -170,22 +177,22 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
           )}
           <select
             name={moderation ? "waitingHours" : "stock"}
-            aria-label="Додатковий фільтр"
+            aria-label={t("Додатковий фільтр")}
             defaultValue={
               params.get(moderation ? "waitingHours" : "stock") ?? ""
             }
           >
             {moderation ? (
               <>
-                <option value="">Будь-який час очікування</option>
-                <option value="24">Понад 24 години</option>
-                <option value="72">Понад 72 години</option>
+                <option value="">{t("Будь-який час очікування")}</option>
+                <option value="24">{t("Понад 24 години")}</option>
+                <option value="72">{t("Понад 72 години")}</option>
               </>
             ) : (
               <>
-                <option value="">Усі залишки</option>
-                <option value="available">У наявності</option>
-                <option value="out">Немає в наявності</option>
+                <option value="">{t("Усі залишки")}</option>
+                <option value="available">{t("У наявності")}</option>
+                <option value="out">{t("Немає в наявності")}</option>
               </>
             )}
           </select>
@@ -196,8 +203,8 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
                 min="0"
                 step="0.01"
                 name="minPrice"
-                aria-label="Ціна від"
-                placeholder="Ціна від"
+                aria-label={t("Ціна від")}
+                placeholder={t("Ціна від")}
                 defaultValue={params.get("minPrice") ?? ""}
               />
               <input
@@ -205,33 +212,36 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
                 min="0"
                 step="0.01"
                 name="maxPrice"
-                aria-label="Ціна до"
-                placeholder="Ціна до"
+                aria-label={t("Ціна до")}
+                placeholder={t("Ціна до")}
                 defaultValue={params.get("maxPrice") ?? ""}
               />
             </>
           )}
           <select
             name="sort"
-            aria-label="Сортування"
+            aria-label={t("Сортування")}
             defaultValue={params.get("sort") ?? ""}
           >
-            <option value="">За замовчуванням</option>
-            <option value="nameasc">За назвою</option>
-            <option value="priceasc">За ціною</option>
-            <option value="updated">За оновленням</option>
+            <option value="">{t("За замовчуванням")}</option>
+            <option value="nameasc">{t("За назвою")}</option>
+            <option value="priceasc">{t("За ціною")}</option>
+            <option value="updated">{t("За оновленням")}</option>
           </select>
         </Filters>
         {!moderation && selected.length > 0 && staff.role !== "Moderator" && (
           <div className="treba-admin-bulk">
-            <b>Вибрано: {selected.length}</b>
+            <b>
+              {t("Вибрано: ")}
+              {selected.length}
+            </b>
             <div className="treba-admin-filters">
               <input
                 type="number"
                 min="0.01"
                 step="0.01"
-                aria-label="Нова ціна"
-                placeholder="Нова ціна"
+                aria-label={t("Нова ціна")}
+                placeholder={t("Нова ціна")}
                 value={bulkPrice}
                 onChange={(e) => {
                   setBulkPrice(e.target.value);
@@ -241,15 +251,15 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
               <input
                 type="number"
                 min="0"
-                aria-label="Новий залишок"
-                placeholder="Новий залишок"
+                aria-label={t("Новий залишок")}
+                placeholder={t("Новий залишок")}
                 value={bulkStock}
                 onChange={(e) => setBulkStock(e.target.value)}
               />
               <input
                 type="number"
-                aria-label="Зміна ціни у відсотках"
-                placeholder="Зміна ціни, %"
+                aria-label={t("Зміна ціни у відсотках")}
+                placeholder={t("Зміна ціни, %")}
                 min="-99.99"
                 max="1000"
                 step="0.01"
@@ -260,13 +270,13 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
                 }}
               />
               <select
-                aria-label="Активність варіантів"
+                aria-label={t("Активність варіантів")}
                 value={bulkActive}
                 onChange={(e) => setBulkActive(e.target.value)}
               >
-                <option value="">Не змінювати активність</option>
-                <option value="true">Активувати варіанти</option>
-                <option value="false">Вимкнути варіанти</option>
+                <option value="">{t("Не змінювати активність")}</option>
+                <option value="true">{t("Активувати варіанти")}</option>
+                <option value="false">{t("Вимкнути варіанти")}</option>
               </select>
               <Button
                 disabled={
@@ -276,15 +286,20 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
                 tone="secondary"
                 onClick={() =>
                   void action
-                    .run<
-                      typeof preview
-                    >("catalog/bulk/preview", { productIds: selected, price: bulkPrice ? Number(bulkPrice) : null, stockQuantity: bulkStock ? Number(bulkStock) : null, pricePercent: bulkPercent ? Number(bulkPercent) : null, isActive: bulkActive === "" ? null : bulkActive === "true" })
+                    .run<typeof preview>("catalog/bulk/preview", {
+                      productIds: selected,
+                      price: bulkPrice ? Number(bulkPrice) : null,
+                      stockQuantity: bulkStock ? Number(bulkStock) : null,
+                      pricePercent: bulkPercent ? Number(bulkPercent) : null,
+                      isActive:
+                        bulkActive === "" ? null : bulkActive === "true",
+                    })
                     .then((result) => {
                       if (result) setPreview(result);
                     })
                 }
               >
-                Переглянути зміни
+                {t("Переглянути зміни")}
               </Button>
             </div>
           </div>
@@ -298,11 +313,11 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
                 rows={resource.data.content}
                 columns={[
                   {
-                    title: "Вибір",
+                    title: t("Вибір"),
                     render: (p) => (
                       <input
                         type="checkbox"
-                        aria-label={`Вибрати ${p.name}`}
+                        aria-label={t("Вибрати {0}", [p.name])}
                         checked={selected.includes(p.id)}
                         onChange={(e) =>
                           setSelected(
@@ -315,7 +330,7 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
                     ),
                   },
                   {
-                    title: "Товар",
+                    title: t("Товар"),
                     render: (p) => (
                       <div className="treba-admin-product-cell">
                         <Thumbnail images={p.images} />
@@ -329,7 +344,7 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
                     ),
                   },
                   {
-                    title: "Категорія",
+                    title: t("Категорія"),
                     render: (p) => (
                       <>
                         {p.categoryName}
@@ -338,20 +353,23 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
                     ),
                   },
                   {
-                    title: "Статус",
+                    title: t("Статус"),
                     render: (p) => <Badge value={p.status} />,
                   },
                   {
-                    title: "Ціна / залишок",
+                    title: t("Ціна / залишок"),
                     render: (p) => (
                       <>
                         <strong>{money(p.price)}</strong>
-                        <small>{p.stockQuantity} шт.</small>
+                        <small>
+                          {p.stockQuantity}
+                          {t(" шт.")}
+                        </small>
                       </>
                     ),
                   },
                   {
-                    title: "Дії",
+                    title: t("Дії"),
                     render: (p) => (
                       <div className="treba-admin-actions">
                         {staff.role !== "Moderator" && (
@@ -359,7 +377,7 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
                             className="treba-admin-text-link"
                             href={`/admin/products/${p.id}/edit`}
                           >
-                            Редагувати
+                            {t("Редагувати")}
                           </Link>
                         )}
                         {!moderation && staff.role !== "Moderator" && (
@@ -371,7 +389,7 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
                               setDecision({ id: p.id, type: "delete" })
                             }
                           >
-                            Прибрати
+                            {t("Прибрати")}
                           </Button>
                         )}
                         {moderation ? (
@@ -384,16 +402,17 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
                                 setDecision({ id: p.id, type: "approve" })
                               }
                             >
-                              Схвалити
+                              {t("Схвалити")}
                             </Button>
                             <Button
+                              icon="close"
                               tone="danger"
                               disabled={action.busy}
                               onClick={() =>
                                 setDecision({ id: p.id, type: "reject" })
                               }
                             >
-                              Відхилити
+                              {t("Відхилити")}
                             </Button>
                           </>
                         ) : p.status === "DRAFT" || p.status === "REJECTED" ? (
@@ -404,7 +423,7 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
                               void action.run(`products/${p.id}/submit`)
                             }
                           >
-                            На перевірку
+                            {t("На перевірку")}
                           </Button>
                         ) : null}
                       </div>
@@ -426,10 +445,10 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
           error={action.error}
           title={
             decision.type === "approve"
-              ? "Схвалити товар?"
+              ? t("Схвалити товар?")
               : decision.type === "delete"
-                ? "Прибрати товар з каталогу?"
-                : "Відхилити товар?"
+                ? t("Прибрати товар з каталогу?")
+                : t("Відхилити товар?")
           }
           onClose={() => setDecision(null)}
           onConfirm={() => void decide()}
@@ -437,11 +456,13 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
         >
           <p>
             {decision.type === "delete"
-              ? "Товар буде прибрано з активного каталогу. Історія замовлень збережеться."
-              : "Рішення буде записано до історії модерації."}
+              ? t(
+                  "Товар буде прибрано з активного каталогу. Історія замовлень збережеться.",
+                )
+              : t("Рішення буде записано до історії модерації.")}
           </p>
           {decision.type === "reject" && (
-            <Field label="Причина відхилення">
+            <Field label={t("Причина відхилення")}>
               <textarea
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
@@ -455,7 +476,7 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
       {preview && (
         <Confirm
           error={action.error}
-          title="Підтвердити масові зміни"
+          title={t("Підтвердити масові зміни")}
           onClose={() => setPreview(null)}
           busy={action.busy}
           onConfirm={() =>
@@ -470,13 +491,13 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
           <Table
             rows={preview.rows}
             columns={[
-              { title: "Товар", render: (r) => r.name },
+              { title: t("Товар"), render: (r) => r.name },
               {
-                title: "Ціна",
+                title: t("Ціна"),
                 render: (r) => `${r.beforePrice} → ${r.afterPrice}`,
               },
               {
-                title: "Залишок",
+                title: t("Залишок"),
                 render: (r) => `${r.beforeStock} → ${r.afterStock}`,
               },
             ]}
@@ -487,17 +508,20 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
   );
 }
 function ModerationDetails({ product }: { product: Product }) {
+  const { date, t } = useAdminI18n();
   const [open, setOpen] = useState(false);
-  const comparison = useResource<{ capturedAt?: string; changes: Change[] }>(
-    open ? `catalog/products/${product.id}/resubmission-changes` : null,
-  );
+  const comparison = useResource<{
+    capturedAt?: string;
+    changes: Change[];
+  }>(open ? `catalog/products/${product.id}/resubmission-changes` : null);
   const history = useResource<ModerationEvent[]>(
     open ? `catalog/products/${product.id}/moderation-history` : null,
   );
   return (
     <Card>
       <Button tone="secondary" icon="layers" onClick={() => setOpen(!open)}>
-        {product.name} · Деталі перевірки
+        {product.name}
+        {t(" · Деталі перевірки")}
       </Button>
       {open && (
         <>
@@ -518,7 +542,7 @@ function ModerationDetails({ product }: { product: Product }) {
           <Alert message={comparison.error || history.error} />
           {!comparison.data?.capturedAt ? (
             <p className="treba-admin-note">
-              Попередній знімок для порівняння відсутній.
+              {t("Попередній знімок для порівняння відсутній.")}
             </p>
           ) : (
             comparison.data.changes.map((c, i) => (
@@ -547,7 +571,6 @@ function ModerationDetails({ product }: { product: Product }) {
     </Card>
   );
 }
-
 function normalizeProduct(product: Product): Product {
   return {
     ...product,
@@ -582,9 +605,9 @@ const freshProduct = (): Product => ({
   variants: [],
   attributes: [],
 });
-const freshVariant = (): Variant => ({
+const freshVariant = (name: string): Variant => ({
   id: crypto.randomUUID(),
-  name: "Основний",
+  name,
   sku: "",
   price: 1,
   oldPrice: null,
@@ -593,6 +616,7 @@ const freshVariant = (): Variant => ({
   isActive: true,
 });
 export function ProductEditor({ id }: { id?: string }) {
+  const { t } = useAdminI18n();
   const staff = useStaff(),
     router = useRouter(),
     source = useResource<Product>(id ? `catalog/products/${id}` : null);
@@ -606,7 +630,12 @@ export function ProductEditor({ id }: { id?: string }) {
     [attributeName, setAttributeName] = useState(""),
     [attributeUnit, setAttributeUnit] = useState(""),
     [duplicates, setDuplicates] = useState<
-      { name: string; storeName: string; reason: string }[] | null
+      | {
+          name: string;
+          storeName: string;
+          reason: string;
+        }[]
+      | null
     >(null);
   const action = useAction(),
     dirty = useRef(false),
@@ -633,7 +662,7 @@ export function ProductEditor({ id }: { id?: string }) {
         if (active) setRecovery(value);
       })
       .catch(() => {
-        if (active) setDraftError("Не вдалося прочитати чернетку.");
+        if (active) setDraftError(message("Не вдалося прочитати чернетку."));
       });
     return () => {
       active = false;
@@ -646,7 +675,9 @@ export function ProductEditor({ id }: { id?: string }) {
         .then(() => setSavedDraft(true))
         .catch(() =>
           setDraftError(
-            "Автозбереження недоступне. Збережіть товар перед виходом.",
+            message(
+              "Автозбереження недоступне. Збережіть товар перед виходом.",
+            ),
           ),
         );
     }, 1000);
@@ -714,10 +745,10 @@ export function ProductEditor({ id }: { id?: string }) {
           await adminRequest<Product>(`catalog/products/${saved.id}`),
         ),
       );
-      action.setSuccess("Товар збережено");
+      action.setSuccess(t("Товар збережено"));
       router.replace(`/admin/products/${saved.id}/edit`);
     } catch (e) {
-      action.setError(e instanceof Error ? e.message : "Помилка збереження");
+      action.setError(e instanceof Error ? e.message : t("Помилка збереження"));
     } finally {
       setSaving(false);
     }
@@ -725,7 +756,7 @@ export function ProductEditor({ id }: { id?: string }) {
   if (!model)
     return (
       <>
-        <Hero title="Редактор товару" />
+        <Hero title={t("Редактор товару")} />
         <Alert message={source.error} />
         <Loading />
       </>
@@ -733,20 +764,21 @@ export function ProductEditor({ id }: { id?: string }) {
   return (
     <>
       <Hero
-        title={id ? "Редагування товару" : "Новий товар"}
-        description="Заповніть картку, додайте варіанти та фотографії."
+        title={id ? t("Редагування товару") : t("Новий товар")}
+        description={t("Заповніть картку, додайте варіанти та фотографії.")}
         action={
           <Link className="treba-admin-button secondary" href="/admin/products">
-            До каталогу
+            {t("До каталогу")}
           </Link>
         }
       />
       <Alert message={source.error || draftError} />
       <Feedback action={action} />
       {recovery && (
-        <Card title="Знайдено незбережену чернетку">
+        <Card icon="file" title={t("Знайдено незбережену чернетку")}>
           <div className="treba-admin-actions">
             <Button
+              icon="refresh"
               onClick={() => {
                 setModel(normalizeProduct(recovery.model));
                 setFiles(recovery.files);
@@ -754,16 +786,17 @@ export function ProductEditor({ id }: { id?: string }) {
                 setRecovery(null);
               }}
             >
-              Відновити
+              {t("Відновити")}
             </Button>
             <Button
+              icon="trash"
               tone="secondary"
               onClick={() => {
                 void saveDraft(key, null);
                 setRecovery(null);
               }}
             >
-              Видалити чернетку
+              {t("Видалити чернетку")}
             </Button>
           </div>
         </Card>
@@ -776,9 +809,9 @@ export function ProductEditor({ id }: { id?: string }) {
       >
         <div className="treba-admin-two-grid">
           <div>
-            <Card title="Основна інформація">
+            <Card icon="file" title={t("Основна інформація")}>
               <div className="treba-admin-form-grid">
-                <Field label="Назва *" wide>
+                <Field label={t("Назва *")} wide>
                   <input
                     value={model.name}
                     maxLength={250}
@@ -786,7 +819,7 @@ export function ProductEditor({ id }: { id?: string }) {
                     onChange={(e) => change("name", e.target.value)}
                   />
                 </Field>
-                <Field label="Адреса товару (slug) *">
+                <Field label={t("Адреса товару (slug) *")}>
                   <input
                     value={model.slug}
                     pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
@@ -794,7 +827,7 @@ export function ProductEditor({ id }: { id?: string }) {
                     onChange={(e) => change("slug", e.target.value)}
                   />
                 </Field>
-                <Field label="Артикул виробника">
+                <Field label={t("Артикул виробника")}>
                   <input
                     value={model.manufacturerPartNumber}
                     onChange={(e) =>
@@ -803,14 +836,14 @@ export function ProductEditor({ id }: { id?: string }) {
                     maxLength={100}
                   />
                 </Field>
-                <Field label="Короткий опис" wide>
+                <Field label={t("Короткий опис")} wide>
                   <textarea
                     value={model.shortDescription}
                     maxLength={500}
                     onChange={(e) => change("shortDescription", e.target.value)}
                   />
                 </Field>
-                <Field label="Опис" wide>
+                <Field label={t("Опис")} wide>
                   <textarea
                     rows={8}
                     value={model.description}
@@ -820,7 +853,7 @@ export function ProductEditor({ id }: { id?: string }) {
                 </Field>
               </div>
             </Card>
-            <Card title="Ціни та варіанти">
+            <Card icon="gift" title={t("Ціни та варіанти")}>
               {!model.variants.length ? (
                 <div className="treba-admin-three-grid">
                   <Field label="SKU *">
@@ -830,7 +863,7 @@ export function ProductEditor({ id }: { id?: string }) {
                       onChange={(e) => change("sku", e.target.value)}
                     />
                   </Field>
-                  <Field label="Ціна, ₴ *">
+                  <Field label={t("Ціна, ₴ *")}>
                     <input
                       type="number"
                       min="0.01"
@@ -840,7 +873,7 @@ export function ProductEditor({ id }: { id?: string }) {
                       onChange={(e) => change("price", Number(e.target.value))}
                     />
                   </Field>
-                  <Field label="Залишок">
+                  <Field label={t("Залишок")}>
                     <input
                       type="number"
                       min="0"
@@ -855,7 +888,7 @@ export function ProductEditor({ id }: { id?: string }) {
               ) : (
                 model.variants.map((v, index) => (
                   <div className="treba-admin-editor-row" key={v.id}>
-                    <Field label="Назва">
+                    <Field label={t("Назва")}>
                       <input
                         value={v.name}
                         required
@@ -873,7 +906,7 @@ export function ProductEditor({ id }: { id?: string }) {
                         }
                       />
                     </Field>
-                    <Field label="Штрихкод">
+                    <Field label={t("Штрихкод")}>
                       <input
                         value={v.barcode ?? ""}
                         onChange={(e) =>
@@ -881,7 +914,7 @@ export function ProductEditor({ id }: { id?: string }) {
                         }
                       />
                     </Field>
-                    <Field label="Ціна">
+                    <Field label={t("Ціна")}>
                       <input
                         type="number"
                         min="0.01"
@@ -893,7 +926,7 @@ export function ProductEditor({ id }: { id?: string }) {
                         }
                       />
                     </Field>
-                    <Field label="Стара ціна">
+                    <Field label={t("Стара ціна")}>
                       <input
                         type="number"
                         min="0.01"
@@ -908,7 +941,7 @@ export function ProductEditor({ id }: { id?: string }) {
                         }
                       />
                     </Field>
-                    <Field label="Залишок">
+                    <Field label={t("Залишок")}>
                       <input
                         type="number"
                         min="0"
@@ -928,7 +961,7 @@ export function ProductEditor({ id }: { id?: string }) {
                           variant(index, { isActive: e.target.checked })
                         }
                       />
-                      Активний
+                      {t("Активний")}
                     </label>
                     <Button
                       tone="icon"
@@ -940,7 +973,7 @@ export function ProductEditor({ id }: { id?: string }) {
                         )
                       }
                     >
-                      Видалити
+                      {t("Видалити")}
                     </Button>
                   </div>
                 ))
@@ -953,9 +986,9 @@ export function ProductEditor({ id }: { id?: string }) {
                     change("variants", [
                       ...model.variants,
                       model.variants.length
-                        ? freshVariant()
+                        ? freshVariant(t("Основний"))
                         : {
-                            ...freshVariant(),
+                            ...freshVariant(t("Основний")),
                             sku: model.sku,
                             price: model.price,
                             stockQuantity: model.stockQuantity,
@@ -963,11 +996,11 @@ export function ProductEditor({ id }: { id?: string }) {
                     ])
                   }
                 >
-                  Додати варіант
+                  {t("Додати варіант")}
                 </Button>
               </div>
             </Card>
-            <Card title="Характеристики">
+            <Card icon="layers" title={t("Характеристики")}>
               <Alert message={definitions.error} />
               <div className="treba-admin-actions">
                 <Button
@@ -976,22 +1009,34 @@ export function ProductEditor({ id }: { id?: string }) {
                   disabled={!model.categoryId || action.busy}
                   onClick={() => setAddingAttribute(true)}
                 >
-                  Додати характеристику категорії
+                  {t("Додати характеристику категорії")}
                 </Button>
                 <Button
+                  icon="shield"
                   tone="secondary"
                   disabled={!model.brandId || action.busy}
                   onClick={() =>
                     void action
                       .run<
-                        { name: string; storeName: string; reason: string }[]
-                      >("catalog/duplicates", { brandId: model.brandId, manufacturerPartNumber: model.manufacturerPartNumber, barcodes: model.variants.map((v) => v.barcode).filter(Boolean), excludeId: model.id || null })
+                        {
+                          name: string;
+                          storeName: string;
+                          reason: string;
+                        }[]
+                      >("catalog/duplicates", {
+                        brandId: model.brandId,
+                        manufacturerPartNumber: model.manufacturerPartNumber,
+                        barcodes: model.variants
+                          .map((v) => v.barcode)
+                          .filter(Boolean),
+                        excludeId: model.id || null,
+                      })
                       .then((result) => {
                         if (result) setDuplicates(result);
                       })
                   }
                 >
-                  Перевірити дублікати
+                  {t("Перевірити дублікати")}
                 </Button>
               </div>
               {duplicates?.map((d, i) => (
@@ -1000,7 +1045,9 @@ export function ProductEditor({ id }: { id?: string }) {
                 </p>
               ))}
               {duplicates?.length === 0 && (
-                <p className="treba-admin-note">Схожих товарів не знайдено.</p>
+                <p className="treba-admin-note">
+                  {t("Схожих товарів не знайдено.")}
+                </p>
               )}
               <Characteristics
                 definitions={definitions.data ?? []}
@@ -1010,18 +1057,18 @@ export function ProductEditor({ id }: { id?: string }) {
               />
               {!definitions.data?.length && (
                 <p className="treba-admin-note">
-                  Оберіть категорію, щоб побачити її характеристики.
+                  {t("Оберіть категорію, щоб побачити її характеристики.")}
                 </p>
               )}
             </Card>
           </div>
           <div>
-            <Card title="Публікація">
+            <Card icon="box" title={t("Публікація")}>
               <div className="treba-admin-form-grid">
                 {[
-                  ["categoryId", "Категорія", categories.data],
-                  ["brandId", "Бренд", brands.data],
-                  ["storeId", "Магазин", stores.data],
+                  ["categoryId", t("Категорія"), categories.data],
+                  ["brandId", t("Бренд"), brands.data],
+                  ["storeId", t("Магазин"), stores.data],
                 ].map(([field, title, values]) => (
                   <Field key={String(field)} label={String(title) + " *"} wide>
                     <select
@@ -1033,7 +1080,7 @@ export function ProductEditor({ id }: { id?: string }) {
                         change(field as "categoryId", e.target.value)
                       }
                     >
-                      <option value="">Оберіть…</option>
+                      <option value="">{t("Оберіть…")}</option>
                       {(values as Lookup[] | null)?.map((v) => (
                         <option key={v.id} value={v.id}>
                           {v.name}
@@ -1042,7 +1089,7 @@ export function ProductEditor({ id }: { id?: string }) {
                     </select>
                   </Field>
                 ))}
-                <Field label="Гарантія, місяців">
+                <Field label={t("Гарантія, місяців")}>
                   <input
                     type="number"
                     min="0"
@@ -1053,7 +1100,7 @@ export function ProductEditor({ id }: { id?: string }) {
                     }
                   />
                 </Field>
-                <Field label="Країна виробництва">
+                <Field label={t("Країна виробництва")}>
                   <input
                     value={model.countryOfOrigin}
                     onChange={(e) => change("countryOfOrigin", e.target.value)}
@@ -1062,10 +1109,11 @@ export function ProductEditor({ id }: { id?: string }) {
               </div>
               <p className="treba-admin-note">
                 {savedDraft
-                  ? "Текст чернетки збережено на цьому пристрої."
-                  : "Незбережені зміни зберігаються на цьому пристрої."}{" "}
-                Фотографії також зберігаються в чернетці та завантажуються під
-                час збереження.
+                  ? t("Текст чернетки збережено на цьому пристрої.")
+                  : t("Незбережені зміни зберігаються на цьому пристрої.")}{" "}
+                {t(
+                  "Фотографії також зберігаються в чернетці та завантажуються під час збереження.",
+                )}
               </p>
               <div className="treba-admin-actions">
                 <Button
@@ -1073,21 +1121,21 @@ export function ProductEditor({ id }: { id?: string }) {
                   icon="check"
                   disabled={saving || action.busy}
                 >
-                  Зберегти товар
+                  {t("Зберегти товар")}
                 </Button>
                 {id && (
                   <Button
                     tone="secondary"
                     onClick={() => void action.run(`products/${id}/submit`)}
                   >
-                    На модерацію
+                    {t("На модерацію")}
                   </Button>
                 )}
               </div>
             </Card>
-            <Card title="Фотографії">
+            <Card icon="image" title={t("Фотографії")}>
               <p className="treba-admin-note">
-                До 8 зображень, JPEG / PNG / WebP / GIF, до 5 МБ кожне.
+                {t("До 8 зображень, JPEG / PNG / WebP / GIF, до 5 МБ кожне.")}
               </p>
               <div className="treba-admin-photo-grid">
                 {model.images.map((image) => (
@@ -1097,10 +1145,10 @@ export function ProductEditor({ id }: { id?: string }) {
                       width={320}
                       height={240}
                       src={resolveMediaUrl(image.imageUrl) ?? "/icons/box.svg"}
-                      alt="Фото товару"
+                      alt={t("Фото товару")}
                     />
                     <small>
-                      {image.isMain ? "Головне фото" : "Фото товару"}
+                      {image.isMain ? t("Головне фото") : t("Фото товару")}
                     </small>
                     <Button
                       tone="icon"
@@ -1122,7 +1170,7 @@ export function ProductEditor({ id }: { id?: string }) {
                           })
                       }
                     >
-                      Видалити
+                      {t("Видалити")}
                     </Button>
                   </div>
                 ))}
@@ -1130,12 +1178,13 @@ export function ProductEditor({ id }: { id?: string }) {
                   <div className="treba-admin-photo" key={i}>
                     <small>{file.name}</small>
                     <Button
+                      icon="trash"
                       tone="icon"
                       onClick={() =>
                         setFiles(files.filter((_, index) => index !== i))
                       }
                     >
-                      Прибрати
+                      {t("Прибрати")}
                     </Button>
                   </div>
                 ))}
@@ -1144,6 +1193,7 @@ export function ProductEditor({ id }: { id?: string }) {
                 <Icon name="upload" />
                 <input
                   type="file"
+                  aria-label={t("Додати фото")}
                   multiple
                   accept="image/jpeg,image/png,image/webp,image/gif"
                   onChange={(e) => {
@@ -1155,7 +1205,9 @@ export function ProductEditor({ id }: { id?: string }) {
                       next.length + model.images.length > 8 ||
                       next.some((f) => f.size > 5 * 1024 * 1024)
                     ) {
-                      action.setError("Дозволено до 8 фото розміром до 5 МБ.");
+                      action.setError(
+                        t("Дозволено до 8 фото розміром до 5 МБ."),
+                      );
                       return;
                     }
                     setFiles(next);
@@ -1170,7 +1222,7 @@ export function ProductEditor({ id }: { id?: string }) {
       {addingAttribute && (
         <Confirm
           error={action.error}
-          title="Нова характеристика"
+          title={t("Нова характеристика")}
           busy={action.busy}
           onClose={() => setAddingAttribute(false)}
           onConfirm={() => {
@@ -1190,14 +1242,14 @@ export function ProductEditor({ id }: { id?: string }) {
               });
           }}
         >
-          <Field label="Назва">
+          <Field label={t("Назва")}>
             <input
               value={attributeName}
               onChange={(e) => setAttributeName(e.target.value)}
               maxLength={200}
             />
           </Field>
-          <Field label="Одиниця виміру">
+          <Field label={t("Одиниця виміру")}>
             <input
               value={attributeUnit}
               onChange={(e) => setAttributeUnit(e.target.value)}

@@ -25,6 +25,14 @@ List parameters are preserved in URLs. Calendar date filters use Europe/Vilnius 
 
 ## Local development
 
+The workspace uses a dark navy navigation rail, a slate canvas, bordered white panels and semantic icon accents. It keeps the `treba-admin-` namespace so cosmetic ad filters do not hide navigation or content.
+
+UK/EN is available in the top bar and on the signed-out workspace screen. The chosen language is kept in the `treba_workspace_language` preference cookie; a fresh workspace document reads it on the server. Without an explicit browser preference the user's profile language is used after sign-in. The profile form can save the account's preferred language through the existing profile API. Switching language does not remount editors or reset unsaved form data.
+
+`src/features/admin/i18n/en.json` contains the English dictionary, keyed by the canonical Ukrainian copy. Components use `useAdminI18n` for labels, interpolation, statuses, dates, money and request errors. User-entered names, product descriptions and messages remain in their original language. Unknown server errors show a translated summary with expandable original details. `tests/admin-localization.test.mjs` checks translation coverage, interpolation and formats; component copy cannot bypass the dictionary.
+
+The shared sign-in, registration, password recovery and Telegram Guard forms also use the dictionary and language selector. Their modal reads the same browser preference and restores the surrounding page language when closed. The storefront catalog and customer account remain outside the scope of this workspace translation.
+
 Set `TREBA_API_URL` to the backend address. Set `NEXT_PUBLIC_API_URL` to its browser-accessible address for public media and storefront requests.
 
 ```powershell
@@ -54,6 +62,8 @@ The migration was checked in a browser across the administrative lists, record d
 Final verification: lint and the production build pass; all 52 frontend tests pass. Twenty-nine administrative screens were checked at desktop and mobile widths, with additional seller login/import and editor recovery/save checks. Mobile overflow defects in filters, editor columns and long moderation actions were corrected. The backend suite passes 354 tests; 19 PostgreSQL checks require a separate configured test database.
 
 Screenshots: [desktop catalog](admin-preview/desktop.png), [mobile settings](admin-preview/mobile.png).
+
+The refreshed workspace and UK/EN release passes lint, the production build and all 59 frontend tests. Thirty workspace routes were checked at desktop and 390px mobile widths, with additional seller/import and localized sign-in/recovery checks. Switching UK/EN preserves editor input; profile language changes persist through the existing API. Current examples: [Ukrainian desktop workspace](admin-preview/desktop-workspace-uk.png), [English mobile workspace](admin-preview/mobile-workspace-en.png).
 
 ## Release order and recovery
 

@@ -214,6 +214,7 @@ export function createAdminFixture() {
       },
     ],
   };
+  const profileEdits = new Map();
   const profile = (role) => ({
     id: ids.user,
     firstName: "Тест",
@@ -225,6 +226,7 @@ export function createAdminFixture() {
     createdAt: now,
     addresses: [],
     profile: { language: "uk", marketingEmailsEnabled: false },
+    ...profileEdits.get(role),
   });
   const auth = (role, expired = false) => ({
     userId: ids.user,
@@ -299,6 +301,18 @@ export function createAdminFixture() {
       return;
     }
     if (path === "/api/users/me") {
+      if (method === "PATCH") {
+        const current = profile(role);
+        profileEdits.set(role, {
+          ...current,
+          ...body,
+          profile: {
+            ...current.profile,
+            language: body.language,
+            marketingEmailsEnabled: body.marketingEmailsEnabled,
+          },
+        });
+      }
       reply(profile(role));
       return;
     }

@@ -1,4 +1,5 @@
 "use client";
+import { useAdminI18n } from "@/features/admin/i18n/provider";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -19,9 +20,10 @@ import {
   useAction,
 } from "@/components/admin/ui";
 import { visibleCategories } from "./category-tree";
-import { date, useResource } from "./api";
+import { useResource } from "./api";
 import type { Category, Change, Lookup, Paged, User } from "./types";
 export default function Settings({ section }: { section?: string }) {
+  const { t } = useAdminI18n();
   if (section === "features") return <Features />;
   if (section === "staff") return <Staff />;
   if (section === "audit") return <Audit />;
@@ -29,33 +31,33 @@ export default function Settings({ section }: { section?: string }) {
   return (
     <>
       <Hero
-        title="Налаштування"
-        description="Доступи, можливості та інтеграції маркетплейсу."
+        title={t("Налаштування")}
+        description={t("Доступи, можливості та інтеграції маркетплейсу.")}
       />
       <div className="treba-admin-settings-grid">
         {[
           [
             "features",
-            "Функції",
-            "Увімкнення та вимкнення можливостей системи.",
+            t("Функції"),
+            t("Увімкнення та вимкнення можливостей системи."),
             "layers",
           ],
           [
             "staff",
-            "Співробітники та ролі",
-            "Облікові записи та права команди.",
+            t("Співробітники та ролі"),
+            t("Облікові записи та права команди."),
             "users",
           ],
           [
             "telegram",
-            "Telegram та категорії",
-            "Відповідність зовнішніх категорій каталогу TREBA.",
+            t("Telegram та категорії"),
+            t("Відповідність зовнішніх категорій каталогу TREBA."),
             "chat",
           ],
           [
             "audit",
-            "Журнал аудиту",
-            "Історія дій співробітників та змін записів.",
+            t("Журнал аудиту"),
+            t("Історія дій співробітників та змін записів."),
             "clock",
           ],
         ].map(([path, title, description, icon]) => (
@@ -76,10 +78,15 @@ export default function Settings({ section }: { section?: string }) {
   );
 }
 function Features() {
-  const resource =
-      useResource<
-        { key: string; enabled: boolean; version: string; updatedAt?: string }[]
-      >("settings/features"),
+  const { date, t } = useAdminI18n();
+  const resource = useResource<
+      {
+        key: string;
+        enabled: boolean;
+        version: string;
+        updatedAt?: string;
+      }[]
+    >("settings/features"),
     action = useAction(resource.reload),
     [confirm, setConfirm] = useState<{
       key: string;
@@ -89,8 +96,10 @@ function Features() {
   return (
     <>
       <Hero
-        title="Функції системи"
-        description="Зміни застосовуються на сервері та записуються до журналу аудиту."
+        title={t("Функції системи")}
+        description={t(
+          "Зміни застосовуються на сервері та записуються до журналу аудиту.",
+        )}
       />
       <Alert message={resource.error} />
       <Feedback action={action} />
@@ -99,33 +108,39 @@ function Features() {
       ) : (
         resource.data?.map((f) => (
           <Card
+            icon="file"
             key={f.key}
             title={
-              f.key === "support.chat-deletion" ? "Видалення чатів" : f.key
+              f.key === "support.chat-deletion" ? t("Видалення чатів") : f.key
             }
           >
             <p className="treba-admin-note">
-              Дозволяє адміністраторам і менеджерам переміщувати чати в кошик.
-              Історія зберігається, відновлення залишається доступним.
+              {t(
+                "Дозволяє адміністраторам і менеджерам переміщувати чати в кошик. Історія зберігається, відновлення залишається доступним.",
+              )}
             </p>
             <div className="treba-admin-actions">
               <Badge value={f.enabled ? "ACTIVE" : "DRAFT"} />
               <Button
+                icon="check"
                 tone="secondary"
                 disabled={action.busy}
                 onClick={() => setConfirm(f)}
               >
-                {f.enabled ? "Вимкнути" : "Увімкнути"}
+                {f.enabled ? t("Вимкнути") : t("Увімкнути")}
               </Button>
             </div>
-            <small className="treba-admin-note">Оновлено: {date(f.updatedAt)}</small>
+            <small className="treba-admin-note">
+              {t("Оновлено: ")}
+              {date(f.updatedAt)}
+            </small>
           </Card>
         ))
       )}
       {confirm && (
         <Confirm
           error={action.error}
-          title="Змінити функцію системи?"
+          title={t("Змінити функцію системи?")}
           busy={action.busy}
           onClose={() => setConfirm(null)}
           onConfirm={() =>
@@ -141,7 +156,7 @@ function Features() {
           }
         >
           <p>
-            {confirm.key}: {confirm.enabled ? "вимкнути" : "увімкнути"}
+            {confirm.key}: {confirm.enabled ? t("вимкнути") : t("увімкнути")}
           </p>
         </Confirm>
       )}
@@ -149,6 +164,7 @@ function Features() {
   );
 }
 function Staff() {
+  const { t, label } = useAdminI18n();
   const params = useSearchParams(),
     resource = useResource<Paged<User>>("settings/staff?" + params),
     action = useAction(resource.reload),
@@ -159,11 +175,11 @@ function Staff() {
   return (
     <>
       <Hero
-        title="Співробітники та ролі"
-        description="Доступ команди до робочого простору."
+        title={t("Співробітники та ролі")}
+        description={t("Доступ команди до робочого простору.")}
         action={
           <Button icon="plus" onClick={() => setCreate(true)}>
-            Додати співробітника
+            {t("Додати співробітника")}
           </Button>
         }
       />
@@ -173,12 +189,14 @@ function Staff() {
         <Filters>
           <select
             name="role"
-            aria-label="Роль"
+            aria-label={t("Роль")}
             defaultValue={params.get("role") ?? ""}
           >
-            <option value="">Усі ролі</option>
+            <option value="">{t("Усі ролі")}</option>
             {["Administrator", "Manager", "Moderator"].map((r) => (
-              <option key={r}>{r}</option>
+              <option key={r} value={r}>
+                {label(r)}
+              </option>
             ))}
           </select>
         </Filters>
@@ -191,7 +209,7 @@ function Staff() {
                 rows={resource.data.content}
                 columns={[
                   {
-                    title: "Співробітник",
+                    title: t("Співробітник"),
                     render: (u) => (
                       <>
                         <strong>
@@ -201,15 +219,16 @@ function Staff() {
                       </>
                     ),
                   },
-                  { title: "Роль", render: (u) => u.role },
+                  { title: t("Роль"), render: (u) => label(u.role) },
                   {
-                    title: "Статус",
+                    title: t("Статус"),
                     render: (u) => <Badge value={u.status} />,
                   },
                   {
-                    title: "Доступ",
+                    title: t("Доступ"),
                     render: (u) => (
                       <Button
+                        icon="edit"
                         tone="secondary"
                         onClick={() => {
                           setEdit(u);
@@ -217,7 +236,7 @@ function Staff() {
                           setBlocked(u.status === "BLOCKED");
                         }}
                       >
-                        Змінити
+                        {t("Змінити")}
                       </Button>
                     ),
                   },
@@ -231,7 +250,7 @@ function Staff() {
       {create && (
         <Confirm
           error={action.error}
-          title="Новий співробітник"
+          title={t("Новий співробітник")}
           onClose={() => setCreate(false)}
           onConfirm={() => {
             document.getElementById("staff-create-submit")?.click();
@@ -254,9 +273,9 @@ function Staff() {
             <div className="treba-admin-form-grid">
               {[
                 ["email", "Email", "email"],
-                ["password", "Пароль (від 12 символів)", "password"],
-                ["firstName", "Ім’я", "text"],
-                ["lastName", "Прізвище", "text"],
+                ["password", t("Пароль (від 12 символів)"), "password"],
+                ["firstName", t("Ім’я"), "text"],
+                ["lastName", t("Прізвище"), "text"],
               ].map(([name, title, type]) => (
                 <Field key={name} label={title}>
                   <input
@@ -267,10 +286,12 @@ function Staff() {
                   />
                 </Field>
               ))}
-              <Field label="Роль">
+              <Field label={t("Роль")}>
                 <select name="role">
                   {["Manager", "Moderator", "Administrator"].map((r) => (
-                    <option key={r}>{r}</option>
+                    <option key={r} value={r}>
+                      {label(r)}
+                    </option>
                   ))}
                 </select>
               </Field>
@@ -283,7 +304,7 @@ function Staff() {
       {edit && (
         <Confirm
           error={action.error}
-          title="Змінити доступ співробітника"
+          title={t("Змінити доступ співробітника")}
           busy={action.busy}
           onClose={() => setEdit(null)}
           onConfirm={() =>
@@ -295,10 +316,12 @@ function Staff() {
           }
         >
           <p>{edit.email}</p>
-          <Field label="Роль">
+          <Field label={t("Роль")}>
             <select value={role} onChange={(e) => setRole(e.target.value)}>
               {["Manager", "Moderator", "Administrator"].map((r) => (
-                <option key={r}>{r}</option>
+                <option key={r} value={r}>
+                  {label(r)}
+                </option>
               ))}
             </select>
           </Field>
@@ -308,7 +331,7 @@ function Staff() {
               checked={blocked}
               onChange={(e) => setBlocked(e.target.checked)}
             />
-            Заблокувати доступ
+            {t("Заблокувати доступ")}
           </label>
         </Confirm>
       )}
@@ -316,6 +339,7 @@ function Staff() {
   );
 }
 function Audit() {
+  const { date, t } = useAdminI18n();
   const params = useSearchParams(),
     resource = useResource<
       Paged<{
@@ -332,8 +356,8 @@ function Audit() {
   return (
     <>
       <Hero
-        title="Журнал аудиту"
-        description="Історія адміністративних дій та змін даних."
+        title={t("Журнал аудиту")}
+        description={t("Історія адміністративних дій та змін даних.")}
       />
       <Alert message={resource.error} />
       <Card>
@@ -341,19 +365,19 @@ function Audit() {
           <input
             name="from"
             type="date"
-            aria-label="Від дати"
+            aria-label={t("Від дати")}
             defaultValue={params.get("from") ?? ""}
           />
           <input
             name="to"
             type="date"
-            aria-label="До дати"
+            aria-label={t("До дати")}
             defaultValue={params.get("to") ?? ""}
           />
           <input
             name="entityType"
-            aria-label="Тип запису"
-            placeholder="Тип запису"
+            aria-label={t("Тип запису")}
+            placeholder={t("Тип запису")}
             defaultValue={params.get("entityType") ?? ""}
           />
         </Filters>
@@ -366,7 +390,7 @@ function Audit() {
                 rows={resource.data.content}
                 columns={[
                   {
-                    title: "Співробітник",
+                    title: t("Співробітник"),
                     render: (r) => (
                       <>
                         {r.actorName}
@@ -375,7 +399,7 @@ function Audit() {
                     ),
                   },
                   {
-                    title: "Дія",
+                    title: t("Дія"),
                     render: (r) => (
                       <>
                         {r.action}
@@ -386,10 +410,13 @@ function Audit() {
                     ),
                   },
                   {
-                    title: "Зміни",
+                    title: t("Зміни"),
                     render: (r) => (
                       <details>
-                        <summary>{r.changes.length} змін</summary>
+                        <summary>
+                          {r.changes.length}
+                          {t(" змін")}
+                        </summary>
                         {r.changes.map((c, i) => (
                           <div className="treba-admin-note" key={i}>
                             <b>{c.field}</b>
@@ -402,7 +429,7 @@ function Audit() {
                       </details>
                     ),
                   },
-                  { title: "Час", render: (r) => date(r.occurredAt) },
+                  { title: t("Час"), render: (r) => date(r.occurredAt) },
                 ]}
               />
               <Pagination data={resource.data} />
@@ -414,6 +441,7 @@ function Audit() {
   );
 }
 function Telegram() {
+  const { t } = useAdminI18n();
   const resource = useResource<
       {
         id: string;
@@ -427,12 +455,12 @@ function Telegram() {
   return (
     <>
       <Hero
-        title="Telegram та категорії"
-        description="Зіставлення зовнішніх категорій з каталогом TREBA."
+        title={t("Telegram та категорії")}
+        description={t("Зіставлення зовнішніх категорій з каталогом TREBA.")}
       />
       <Alert message={resource.error || categories.error} />
       <Feedback action={action} />
-      <Card title="Додати відповідність">
+      <Card icon="file" title={t("Додати відповідність")}>
         <form
           action={(form) => {
             void action.run(
@@ -443,16 +471,16 @@ function Telegram() {
           }}
         >
           <div className="treba-admin-form-grid">
-            <Field label="Ключ зовнішньої категорії">
+            <Field label={t("Ключ зовнішньої категорії")}>
               <input
                 name="externalKey"
                 required
-                placeholder="c12345 або prom:…"
+                placeholder={t("c12345 або prom:…")}
               />
             </Field>
-            <Field label="Категорія TREBA">
+            <Field label={t("Категорія TREBA")}>
               <select name="categoryId" required>
-                <option value="">Оберіть…</option>
+                <option value="">{t("Оберіть…")}</option>
                 {categories.data?.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -462,21 +490,21 @@ function Telegram() {
             </Field>
           </div>
           <div className="treba-admin-actions">
-            <Button type="submit" disabled={action.busy}>
-              Зберегти відповідність
+            <Button icon="save" type="submit" disabled={action.busy}>
+              {t("Зберегти відповідність")}
             </Button>
           </div>
         </form>
       </Card>
-      <Card title="Наявні відповідності">
+      <Card icon="file" title={t("Наявні відповідності")}>
         {resource.loading ? (
           <Loading />
         ) : (
           <Table
             rows={resource.data ?? []}
             columns={[
-              { title: "Зовнішній ключ", render: (r) => r.externalKey },
-              { title: "Категорія TREBA", render: (r) => r.categoryName },
+              { title: t("Зовнішній ключ"), render: (r) => r.externalKey },
+              { title: t("Категорія TREBA"), render: (r) => r.categoryName },
             ]}
           />
         )}
@@ -485,16 +513,22 @@ function Telegram() {
   );
 }
 export function Categories() {
+  const { t } = useAdminI18n();
   const resource = useResource<Category[]>("categories"),
     action = useAction(resource.reload),
     [edit, setEdit] = useState<
-      (Partial<Category> & { parentId?: string }) | null
+      | (Partial<Category> & {
+          parentId?: string;
+        })
+      | null
     >(null),
     [move, setMove] = useState<Category | null>(null),
     [parent, setParent] = useState(""),
     [search, setSearch] = useState(""),
     [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const flat: (Category & { depth: number })[] = [];
+  const flat: (Category & {
+    depth: number;
+  })[] = [];
   function flatten(rows: Category[], depth = 0) {
     for (const row of rows) {
       flat.push({ ...row, depth });
@@ -506,8 +540,10 @@ export function Categories() {
   return (
     <>
       <Hero
-        title="Категорії"
-        description="Структура каталогу, вкладені категорії та їх видимість."
+        title={t("Категорії")}
+        description={t(
+          "Структура каталогу, вкладені категорії та їх видимість.",
+        )}
         action={
           <Button
             icon="plus"
@@ -515,7 +551,7 @@ export function Categories() {
               setEdit({ name: "", slug: "", isActive: true, sortOrder: 0 })
             }
           >
-            Додати категорію
+            {t("Додати категорію")}
           </Button>
         }
       />
@@ -524,8 +560,8 @@ export function Categories() {
       <Card>
         <div className="treba-admin-filters">
           <input
-            aria-label="Знайти категорію"
-            placeholder="Знайти категорію…"
+            aria-label={t("Знайти категорію")}
+            placeholder={t("Знайти категорію…")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -554,8 +590,8 @@ export function Categories() {
                 >
                   {c.children?.length
                     ? expanded.has(c.id)
-                      ? "Згорнути"
-                      : "Розгорнути"
+                      ? t("Згорнути")
+                      : t("Розгорнути")
                     : ""}
                 </Button>
                 <Icon name="layers" />
@@ -566,10 +602,11 @@ export function Categories() {
                 <Badge value={c.isActive ? "ACTIVE" : "DRAFT"} />
               </div>
               <div className="treba-admin-actions">
-                <Button tone="secondary" onClick={() => setEdit(c)}>
-                  Редагувати
+                <Button icon="edit" tone="secondary" onClick={() => setEdit(c)}>
+                  {t("Редагувати")}
                 </Button>
                 <Button
+                  icon="layers"
                   tone="icon"
                   onClick={() =>
                     setEdit({
@@ -581,16 +618,17 @@ export function Categories() {
                     })
                   }
                 >
-                  + Підкатегорія
+                  {t("+ Підкатегорія")}
                 </Button>
                 <Button
+                  icon="edit"
                   tone="icon"
                   onClick={() => {
                     setMove(c);
                     setParent("");
                   }}
                 >
-                  Перемістити
+                  {t("Перемістити")}
                 </Button>
               </div>
             </div>
@@ -600,12 +638,12 @@ export function Categories() {
       {edit && (
         <Confirm
           error={action.error}
-          title={edit.id ? "Редагувати категорію" : "Нова категорія"}
+          title={edit.id ? t("Редагувати категорію") : t("Нова категорія")}
           busy={action.busy}
           onClose={() => setEdit(null)}
           onConfirm={() => {
             if (!edit.name?.trim() || !edit.slug?.trim()) {
-              action.setError("Заповніть назву та slug.");
+              action.setError(t("Заповніть назву та slug."));
               return;
             }
             void action
@@ -620,7 +658,7 @@ export function Categories() {
           }}
         >
           <div className="treba-admin-form-grid">
-            <Field label="Назва *">
+            <Field label={t("Назва *")}>
               <input
                 value={edit.name ?? ""}
                 onChange={(e) => setEdit({ ...edit, name: e.target.value })}
@@ -632,7 +670,7 @@ export function Categories() {
                 onChange={(e) => setEdit({ ...edit, slug: e.target.value })}
               />
             </Field>
-            <Field label="Порядок">
+            <Field label={t("Порядок")}>
               <input
                 type="number"
                 value={edit.sortOrder ?? 0}
@@ -641,13 +679,13 @@ export function Categories() {
                 }
               />
             </Field>
-            <Field label="Посилання на зображення">
+            <Field label={t("Посилання на зображення")}>
               <input
                 value={edit.imageUrl ?? ""}
                 onChange={(e) => setEdit({ ...edit, imageUrl: e.target.value })}
               />
             </Field>
-            <Field label="Опис" wide>
+            <Field label={t("Опис")} wide>
               <textarea
                 value={edit.description ?? ""}
                 onChange={(e) =>
@@ -662,7 +700,7 @@ export function Categories() {
               checked={edit.isActive}
               onChange={(e) => setEdit({ ...edit, isActive: e.target.checked })}
             />
-            Активна
+            {t("Активна")}
           </label>
           <Feedback action={action} />
         </Confirm>
@@ -670,7 +708,7 @@ export function Categories() {
       {move && (
         <Confirm
           error={action.error}
-          title="Перемістити категорію"
+          title={t("Перемістити категорію")}
           onClose={() => setMove(null)}
           busy={action.busy}
           onConfirm={() =>
@@ -683,9 +721,9 @@ export function Categories() {
               })
           }
         >
-          <Field label="Нова батьківська категорія">
+          <Field label={t("Нова батьківська категорія")}>
             <select value={parent} onChange={(e) => setParent(e.target.value)}>
-              <option value="">Коренева категорія</option>
+              <option value="">{t("Коренева категорія")}</option>
               {flat
                 .filter((c) => c.id !== move.id)
                 .map((c) => (

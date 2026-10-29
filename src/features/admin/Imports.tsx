@@ -1,4 +1,5 @@
 "use client";
+import { useAdminI18n } from "@/features/admin/i18n/provider";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
@@ -21,6 +22,7 @@ import type {
   Lookup,
 } from "./types";
 export default function Imports() {
+  const { t } = useAdminI18n();
   const jobs = useResource<ImportJob[]>("imports/queue", 3000),
     options = useResource<{
       categories: Lookup[];
@@ -61,29 +63,30 @@ export default function Imports() {
               : { stringValue: value }),
       }));
     });
-    const result = await action.run<{ productId: string }>(
-      `imports/${previewId}/submit`,
-      {
-        ...fields,
-        price: Number(fields.price),
-        stockQuantity: Number(fields.stockQuantity),
-        duplicateConfirmed: form.has("duplicateConfirmed"),
-        attributes,
-      },
-    );
+    const result = await action.run<{
+      productId: string;
+    }>(`imports/${previewId}/submit`, {
+      ...fields,
+      price: Number(fields.price),
+      stockQuantity: Number(fields.stockQuantity),
+      duplicateConfirmed: form.has("duplicateConfirmed"),
+      attributes,
+    });
     if (result)
       window.location.assign(`/admin/products/${result.productId}/edit`);
   }
   return (
     <>
       <Hero
-        title="Імпорт товарів"
-        description="Додайте посилання, перевірте дані та створіть картку у своєму магазині."
+        title={t("Імпорт товарів")}
+        description={t(
+          "Додайте посилання, перевірте дані та створіть картку у своєму магазині.",
+        )}
       />
       <Alert message={jobs.error || options.error || preview.error} />
       <Feedback action={action} />
-      <Card title="Посилання на товари">
-        <Field label="Кожне посилання з нового рядка, до 20 за раз">
+      <Card icon="file" title={t("Посилання на товари")}>
+        <Field label={t("Кожне посилання з нового рядка, до 20 за раз")}>
           <textarea
             value={urls}
             onChange={(e) => setUrls(e.target.value)}
@@ -91,12 +94,12 @@ export default function Imports() {
             placeholder="https://…"
           />
         </Field>
-        <Field label="Категорія">
+        <Field label={t("Категорія")}>
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
           >
-            <option value="">Автоматичне визначення</option>
+            <option value="">{t("Автоматичне визначення")}</option>
             {options.data?.categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -118,16 +121,16 @@ export default function Imports() {
               })
             }
           >
-            Додати до черги
+            {t("Додати до черги")}
           </Button>
         </div>
       </Card>
-      <Card title="Черга імпорту">
+      <Card icon="file" title={t("Черга імпорту")}>
         <Table
           rows={jobs.data ?? []}
           columns={[
             {
-              title: "Джерело",
+              title: t("Джерело"),
               render: (j) => (
                 <div
                   style={{
@@ -141,7 +144,7 @@ export default function Imports() {
               ),
             },
             {
-              title: "Статус",
+              title: t("Статус"),
               render: (j) => (
                 <>
                   <Badge value={j.status} />
@@ -150,15 +153,16 @@ export default function Imports() {
               ),
             },
             {
-              title: "Дії",
+              title: t("Дії"),
               render: (j) => (
                 <div className="treba-admin-actions">
                   {j.previewId && (
                     <Button
+                      icon="shield"
                       tone="secondary"
                       onClick={() => setPreviewId(j.previewId!)}
                     >
-                      Перевірити
+                      {t("Перевірити")}
                     </Button>
                   )}
                   {j.status === "FAILED" && (
@@ -171,7 +175,7 @@ export default function Imports() {
                         )
                       }
                     >
-                      Повторити
+                      {t("Повторити")}
                     </Button>
                   )}
                   {j.productId && (
@@ -179,7 +183,7 @@ export default function Imports() {
                       className="treba-admin-text-link"
                       href={`/admin/products/${j.productId}/edit`}
                     >
-                      Відкрити товар →
+                      {t("Відкрити товар →")}
                     </Link>
                   )}
                 </div>
@@ -189,7 +193,7 @@ export default function Imports() {
         />
       </Card>
       {preview.data && (
-        <Card title="Перевірка імпортованого товару">
+        <Card icon="file" title={t("Перевірка імпортованого товару")}>
           <div className="treba-admin-photo-grid">
             {preview.data.images.map((image, i) => (
               <div className="treba-admin-photo" key={i}>
@@ -198,18 +202,19 @@ export default function Imports() {
                   width={320}
                   height={240}
                   src={image}
-                  alt="Фото з джерела"
+                  alt={t("Фото з джерела")}
                 />
               </div>
             ))}
           </div>
           <p className="treba-admin-note">
-            Категорія: {preview.data.categoryName} · Бренд:{" "}
-            {preview.data.brandName}
+            {t("Категорія: ")}
+            {preview.data.categoryName}
+            {t(" · Бренд:")} {preview.data.brandName}
           </p>
           {preview.data.canClassifyCategory && (
             <div className="treba-admin-editor-row">
-              <Field label="Категорія TREBA">
+              <Field label={t("Категорія TREBA")}>
                 <select
                   value={categoryId || preview.data.categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
@@ -222,6 +227,7 @@ export default function Imports() {
                 </select>
               </Field>
               <Button
+                icon="check"
                 tone="secondary"
                 onClick={() =>
                   void action
@@ -233,15 +239,16 @@ export default function Imports() {
                     .then(() => preview.reload())
                 }
               >
-                Застосувати категорію
+                {t("Застосувати категорію")}
               </Button>
-              <Field label="Нова підкатегорія">
+              <Field label={t("Нова підкатегорія")}>
                 <input
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
                 />
               </Field>
               <Button
+                icon="plus"
                 tone="secondary"
                 disabled={!newCategory || !categoryId}
                 onClick={() =>
@@ -253,23 +260,23 @@ export default function Imports() {
                     .then(() => preview.reload())
                 }
               >
-                Створити підкатегорію
+                {t("Створити підкатегорію")}
               </Button>
             </div>
           )}
           <form key={preview.data.id + preview.data.categoryId} action={submit}>
             <div className="treba-admin-form-grid">
-              <Field label="Назва *" wide>
+              <Field label={t("Назва *")} wide>
                 <input name="name" defaultValue={preview.data.name} required />
               </Field>
-              <Field label="Опис" wide>
+              <Field label={t("Опис")} wide>
                 <textarea
                   name="description"
                   defaultValue={preview.data.description}
                   rows={7}
                 />
               </Field>
-              <Field label="Магазин *">
+              <Field label={t("Магазин *")}>
                 <select name="storeId" required>
                   {options.data?.stores.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -278,13 +285,13 @@ export default function Imports() {
                   ))}
                 </select>
               </Field>
-              <Field label="Бренд *">
+              <Field label={t("Бренд *")}>
                 <select
                   name="brandId"
                   required
                   defaultValue={preview.data.brandId ?? ""}
                 >
-                  <option value="">Оберіть…</option>
+                  <option value="">{t("Оберіть…")}</option>
                   {options.data?.brands.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
@@ -295,16 +302,16 @@ export default function Imports() {
               <Field label="SKU *">
                 <input name="sku" required />
               </Field>
-              <Field label="Артикул виробника">
+              <Field label={t("Артикул виробника")}>
                 <input
                   name="manufacturerPartNumber"
                   defaultValue={preview.data.manufacturerPartNumber}
                 />
               </Field>
-              <Field label="Штрихкод">
+              <Field label={t("Штрихкод")}>
                 <input name="barcode" defaultValue={preview.data.barcode} />
               </Field>
-              <Field label="Ціна *">
+              <Field label={t("Ціна *")}>
                 <input
                   name="price"
                   type="number"
@@ -314,7 +321,7 @@ export default function Imports() {
                   defaultValue={preview.data.sourcePrice ?? ""}
                 />
               </Field>
-              <Field label="Залишок">
+              <Field label={t("Залишок")}>
                 <input
                   name="stockQuantity"
                   type="number"
@@ -331,7 +338,7 @@ export default function Imports() {
                       multiple={d.type.toUpperCase() === "MULTI_SELECT"}
                       required={d.isRequired}
                     >
-                      <option value="">Оберіть значення</option>
+                      <option value="">{t("Оберіть значення")}</option>
                       {d.options.map((o) => (
                         <option key={o.id} value={o.id}>
                           {o.name}
@@ -340,9 +347,9 @@ export default function Imports() {
                     </select>
                   ) : ["BOOL", "BOOLEAN"].includes(d.type.toUpperCase()) ? (
                     <select name={"attr:" + d.id} required={d.isRequired}>
-                      <option value="">Не вказано</option>
-                      <option value="true">Так</option>
-                      <option value="false">Ні</option>
+                      <option value="">{t("Не вказано")}</option>
+                      <option value="true">{t("Так")}</option>
+                      <option value="false">{t("Ні")}</option>
                     </select>
                   ) : (
                     <input
@@ -370,36 +377,42 @@ export default function Imports() {
             </div>
             {preview.data.duplicates.length > 0 && (
               <>
-                <Alert message="Знайдено схожі товари. Перевірте, чи не створюєте дублікат." />
+                <Alert
+                  message={t(
+                    "Знайдено схожі товари. Перевірте, чи не створюєте дублікат.",
+                  )}
+                />
                 {preview.data.duplicates.map((d) => (
                   <p className="treba-admin-note" key={d.id}>
                     {d.name} · {d.storeName} · {d.reason}
                   </p>
                 ))}
                 <label className="treba-admin-check">
-                  <input type="checkbox" name="duplicateConfirmed" required />Я
-                  перевірив схожі товари та підтверджую створення
+                  <input type="checkbox" name="duplicateConfirmed" required />
+                  {t("Я перевірив схожі товари та підтверджую створення")}
                 </label>
               </>
             )}
             <div className="treba-admin-actions">
               <Button
+                icon="plus"
                 type="submit"
                 disabled={action.busy || !!preview.data.productId}
               >
-                Створити товар
+                {t("Створити товар")}
               </Button>
             </div>
           </form>
           <div className="treba-admin-editor-row">
-            <Field label="Бренду немає у списку?">
+            <Field label={t("Бренду немає у списку?")}>
               <input
                 value={brandName}
                 onChange={(e) => setBrandName(e.target.value)}
-                placeholder="Назва нового бренду"
+                placeholder={t("Назва нового бренду")}
               />
             </Field>
             <Button
+              icon="plus"
               tone="secondary"
               disabled={!brandName || action.busy}
               onClick={() =>
@@ -408,7 +421,7 @@ export default function Imports() {
                   .then(() => options.reload())
               }
             >
-              Створити бренд
+              {t("Створити бренд")}
             </Button>
           </div>
         </Card>

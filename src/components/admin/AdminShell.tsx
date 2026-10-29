@@ -1,14 +1,22 @@
 "use client";
+import { useAdminI18n } from "@/features/admin/i18n/provider";
+import { message } from "@/features/admin/i18n/core";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import { adminRequest, useResource } from "@/features/admin/api";
 import { canAccessAdmin } from "@/lib/admin-access";
 import { roleLabel, workspaceLabel } from "@/lib/admin";
 import type { Feed, User } from "@/features/admin/types";
 import Icon from "./Icon";
+import LanguageSelector from "./LanguageSelector";
 import { Alert, Button, Empty, Loading } from "./ui";
-
 const StaffContext = createContext<User | null>(null);
 export function useStaff() {
   const user = useContext(StaffContext);
@@ -16,26 +24,37 @@ export function useStaff() {
   return user;
 }
 const nav = [
-  ["Робота", "Огляд", "", "grid"],
-  ["Робота", "Замовлення", "/orders", "bag"],
-  ["Робота", "Товари", "/products", "box"],
-  ["Робота", "Модерація", "/moderation", "shield"],
-  ["Робота", "Категорії", "/categories", "layers"],
-  ["Люди", "Продавці", "/sellers", "shop"],
-  ["Люди", "Заявки продавців", "/sellers/applications", "users"],
-  ["Люди", "Відгуки", "/reviews", "star"],
-  ["Люди", "Підтримка", "/support", "chat"],
-  ["Люди", "Покупці", "/customer-activity", "chart"],
-  ["Просування", "Акції та промокоди", "/loyalty", "gift"],
-  ["Система", "Користувачі", "/users", "users"],
-  ["Система", "Налаштування", "/settings", "settings"],
+  [message("Робота"), message("Огляд"), "", "grid"],
+  [message("Робота"), message("Замовлення"), "/orders", "bag"],
+  [message("Робота"), message("Товари"), "/products", "box"],
+  [message("Робота"), message("Модерація"), "/moderation", "shield"],
+  [message("Робота"), message("Категорії"), "/categories", "layers"],
+  [message("Люди"), message("Продавці"), "/sellers", "shop"],
+  [
+    message("Люди"),
+    message("Заявки продавців"),
+    "/sellers/applications",
+    "users",
+  ],
+  [message("Люди"), message("Відгуки"), "/reviews", "star"],
+  [message("Люди"), message("Підтримка"), "/support", "chat"],
+  [message("Люди"), message("Покупці"), "/customer-activity", "chart"],
+  [message("Просування"), message("Акції та промокоди"), "/loyalty", "gift"],
+  [message("Система"), message("Користувачі"), "/users", "users"],
+  [message("Система"), message("Налаштування"), "/settings", "settings"],
 ];
 export default function AdminShell({ children }: { children: ReactNode }) {
-  const session = useResource<{ user: User }>("session", 60000),
+  const { t, adoptProfileLanguage } = useAdminI18n();
+  const session = useResource<{
+      user: User;
+    }>("session", 60000),
     path = usePathname();
   const [open, setOpen] = useState(false),
     [leaving, setLeaving] = useState(false);
   const user = session.data?.user;
+  useEffect(() => {
+    adoptProfileLanguage(user?.profile?.language);
+  }, [adoptProfileLanguage, user?.profile?.language]);
   const feed = useResource<Feed>(user ? "notifications" : null, 30000);
   async function logout(store = false) {
     setLeaving(true);
@@ -49,6 +68,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   if (session.loading)
     return (
       <div className="treba-admin-boot" data-treba-workspace="loading">
+        <LanguageSelector />
         <div className="treba-admin-brand-mark">
           T<span>•</span>
         </div>
@@ -58,33 +78,42 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   if (!user)
     return (
       <div className="treba-admin-boot" data-treba-workspace="sign-in">
+        <LanguageSelector />
         <div className="treba-admin-brand-mark">
           T<span>•</span>
         </div>
-        <h1>Робочий простір TREBA</h1>
+        <h1>{t("Робочий простір TREBA")}</h1>
         <Alert message={session.error} />
-        <p>Увійдіть як співробітник або продавець.</p>
+        <p>{t("Увійдіть як співробітник або продавець.")}</p>
         <Link
           className="treba-admin-button primary"
           href={"/login?next=" + encodeURIComponent(path)}
         >
-          Увійти
+          {t("Увійти")}
         </Link>
         <Button tone="secondary" onClick={() => void session.reload()}>
-          Спробувати ще раз
+          {t("Спробувати ще раз")}
         </Button>
-        <Link href="/">На головну</Link>
+        <Link href="/">{t("На головну")}</Link>
       </div>
     );
   const active =
-    nav.find((n) => n[2] && path.startsWith("/admin" + n[2])) ?? nav[0];
+    nav
+      .filter((n) => n[2] && path.startsWith("/admin" + n[2]))
+      .sort((a, b) => b[2].length - a[2].length)[0] ?? nav[0];
+  const activeTitle =
+    path === "/admin/profile"
+      ? t("Мій профіль")
+      : path === "/admin/notifications"
+        ? t("Сповіщення")
+        : t(active[1]);
   return (
     <StaffContext.Provider value={user}>
       <div className="treba-admin-shell" data-treba-workspace="ready">
         {open && (
           <button
             className="treba-admin-nav-scrim"
-            aria-label="Закрити меню"
+            aria-label={t("Закрити меню")}
             onClick={() => setOpen(false)}
           />
         )}
@@ -99,7 +128,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             </div>
             <div>
               <b>TREBA</b>
-              <small>{workspaceLabel(user.role)}</small>
+              <small>{t(workspaceLabel(user.role))}</small>
             </div>
           </Link>
           <div className="treba-admin-nav-scroll">
@@ -109,7 +138,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                 .map((item, index, visible) => (
                   <div key={item[2]}>
                     {(index === 0 || visible[index - 1][0] !== item[0]) && (
-                      <div className="treba-admin-nav-label">{item[0]}</div>
+                      <div className="treba-admin-nav-label">{t(item[0])}</div>
                     )}
                     <Link
                       href={"/admin" + item[2]}
@@ -119,30 +148,33 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                       <Icon name={item[3]} />
                       <span>
                         {user.role === "Seller" && item[2] === "/support"
-                          ? "Питання покупців"
-                          : item[1]}
+                          ? t("Питання покупців")
+                          : t(item[1])}
                       </span>
                     </Link>
                   </div>
                 ))}
             </nav>
             {user.role === "Seller" && (
-              <Link className="treba-admin-nav-link" href="/admin/products/import">
+              <Link
+                className="treba-admin-nav-link"
+                href="/admin/products/import"
+              >
                 <Icon name="upload" />
-                Імпорт товарів
+                {t("Імпорт товарів")}
               </Link>
             )}
           </div>
           <div className="treba-admin-sidebar-bottom">
             <span className="treba-admin-online-dot" />
-            <span>Робочий простір TREBA</span>
+            <span>{t("Робочий простір TREBA")}</span>
             <Button
               tone="icon"
               onClick={() => void logout(true)}
               disabled={leaving}
               icon="logout"
             >
-              На сайт
+              {t("На сайт")}
             </Button>
           </div>
         </aside>
@@ -151,20 +183,21 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             <div className="treba-admin-topbar-title">
               <button
                 className="treba-admin-mobile-menu"
-                aria-label="Відкрити меню"
+                aria-label={t("Відкрити меню")}
                 onClick={() => setOpen(true)}
               >
                 <Icon name="menu" />
               </button>
               <span>
-                TREBA <i>/</i> <b>{active[1]}</b>
+                TREBA <i>/</i> <b>{activeTitle}</b>
               </span>
             </div>
             <div className="treba-admin-topbar-actions">
+              <LanguageSelector />
               <Link
                 className="treba-admin-notification"
                 href="/admin/notifications"
-                aria-label={`Сповіщення: ${feed.data?.unreadCount ?? 0}`}
+                aria-label={t("Сповіщення: {0}", [feed.data?.unreadCount ?? 0])}
               >
                 <Icon name="bell" />
                 {!!feed.data?.unreadCount && (
@@ -182,12 +215,12 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                   <b>
                     {user.firstName} {user.lastName}
                   </b>
-                  <small>{roleLabel(user.role)}</small>
+                  <small>{t(roleLabel(user.role) ?? "")}</small>
                 </span>
               </Link>
               <button
                 className="treba-admin-icon-button"
-                aria-label="Вийти"
+                aria-label={t("Вийти")}
                 onClick={() => void logout()}
                 disabled={leaving}
               >
@@ -200,14 +233,14 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               children
             ) : (
               <Empty
-                title="Доступ обмежено"
-                description="Цей розділ недоступний для вашої ролі."
+                title={t("Доступ обмежено")}
+                description={t("Цей розділ недоступний для вашої ролі.")}
               />
             )}
           </main>
           <footer className="treba-admin-footer">
-            <span>© TREBA · Робочий простір</span>
-            <span>Часовий пояс: Europe/Vilnius</span>
+            <span>{t("© TREBA · Робочий простір")}</span>
+            <span>{t("Часовий пояс: Europe/Vilnius")}</span>
           </footer>
         </div>
       </div>

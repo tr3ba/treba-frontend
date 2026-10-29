@@ -1,4 +1,5 @@
 "use client";
+import { useAdminI18n } from "@/features/admin/i18n/provider";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
@@ -16,10 +17,9 @@ import {
   Loading,
   Pagination,
   Table,
-  label,
   useAction,
 } from "@/components/admin/ui";
-import { adminRequest, date, money, useResource } from "./api";
+import { adminRequest, useResource } from "./api";
 import type {
   Customer,
   CustomerDetails,
@@ -30,7 +30,6 @@ import type {
   Ticket,
   TicketRow,
 } from "./types";
-
 const orderStatuses = [
   "AWAITING_PAYMENT",
   "PAID",
@@ -45,13 +44,15 @@ const orderStatuses = [
   "RETURNED",
 ];
 export function Orders() {
+  const { t } = useAdminI18n();
+  const orderColumns = useOrderColumns();
   const params = useSearchParams(),
     resource = useResource<Paged<OrderRow>>("orders?" + params);
   return (
     <>
       <Hero
-        title="Замовлення"
-        description="Оплата, обробка та доставка замовлень маркетплейсу."
+        title={t("Замовлення")}
+        description={t("Оплата, обробка та доставка замовлень маркетплейсу.")}
       />
       <Alert message={resource.error} />
       <Card>
@@ -59,13 +60,13 @@ export function Orders() {
           <input
             name="from"
             type="date"
-            aria-label="Від дати"
+            aria-label={t("Від дати")}
             defaultValue={params.get("from") ?? ""}
           />
           <input
             name="to"
             type="date"
-            aria-label="До дати"
+            aria-label={t("До дати")}
             defaultValue={params.get("to") ?? ""}
           />
         </Filters>
@@ -83,21 +84,28 @@ export function Orders() {
     </>
   );
 }
-const orderColumns = [
-  {
-    title: "Замовлення",
-    render: (r: OrderRow) => (
-      <Link className="treba-admin-text-link" href={`/admin/orders/${r.id}`}>
-        {r.orderNumber}
-      </Link>
-    ),
-  },
-  { title: "Покупець", render: (r: OrderRow) => r.customerName },
-  { title: "Статус", render: (r: OrderRow) => <Badge value={r.status} /> },
-  { title: "Сума", render: (r: OrderRow) => money(r.totalAmount, r.currency) },
-  { title: "Дата", render: (r: OrderRow) => date(r.createdAt) },
-];
+function useOrderColumns() {
+  const { date, money, t } = useAdminI18n();
+  return [
+    {
+      title: t("Замовлення"),
+      render: (r: OrderRow) => (
+        <Link className="treba-admin-text-link" href={`/admin/orders/${r.id}`}>
+          {r.orderNumber}
+        </Link>
+      ),
+    },
+    { title: t("Покупець"), render: (r: OrderRow) => r.customerName },
+    { title: t("Статус"), render: (r: OrderRow) => <Badge value={r.status} /> },
+    {
+      title: t("Сума"),
+      render: (r: OrderRow) => money(r.totalAmount, r.currency),
+    },
+    { title: t("Дата"), render: (r: OrderRow) => date(r.createdAt) },
+  ];
+}
 export function OrderDetails({ id }: { id: string }) {
+  const { date, label, money, t } = useAdminI18n();
   const resource = useResource<Order>("orders/" + id),
     action = useAction(resource.reload),
     staff = useStaff();
@@ -108,10 +116,12 @@ export function OrderDetails({ id }: { id: string }) {
   return (
     <>
       <Hero
-        title={order ? "Замовлення " + order.summary.orderNumber : "Замовлення"}
+        title={
+          order ? t("Замовлення ") + order.summary.orderNumber : t("Замовлення")
+        }
         action={
           <Link className="treba-admin-button secondary" href="/admin/orders">
-            До списку
+            {t("До списку")}
           </Link>
         }
       />
@@ -121,18 +131,19 @@ export function OrderDetails({ id }: { id: string }) {
       {order && (
         <>
           <div className="treba-admin-two-grid">
-            <Card title="Склад замовлення">
+            <Card icon="bag" title={t("Склад замовлення")}>
               {order.partialOrder && (
                 <p className="treba-admin-note">
-                  Показано тільки ваші позиції замовлення. Доступні дії визначає
-                  сервер.
+                  {t(
+                    "Показано тільки ваші позиції замовлення. Доступні дії визначає сервер.",
+                  )}
                 </p>
               )}
               <Table
                 rows={order.items}
                 columns={[
                   {
-                    title: "Товар",
+                    title: t("Товар"),
                     render: (r) => (
                       <>
                         <strong>{r.productName}</strong>
@@ -142,26 +153,26 @@ export function OrderDetails({ id }: { id: string }) {
                       </>
                     ),
                   },
-                  { title: "Кількість", render: (r) => r.quantity },
-                  { title: "Ціна", render: (r) => money(r.unitPrice) },
-                  { title: "Сума", render: (r) => money(r.totalPrice) },
+                  { title: t("Кількість"), render: (r) => r.quantity },
+                  { title: t("Ціна"), render: (r) => money(r.unitPrice) },
+                  { title: t("Сума"), render: (r) => money(r.totalPrice) },
                 ]}
               />
               <div className="treba-admin-detail-list">
                 <div>
-                  <dt>Вартість товарів</dt>
+                  <dt>{t("Вартість товарів")}</dt>
                   <dd>{money(order.subtotal)}</dd>
                 </div>
                 <div>
-                  <dt>Знижка</dt>
+                  <dt>{t("Знижка")}</dt>
                   <dd>{money(order.discountAmount)}</dd>
                 </div>
                 <div>
-                  <dt>Доставка</dt>
+                  <dt>{t("Доставка")}</dt>
                   <dd>{money(order.deliveryPrice)}</dd>
                 </div>
                 <div>
-                  <dt>Разом</dt>
+                  <dt>{t("Разом")}</dt>
                   <dd>
                     <strong>
                       {money(order.summary.totalAmount, order.summary.currency)}
@@ -170,14 +181,14 @@ export function OrderDetails({ id }: { id: string }) {
                 </div>
               </div>
             </Card>
-            <Card title="Покупець і доставка">
+            <Card icon="user" title={t("Покупець і доставка")}>
               <div className="treba-admin-detail-list">
                 <div>
-                  <dt>Покупець</dt>
+                  <dt>{t("Покупець")}</dt>
                   <dd>{order.summary.customerName}</dd>
                 </div>
                 <div>
-                  <dt>Телефон</dt>
+                  <dt>{t("Телефон")}</dt>
                   <dd>{order.recipientPhone}</dd>
                 </div>
                 <div>
@@ -185,7 +196,7 @@ export function OrderDetails({ id }: { id: string }) {
                   <dd>{order.recipientEmail}</dd>
                 </div>
                 <div>
-                  <dt>Адреса</dt>
+                  <dt>{t("Адреса")}</dt>
                   <dd>
                     {order.address
                       ? `${order.address.city}, ${order.address.street}, ${order.address.building}`
@@ -193,14 +204,17 @@ export function OrderDetails({ id }: { id: string }) {
                   </dd>
                 </div>
                 <div>
-                  <dt>Статус</dt>
+                  <dt>{t("Статус")}</dt>
                   <dd>
                     <Badge value={order.summary.status} />
                   </dd>
                 </div>
               </div>
               {order.customerComment && (
-                <p className="treba-admin-note">Коментар: {order.customerComment}</p>
+                <p className="treba-admin-note">
+                  {t("Коментар: ")}
+                  {order.customerComment}
+                </p>
               )}
               {["Administrator", "Manager"].includes(staff.role) && (
                 <div className="treba-admin-actions">
@@ -208,20 +222,20 @@ export function OrderDetails({ id }: { id: string }) {
                     className="treba-admin-text-link"
                     href={`/admin/customer-activity/${order.summary.customerId}`}
                   >
-                    Історія покупця →
+                    {t("Історія покупця →")}
                   </Link>
                   <Link
                     className="treba-admin-text-link"
                     href={`/admin/support?orderId=${id}`}
                   >
-                    Створити звернення →
+                    {t("Створити звернення →")}
                   </Link>
                 </div>
               )}
             </Card>
           </div>
           <div className="treba-admin-two-grid">
-            <Card title="Історія замовлення">
+            <Card icon="clock" title={t("Історія замовлення")}>
               <div className="treba-admin-timeline">
                 {order.history.map((e, i) => (
                   <div key={i}>
@@ -232,15 +246,15 @@ export function OrderDetails({ id }: { id: string }) {
                 ))}
               </div>
             </Card>
-            <Card title="Змінити статус">
+            <Card icon="clock" title={t("Змінити статус")}>
               {order.allowedStatuses.length ? (
                 <>
-                  <Field label="Наступний статус">
+                  <Field label={t("Наступний статус")}>
                     <select
                       value={status}
                       onChange={(e) => setStatus(e.target.value)}
                     >
-                      <option value="">Оберіть статус</option>
+                      <option value="">{t("Оберіть статус")}</option>
                       {order.allowedStatuses.map((s) => (
                         <option key={s} value={s}>
                           {label(s)}
@@ -248,7 +262,7 @@ export function OrderDetails({ id }: { id: string }) {
                       ))}
                     </select>
                   </Field>
-                  <Field label="Причина / службовий коментар">
+                  <Field label={t("Причина / службовий коментар")}>
                     <textarea
                       maxLength={500}
                       value={reason}
@@ -257,6 +271,7 @@ export function OrderDetails({ id }: { id: string }) {
                   </Field>
                   <div className="treba-admin-actions">
                     <Button
+                      icon="check"
                       disabled={
                         !status ||
                         action.busy ||
@@ -264,13 +279,15 @@ export function OrderDetails({ id }: { id: string }) {
                       }
                       onClick={() => setConfirm(true)}
                     >
-                      Застосувати
+                      {t("Застосувати")}
                     </Button>
                   </div>
                 </>
               ) : (
                 <p className="treba-admin-note">
-                  Для поточного статусу та вашої ролі немає доступних переходів.
+                  {t(
+                    "Для поточного статусу та вашої ролі немає доступних переходів.",
+                  )}
                 </p>
               )}
             </Card>
@@ -280,7 +297,7 @@ export function OrderDetails({ id }: { id: string }) {
       {confirm && order && (
         <Confirm
           error={action.error}
-          title="Змінити статус замовлення?"
+          title={t("Змінити статус замовлення?")}
           busy={action.busy}
           onClose={() => setConfirm(false)}
           onConfirm={() =>
@@ -300,7 +317,7 @@ export function OrderDetails({ id }: { id: string }) {
           </p>
           {status === "PAID" && (
             <p className="treba-admin-note">
-              Підтверджуйте лише фактично отриману оплату.
+              {t("Підтверджуйте лише фактично отриману оплату.")}
             </p>
           )}
         </Confirm>
@@ -308,32 +325,41 @@ export function OrderDetails({ id }: { id: string }) {
     </>
   );
 }
-const ticketColumns = [
-  {
-    title: "Звернення",
-    render: (r: TicketRow) => (
-      <Link className="treba-admin-text-link" href={`/admin/support/${r.id}`}>
-        {r.subject}
-        {r.unreadCount > 0 && ` · ${r.unreadCount} нових`}
-        <small>{r.lastMessage?.slice(0, 100)}</small>
-      </Link>
-    ),
-  },
-  { title: "Покупець", render: (r: TicketRow) => r.customerName },
-  { title: "Тип", render: (r: TicketRow) => label(r.kind) },
-  { title: "Статус", render: (r: TicketRow) => <Badge value={r.status} /> },
-  { title: "Оновлено", render: (r: TicketRow) => date(r.updatedAt) },
-];
+function useTicketColumns() {
+  const { date, label, t } = useAdminI18n();
+  return [
+    {
+      title: t("Звернення"),
+      render: (r: TicketRow) => (
+        <Link className="treba-admin-text-link" href={`/admin/support/${r.id}`}>
+          {r.subject}
+          {r.unreadCount > 0 && t(" · {0} нових", [r.unreadCount])}
+          <small>{r.lastMessage?.slice(0, 100)}</small>
+        </Link>
+      ),
+    },
+    { title: t("Покупець"), render: (r: TicketRow) => r.customerName },
+    { title: t("Тип"), render: (r: TicketRow) => label(r.kind) },
+    {
+      title: t("Статус"),
+      render: (r: TicketRow) => <Badge value={r.status} />,
+    },
+    { title: t("Оновлено"), render: (r: TicketRow) => date(r.updatedAt) },
+  ];
+}
 export function Support({ trash = false }: { trash?: boolean }) {
+  const { label, t } = useAdminI18n();
+  const ticketColumns = useTicketColumns();
   const params = useSearchParams(),
     staff = useStaff(),
     resource = useResource<Paged<TicketRow>>(
       (trash ? "support/deleted?" : "support?") + params,
       5000,
     );
-  const capabilities = useResource<{ canDelete: boolean; canRestore: boolean }>(
-    "support/capabilities",
-  );
+  const capabilities = useResource<{
+    canDelete: boolean;
+    canRestore: boolean;
+  }>("support/capabilities");
   const action = useAction(resource.reload),
     [selected, setSelected] = useState<TicketRow | null>(null),
     [create, setCreate] = useState(false);
@@ -351,12 +377,12 @@ export function Support({ trash = false }: { trash?: boolean }) {
       <Hero
         title={
           trash
-            ? "Кошик чатів"
+            ? t("Кошик чатів")
             : staff.role === "Seller"
-              ? "Питання покупців"
-              : "Підтримка та повернення"
+              ? t("Питання покупців")
+              : t("Підтримка та повернення")
         }
-        description="Звернення, повідомлення та історія рішень."
+        description={t("Звернення, повідомлення та історія рішень.")}
         action={
           !trash && ["Administrator", "Manager"].includes(staff.role) ? (
             <Button
@@ -366,7 +392,7 @@ export function Support({ trash = false }: { trash?: boolean }) {
                 requestId.current = crypto.randomUUID();
               }}
             >
-              Створити звернення
+              {t("Створити звернення")}
             </Button>
           ) : undefined
         }
@@ -375,11 +401,14 @@ export function Support({ trash = false }: { trash?: boolean }) {
       <Feedback action={action} />
       <div className="treba-admin-tabs">
         <Link className="treba-admin-button secondary" href="/admin/support">
-          Вхідні
+          {t("Вхідні")}
         </Link>
         {capabilities.data?.canRestore && (
-          <Link className="treba-admin-button secondary" href="/admin/support/trash">
-            Кошик чатів
+          <Link
+            className="treba-admin-button secondary"
+            href="/admin/support/trash"
+          >
+            {t("Кошик чатів")}
           </Link>
         )}
       </div>
@@ -394,10 +423,10 @@ export function Support({ trash = false }: { trash?: boolean }) {
           {!trash && (
             <select
               name="kind"
-              aria-label="Тип звернення"
+              aria-label={t("Тип звернення")}
               defaultValue={params.get("kind") ?? ""}
             >
-              <option value="">Усі типи</option>
+              <option value="">{t("Усі типи")}</option>
               {["CHAT", "QUESTION", "RETURN"].map((k) => (
                 <option key={k} value={k}>
                   {label(k)}
@@ -416,7 +445,7 @@ export function Support({ trash = false }: { trash?: boolean }) {
                 columns={[
                   ...ticketColumns,
                   {
-                    title: "Дія",
+                    title: t("Дія"),
                     render: (r) =>
                       (
                         trash
@@ -424,11 +453,12 @@ export function Support({ trash = false }: { trash?: boolean }) {
                           : capabilities.data?.canDelete
                       ) ? (
                         <Button
+                          icon="trash"
                           tone={trash ? "secondary" : "danger"}
                           disabled={action.busy}
                           onClick={() => setSelected(r)}
                         >
-                          {trash ? "Відновити" : "До кошика"}
+                          {trash ? t("Відновити") : t("До кошика")}
                         </Button>
                       ) : null,
                   },
@@ -442,7 +472,7 @@ export function Support({ trash = false }: { trash?: boolean }) {
       {selected && (
         <Confirm
           error={action.error}
-          title={trash ? "Відновити чат?" : "Перемістити чат у кошик?"}
+          title={trash ? t("Відновити чат?") : t("Перемістити чат у кошик?")}
           onClose={() => setSelected(null)}
           busy={action.busy}
           onConfirm={() =>
@@ -460,24 +490,26 @@ export function Support({ trash = false }: { trash?: boolean }) {
           <p>{selected.subject}</p>
           <p className="treba-admin-note">
             {trash
-              ? "Повідомлення та попередній статус буде відновлено."
-              : "Чат зникне з активної черги та кабінету покупця. Історія зберігається."}
+              ? t("Повідомлення та попередній статус буде відновлено.")
+              : t(
+                  "Чат зникне з активної черги та кабінету покупця. Історія зберігається.",
+                )}
           </p>
         </Confirm>
       )}
       {create && (
         <Confirm
           error={action.error}
-          title="Нове звернення"
+          title={t("Нове звернення")}
           busy={action.busy}
           onClose={() => setCreate(false)}
           onConfirm={() => {
             if (!orderId) {
-              action.setError("Оберіть замовлення для звернення.");
+              action.setError(t("Оберіть замовлення для звернення."));
               return;
             }
             if (!subject.trim() || !message.trim()) {
-              action.setError("Заповніть тему та повідомлення.");
+              action.setError(t("Заповніть тему та повідомлення."));
               return;
             }
             void action
@@ -495,29 +527,31 @@ export function Support({ trash = false }: { trash?: boolean }) {
           }}
         >
           <div className="treba-admin-form-grid">
-            <Field label="Тип">
+            <Field label={t("Тип")}>
               <select value={kind} onChange={(e) => setKind(e.target.value)}>
-                <option value="QUESTION">Питання</option>
-                <option value="RETURN">Повернення</option>
+                <option value="QUESTION">{t("Питання")}</option>
+                <option value="RETURN">{t("Повернення")}</option>
               </select>
             </Field>
-            <Field label="Знайти замовлення">
+            <Field label={t("Знайти замовлення")}>
               <input
                 value={orderSearch}
-                placeholder="Номер, покупець або телефон"
+                placeholder={t("Номер, покупець або телефон")}
                 onChange={(e) => setOrderSearch(e.target.value)}
               />
             </Field>
-            <Field label="Замовлення">
+            <Field label={t("Замовлення")}>
               <select
                 value={orderId}
                 onChange={(e) => setOrderId(e.target.value)}
               >
-                <option value="">Оберіть замовлення</option>
+                <option value="">{t("Оберіть замовлення")}</option>
                 {orderId &&
                   !availableOrders.data?.content.some(
                     (o) => o.id === orderId,
-                  ) && <option value={orderId}>Поточне замовлення</option>}
+                  ) && (
+                    <option value={orderId}>{t("Поточне замовлення")}</option>
+                  )}
                 {availableOrders.data?.content.map((o) => (
                   <option key={o.id} value={o.id}>
                     {o.orderNumber} · {o.customerName}
@@ -525,14 +559,14 @@ export function Support({ trash = false }: { trash?: boolean }) {
                 ))}
               </select>
             </Field>
-            <Field label="Тема *" wide>
+            <Field label={t("Тема *")} wide>
               <input
                 maxLength={200}
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
               />
             </Field>
-            <Field label="Повідомлення *" wide>
+            <Field label={t("Повідомлення *")} wide>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -547,6 +581,7 @@ export function Support({ trash = false }: { trash?: boolean }) {
   );
 }
 export function TicketDetails({ id }: { id: string }) {
+  const { date, label, t } = useAdminI18n();
   const staff = useStaff();
   const resource = useResource<Ticket>("support/" + id, 5000),
     action = useAction(resource.reload),
@@ -570,7 +605,7 @@ export function TicketDetails({ id }: { id: string }) {
       messageId.current = "";
       await resource.reload();
     } catch (e) {
-      action.setError(e instanceof Error ? e.message : "Помилка надсилання");
+      action.setError(e instanceof Error ? e.message : t("Помилка надсилання"));
     }
   }
   async function earlier() {
@@ -587,13 +622,13 @@ export function TicketDetails({ id }: { id: string }) {
       ]);
       setHasMore(page.hasMore);
     } catch (e) {
-      action.setError(e instanceof Error ? e.message : "Помилка історії");
+      action.setError(e instanceof Error ? e.message : t("Помилка історії"));
     }
   }
   return (
     <>
       <Hero
-        title={ticket?.summary.subject ?? "Звернення"}
+        title={ticket?.summary.subject ?? t("Звернення")}
         description={
           ticket
             ? `${ticket.summary.customerName} · ${label(ticket.summary.kind)}`
@@ -601,7 +636,7 @@ export function TicketDetails({ id }: { id: string }) {
         }
         action={
           <Link className="treba-admin-button secondary" href="/admin/support">
-            До звернень
+            {t("До звернень")}
           </Link>
         }
       />
@@ -610,10 +645,10 @@ export function TicketDetails({ id }: { id: string }) {
       {resource.loading && <Loading />}
       {ticket && (
         <div className="treba-admin-two-grid">
-          <Card title="Переписка">
+          <Card icon="chat" title={t("Переписка")}>
             {ticket.hasEarlierMessages && hasMore && (
               <Button tone="secondary" onClick={() => void earlier()}>
-                Завантажити попередні повідомлення
+                {t("Завантажити попередні повідомлення")}
               </Button>
             )}
             <div className="treba-admin-message-list">
@@ -631,7 +666,9 @@ export function TicketDetails({ id }: { id: string }) {
                       <time>{date(m.createdAt)}</time>
                     </header>
                     {m.internal && (
-                      <small>Внутрішня нотатка · покупець не бачить</small>
+                      <small>
+                        {t("Внутрішня нотатка · покупець не бачить")}
+                      </small>
                     )}
                     <p>{m.message}</p>
                   </article>
@@ -643,7 +680,7 @@ export function TicketDetails({ id }: { id: string }) {
                 void sendMessage();
               }}
             >
-              <Field label="Повідомлення">
+              <Field label={t("Повідомлення")}>
                 <textarea
                   value={text}
                   maxLength={4000}
@@ -652,7 +689,7 @@ export function TicketDetails({ id }: { id: string }) {
                     setText(e.target.value);
                     messageId.current = "";
                   }}
-                  placeholder="Напишіть відповідь…"
+                  placeholder={t("Напишіть відповідь…")}
                 />
               </Field>
               {staff.role !== "Seller" && (
@@ -665,12 +702,12 @@ export function TicketDetails({ id }: { id: string }) {
                       messageId.current = "";
                     }}
                   />
-                  Внутрішня нотатка
+                  {t("Внутрішня нотатка")}
                 </label>
               )}
               <div className="treba-admin-actions">
                 <Button type="submit" icon="arrow" disabled={!text.trim()}>
-                  Надіслати
+                  {t("Надіслати")}
                 </Button>
                 <Button
                   tone="secondary"
@@ -682,33 +719,33 @@ export function TicketDetails({ id }: { id: string }) {
                       });
                   }}
                 >
-                  Позначити прочитаним
+                  {t("Позначити прочитаним")}
                 </Button>
               </div>
             </form>
           </Card>
           <div>
-            <Card title="Деталі звернення">
+            <Card icon="file" title={t("Деталі звернення")}>
               <div className="treba-admin-detail-list">
                 <div>
-                  <dt>Статус</dt>
+                  <dt>{t("Статус")}</dt>
                   <dd>
                     <Badge value={ticket.summary.status} />
                   </dd>
                 </div>
                 <div>
-                  <dt>Покупець</dt>
+                  <dt>{t("Покупець")}</dt>
                   <dd>{ticket.summary.customerName}</dd>
                 </div>
                 <div>
-                  <dt>Замовлення</dt>
+                  <dt>{t("Замовлення")}</dt>
                   <dd>
                     {ticket.summary.orderId ? (
                       <Link
                         className="treba-admin-text-link"
                         href={`/admin/orders/${ticket.summary.orderId}`}
                       >
-                        {ticket.summary.orderNumber ?? "Відкрити"}
+                        {ticket.summary.orderNumber ?? t("Відкрити")}
                       </Link>
                     ) : (
                       "—"
@@ -716,20 +753,20 @@ export function TicketDetails({ id }: { id: string }) {
                   </dd>
                 </div>
                 <div>
-                  <dt>Товар</dt>
+                  <dt>{t("Товар")}</dt>
                   <dd>{ticket.summary.productName ?? "—"}</dd>
                 </div>
               </div>
             </Card>
-            <Card title="Рішення">
+            <Card icon="file" title={t("Рішення")}>
               {ticket.allowedStatuses.length ? (
                 <>
-                  <Field label="Новий статус">
+                  <Field label={t("Новий статус")}>
                     <select
                       value={status}
                       onChange={(e) => setStatus(e.target.value)}
                     >
-                      <option value="">Оберіть…</option>
+                      <option value="">{t("Оберіть…")}</option>
                       {ticket.allowedStatuses.map((s) => (
                         <option key={s} value={s}>
                           {label(s)}
@@ -739,15 +776,16 @@ export function TicketDetails({ id }: { id: string }) {
                   </Field>
                   <div className="treba-admin-actions">
                     <Button
+                      icon="edit"
                       disabled={!status || action.busy}
                       onClick={() => setConfirm(true)}
                     >
-                      Змінити статус
+                      {t("Змінити статус")}
                     </Button>
                   </div>
                 </>
               ) : (
-                <p className="treba-admin-note">Немає доступних дій.</p>
+                <p className="treba-admin-note">{t("Немає доступних дій.")}</p>
               )}
             </Card>
           </div>
@@ -756,7 +794,7 @@ export function TicketDetails({ id }: { id: string }) {
       {confirm && ticket && (
         <Confirm
           error={action.error}
-          title="Підтвердити зміну статусу?"
+          title={t("Підтвердити зміну статусу?")}
           busy={action.busy}
           onClose={() => setConfirm(false)}
           onConfirm={() =>
@@ -776,9 +814,9 @@ export function TicketDetails({ id }: { id: string }) {
             status === "CLOSED" &&
             ticket.summary.status === "APPROVED" && (
               <p className="treba-admin-note">
-                Ви підтверджуєте фактичне отримання всіх повернутих товарів,
-                придатних до продажу. Залишки буде відновлено. Це не виконує
-                грошовий переказ покупцю.
+                {t(
+                  "Ви підтверджуєте фактичне отримання всіх повернутих товарів, придатних до продажу. Залишки буде відновлено. Це не виконує грошовий переказ покупцю.",
+                )}
               </p>
             )}
         </Confirm>
@@ -787,6 +825,9 @@ export function TicketDetails({ id }: { id: string }) {
   );
 }
 export function Customers({ id }: { id?: string }) {
+  const { date, money, t } = useAdminI18n();
+  const orderColumns = useOrderColumns(),
+    ticketColumns = useTicketColumns();
   const params = useSearchParams(),
     list = useResource<Paged<Customer>>(
       !id ? "operations/customers?" + params : null,
@@ -797,8 +838,8 @@ export function Customers({ id }: { id?: string }) {
   return (
     <>
       <Hero
-        title={details.data?.customer.name ?? "Покупці"}
-        description="Історія взаємодії з маркетплейсом."
+        title={details.data?.customer.name ?? t("Покупці")}
+        description={t("Історія взаємодії з маркетплейсом.")}
       />
       <Alert message={list.error || details.error} />
       {!id ? (
@@ -813,7 +854,7 @@ export function Customers({ id }: { id?: string }) {
                   rows={list.data.content}
                   columns={[
                     {
-                      title: "Покупець",
+                      title: t("Покупець"),
                       render: (r) => (
                         <Link
                           className="treba-admin-text-link"
@@ -824,14 +865,14 @@ export function Customers({ id }: { id?: string }) {
                         </Link>
                       ),
                     },
-                    { title: "Замовлень", render: (r) => r.orders },
+                    { title: t("Замовлень"), render: (r) => r.orders },
                     {
-                      title: "Сума замовлень",
+                      title: t("Сума замовлень"),
                       render: (r) => money(r.orderedAmount),
                     },
-                    { title: "Відгуків", render: (r) => r.reviews },
+                    { title: t("Відгуків"), render: (r) => r.reviews },
                     {
-                      title: "Останнє замовлення",
+                      title: t("Останнє замовлення"),
                       render: (r) => date(r.lastOrderAt),
                     },
                   ]}
@@ -846,24 +887,24 @@ export function Customers({ id }: { id?: string }) {
       ) : (
         details.data && (
           <>
-            <Card title="Замовлення">
+            <Card icon="bag" title={t("Замовлення")}>
               <Table rows={details.data.orders} columns={orderColumns} />
             </Card>
-            <Card title="Відгуки">
+            <Card icon="file" title={t("Відгуки")}>
               <Table
                 rows={details.data.reviews}
                 columns={[
-                  { title: "Товар", render: (r) => r.productName },
-                  { title: "Оцінка", render: (r) => `${r.rating} / 5` },
-                  { title: "Відгук", render: (r) => r.comment },
+                  { title: t("Товар"), render: (r) => r.productName },
+                  { title: t("Оцінка"), render: (r) => `${r.rating} / 5` },
+                  { title: t("Відгук"), render: (r) => r.comment },
                   {
-                    title: "Статус",
+                    title: t("Статус"),
                     render: (r) => <Badge value={r.status} />,
                   },
                 ]}
               />
             </Card>
-            <Card title="Звернення">
+            <Card icon="chat" title={t("Звернення")}>
               <Table rows={details.data.tickets} columns={ticketColumns} />
             </Card>
           </>

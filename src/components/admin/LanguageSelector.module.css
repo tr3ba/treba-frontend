@@ -1,0 +1,44 @@
+.selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #edf2fa;
+  border: 1px solid #cbd6e6;
+  border-radius: 9px;
+  padding: 3px;
+  color: #405575;
+  flex-shrink: 0;
+}
+.selector > svg {
+  margin: 0 5px;
+}
+.selector button {
+  border: 0;
+  background: transparent;
+  color: #4f617e;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 7px 9px;
+  cursor: pointer;
+  min-height: 34px;
+}
+.selector button[aria-pressed="true"] {
+  background: #2457ee;
+  color: white;
+  box-shadow: 0 2px 5px #203d6820;
+}
+.selector button:focus-visible {
+  outline: 3px solid #93b0ff;
+  outline-offset: 2px;
+}
+@media (max-width: 768px) {
+  .selector > svg {
+    display: none;
+  }
+  .selector button {
+    min-height: 38px;
+    padding: 6px 8px;
+  }
+}

@@ -3,13 +3,35 @@
 import { useEffect, useRef, ReactNode } from "react";
 import { CloseIcon } from "./Icons";
 import styles from "./AuthForm.module.css";
+import {
+  AdminI18nProvider,
+  useAdminI18n,
+} from "@/features/admin/i18n/provider";
+import { languageCookie } from "@/features/admin/i18n/core";
+import LanguageSelector from "@/components/admin/LanguageSelector";
 
 type AuthModalProps = {
   onClose: () => void;
   children: ReactNode;
 };
 
-export default function AuthModal({ onClose, children }: AuthModalProps) {
+export default function AuthModal(props: AuthModalProps) {
+  return (
+    <AdminI18nProvider manageDocumentTitle={false}>
+      <LocalizedAuthModal {...props} />
+    </AdminI18nProvider>
+  );
+}
+function LocalizedAuthModal({ onClose, children }: AuthModalProps) {
+  const { t, adoptProfileLanguage } = useAdminI18n();
+  useEffect(() => {
+    const preference = document.cookie
+      .split(";")
+      .map((value) => value.trim())
+      .find((value) => value.startsWith(languageCookie + "="))
+      ?.split("=")[1];
+    adoptProfileLanguage(preference);
+  }, [adoptProfileLanguage]);
   // Нажатие началось на затемнении? Иначе выделение текста в поле
   // с отпусканием снаружи закрывало бы окно
   const pressedOnOverlayRef = useRef(false);
@@ -38,7 +60,8 @@ export default function AuthModal({ onClose, children }: AuthModalProps) {
   };
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const shouldClose = pressedOnOverlayRef.current && e.target === e.currentTarget;
+    const shouldClose =
+      pressedOnOverlayRef.current && e.target === e.currentTarget;
     pressedOnOverlayRef.current = false;
     if (shouldClose) onClose();
   };
@@ -50,12 +73,19 @@ export default function AuthModal({ onClose, children }: AuthModalProps) {
       onClick={handleOverlayClick}
       role="presentation"
     >
-      <div className={styles.card} role="dialog" aria-modal="true">
+      <div
+        className={`${styles.card} ${styles.localizedCard}`}
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className={styles.languageBar}>
+          <LanguageSelector />
+        </div>
         <button
           type="button"
           className={styles.closeButton}
           onClick={onClose}
-          aria-label="Закрити"
+          aria-label={t("Закрити")}
         >
           <CloseIcon />
         </button>

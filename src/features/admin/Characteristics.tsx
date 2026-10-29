@@ -1,4 +1,5 @@
 "use client";
+import { useAdminI18n } from "@/features/admin/i18n/provider";
 import { useState } from "react";
 import { Field } from "@/components/admin/ui";
 import type { Attribute, AttributeDefinition, Variant } from "./types";
@@ -13,6 +14,7 @@ export default function Characteristics({
   variants?: Variant[];
   onChange: (values: Attribute[]) => void;
 }) {
+  const { t } = useAdminI18n();
   const [scope, setScope] = useState("");
   function update(def: AttributeDefinition, rows: Partial<Attribute>[]) {
     onChange([
@@ -28,9 +30,9 @@ export default function Characteristics({
   }
   return (
     <>
-      <Field label="Характеристики для">
+      <Field label={t("Характеристики для")}>
         <select value={scope} onChange={(e) => setScope(e.target.value)}>
-          <option value="">Усього товару</option>
+          <option value="">{t("Усього товару")}</option>
           {variants.map((v) => (
             <option key={v.id} value={v.id}>
               {v.name} · {v.sku}
@@ -81,7 +83,7 @@ export default function Characteristics({
                     )
                   }
                 >
-                  <option value="">Не вказано</option>
+                  <option value="">{t("Не вказано")}</option>
                   {def.options.map((o) => (
                     <option key={o.id} value={o.id}>
                       {o.name}
@@ -103,9 +105,9 @@ export default function Characteristics({
                     )
                   }
                 >
-                  <option value="">Не вказано</option>
-                  <option value="true">Так</option>
-                  <option value="false">Ні</option>
+                  <option value="">{t("Не вказано")}</option>
+                  <option value="true">{t("Так")}</option>
+                  <option value="false">{t("Ні")}</option>
                 </select>
               ) : (
                 <input
