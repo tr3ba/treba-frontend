@@ -2,7 +2,7 @@
 
 import { useEffect, useState, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth, type RegistrationChallenge } from "../../context/AuthContext";
 import { buildAuthHref, getSafeNextPath } from "../../lib/redirect";
 import { EyeIcon, EyeOffIcon, GoogleIcon } from "./Icons";
 import styles from "./AuthForm.module.css";
@@ -15,6 +15,7 @@ type FormErrors = {
   email?: string;
   password?: string;
   agree?: string;
+  verificationMethod?: string;
 };
 
 type RegisterFormProps = {
@@ -25,7 +26,7 @@ type RegisterFormProps = {
 export default function RegisterForm({ onSuccess }: RegisterFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { register } = useAuth();
+  const { register, verifyRegistration, resendRegistration } = useAuth();
 
   // Куда вернуть после регистрации (?next=/sell#apply)
   const nextParam = searchParams.get("next");
@@ -44,6 +45,29 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [formError, setFormError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [method, setMethod] = useState<"email" | "sms" | "">("");
+  const [methods, setMethods] = useState<string[]>([]);
+  const [methodsLoaded, setMethodsLoaded] = useState(false);
+  const [challenge, setChallenge] = useState<RegistrationChallenge | null>(null);
+  const [code, setCode] = useState("");
+  const [resendIn, setResendIn] = useState(0);
+  useEffect(() => {
+    let active = true;
+    void fetch("/shop-api/registration/methods", { cache: "no-store" }).then(async response => {
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message);
+      if (active) setMethods(Array.isArray(result.methods) ? result.methods : []);
+    }).catch(() => { if (active) setFormError("Не вдалося завантажити способи підтвердження. Оновіть сторінку."); })
+      .finally(() => { if (active) setMethodsLoaded(true); });
+    return () => { active = false; };
+  }, []);
+  useEffect(() => {
+    if (!challenge) return;
+    const update = () => setResendIn(Math.max(0, Math.ceil((Date.parse(challenge.resendAvailableAt) - Date.now()) / 1000)));
+    update();
+    const timer = setInterval(update, 1000);
+    return () => clearInterval(timer);
+  }, [challenge]);
 
   function isPasswordValid(value: string) {
     return (
@@ -59,7 +83,8 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
     if (!firstName.trim()) nextErrors.firstName = "Вкажіть ім'я";
     if (!lastName.trim()) nextErrors.lastName = "Вкажіть прізвище";
-    if (!phone.trim()) nextErrors.phone = "Вкажіть номер телефону";
+    if (method === "sms" && !phone.trim()) nextErrors.phone = "Вкажіть номер телефону для SMS";
+    if (!method || !methods.includes(method)) nextErrors.verificationMethod = "Оберіть спосіб підтвердження";
 
     if (!email.trim()) {
       nextErrors.email = "Вкажіть ел. пошту";
@@ -85,20 +110,27 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
     e.preventDefault();
     setFormError("");
 
-    if (busy || !validate()) return;
+    if (busy || (!challenge && !validate())) return;
 
     try {
       setBusy(true);
-      await register(
-        `${firstName.trim()} ${lastName.trim()}`.trim(),
-        email,
-        password,
-        {
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          phone: phone.trim(),
-        }
-      );
+      if (challenge) {
+        await verifyRegistration(challenge.challengeId, code);
+      } else {
+        const pending = await register(
+          `${firstName.trim()} ${lastName.trim()}`.trim(),
+          email,
+          password,
+          method as "email" | "sms",
+          {
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            phone: phone.trim(),
+          }
+        );
+        setChallenge(pending); setCode("");
+        return;
+      }
 
       if (nextParam) {
         window.location.replace(nextPath);
@@ -110,6 +142,14 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Помилка реєстрації");
     } finally { setBusy(false); }
+  }
+
+  async function resendCode() {
+    if (!challenge || busy || resendIn > 0) return;
+    setBusy(true); setFormError("");
+    try { setChallenge(await resendRegistration(challenge.challengeId)); setCode(""); }
+    catch (error) { setFormError(error instanceof Error ? error.message : "Не вдалося надіслати код."); }
+    finally { setBusy(false); }
   }
 
   function handleSocialClick(provider: "google" | "facebook") {
@@ -124,6 +164,19 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
         <h1 className={styles.title}>Реєстрація</h1>
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
+          {challenge ? <>
+            <h2>Підтвердьте реєстрацію</h2>
+            <p role="status">Код надіслано {challenge.method === "sms" ? "у SMS" : "на пошту"}: {challenge.maskedDestination}.</p>
+            <p className={styles.hintText}>Код діє до {new Date(challenge.expiresAt).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit" })}.</p>
+            <label className={styles.field}>
+              <span>Код підтвердження</span>
+              <input className={styles.input} autoComplete="one-time-code" inputMode="numeric" maxLength={6} value={code} onChange={event => setCode(event.target.value.replace(/\D/g, ""))} />
+            </label>
+            <button type="button" className={styles.textLink} disabled={busy || resendIn > 0} onClick={resendCode}>
+              {resendIn > 0 ? `Надіслати ще раз через ${resendIn} с` : "Надіслати код ще раз"}
+            </button>
+            <button type="button" className={styles.textLink} disabled={busy} onClick={() => { setChallenge(null); setMethod(""); setCode(""); setFormError(""); }}>← Обрати інший спосіб або змінити дані</button>
+          </> : <>
           <label className={styles.field}>
             <input
               type="text"
@@ -158,7 +211,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
               className={styles.input}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="Номер телефону"
+              placeholder={method === "sms" ? "Номер телефону (+380…)" : "Номер телефону (необов'язково)"}
               autoComplete="tel"
             />
             {errors.phone && (
@@ -210,6 +263,15 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
             )}
           </label>
 
+          <fieldset className={styles.registrationMethods} disabled={busy || !methodsLoaded}>
+            <legend>Як підтвердити реєстрацію?</legend>
+            {(["email", "sms"] as const).map(value => <label key={value}>
+              <input type="radio" name="verificationMethod" value={value} checked={method === value} disabled={!methods.includes(value)} onChange={() => setMethod(value)} />
+              <span>{value === "email" ? "Код на електронну пошту" : "Код у SMS"}{methodsLoaded && !methods.includes(value) ? " — тимчасово недоступно" : ""}</span>
+            </label>)}
+            {errors.verificationMethod && <span className={styles.errorText}>{errors.verificationMethod}</span>}
+          </fieldset>
+
           <div className={styles.agreementRow}>
             <input
               type="checkbox"
@@ -228,11 +290,12 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           {errors.agree && (
             <span className={styles.errorText}>{errors.agree}</span>
           )}
+          </>}
 
-          {formError && <p className={styles.formError}>{formError}</p>}
+          {formError && <p className={styles.formError} role="alert">{formError}</p>}
 
-          <button type="submit" className={styles.submitButton} disabled={busy}>
-            {busy ? "Реєструємо…" : "Зареєструватися"}
+          <button type="submit" className={styles.submitButton} disabled={busy || (challenge ? code.length !== 6 : !methodsLoaded || methods.length === 0)}>
+            {busy ? "Зачекайте…" : challenge ? "Підтвердити реєстрацію" : "Отримати код підтвердження"}
           </button>
         </form>
 
