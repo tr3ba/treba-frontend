@@ -11,14 +11,14 @@ async function compiled(name) {
 const dataUrl = source => "data:text/javascript;base64," + Buffer.from(source).toString("base64");
 const redirects = dataUrl(await compiled("redirect"));
 const source = (await compiled("admin")).replace('from "./redirect"', `from "${redirects}"`);
-const { getLoginDestination, canOpenAdmin, canApplyAsSeller, canUseCustomerAccount, workspaceLabel, adminOrigin } = await import(dataUrl(source));
+const { getLoginDestination, canOpenAdmin, canApplyAsSeller, canUseCustomerAccount, workspaceLabel } = await import(dataUrl(source));
 
 test("every workspace role goes to its panel after login, including from a customer page", () => {
   for (const role of ["Administrator", "Manager", "Moderator", "Seller"]) {
     assert.equal(canOpenAdmin(role), true);
-    assert.equal(getLoginDestination(role), adminOrigin + "/site-login/start");
-    assert.equal(getLoginDestination(role, "/sell#apply"), adminOrigin + "/site-login/start");
-    assert.equal(getLoginDestination(role, "/account"), adminOrigin + "/site-login/start");
+    assert.equal(getLoginDestination(role), "/admin");
+    assert.equal(getLoginDestination(role, "/sell#apply"), "/admin");
+    assert.equal(getLoginDestination(role, "/account"), "/admin");
     assert.equal(canApplyAsSeller(role), false);
     assert.equal(canUseCustomerAccount(role), false);
   }
@@ -38,23 +38,23 @@ test("customers keep modal login and their intended customer destination", () =>
   }
 });
 
-test("an existing admin handoff completes once and keeps its state", () => {
-  const target = "/shop-api/admin-entry?state=" + "A".repeat(64);
+test("workspace return paths survive login and external destinations are discarded", () => {
+  const target = "/admin/orders/fixture?view=history";
   for (const role of ["Administrator", "Manager", "Moderator", "Seller"]) {
     assert.equal(getLoginDestination(role, target), target);
     for (const invalid of ["//outside.test", "https://outside.test", "/login?next=%2Flogin", "/shop-api/admin-entry?state=invalid", "/shop-api/admin-entry/other?state=" + "A".repeat(64)]) {
-      assert.equal(getLoginDestination(role, invalid), adminOrigin + "/site-login/start");
+      assert.equal(getLoginDestination(role, invalid), "/admin");
     }
   }
   assert.equal(getLoginDestination("Customer", "//outside.test"), "/");
 });
 
-test("development can use its configured admin origin", async () => {
+test("workspace login remains on the current website origin", async () => {
   const previous = process.env.NEXT_PUBLIC_ADMIN_URL;
   process.env.NEXT_PUBLIC_ADMIN_URL = "http://localhost:5434/";
   try {
     const local = await import(dataUrl(source + "\n// local admin configuration"));
-    assert.equal(local.getLoginDestination("Administrator"), "http://localhost:5434/site-login/start");
+    assert.equal(local.getLoginDestination("Administrator"), "/admin");
   } finally {
     if (previous === undefined) delete process.env.NEXT_PUBLIC_ADMIN_URL;
     else process.env.NEXT_PUBLIC_ADMIN_URL = previous;

@@ -1,0 +1,313 @@
+export type Paged<T> = {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+};
+export type Lookup = { id: string; name: string };
+export type User = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  middleName?: string;
+  email: string;
+  phone?: string;
+  role: string;
+  status: string;
+  updatedAt?: string;
+  profile?: {
+    avatarUrl?: string;
+    birthDate?: string;
+    gender?: string;
+    language?: string;
+    marketingEmailsEnabled?: boolean;
+  };
+  addresses?: Address[];
+  createdAt: string;
+  lastLoginAt?: string;
+};
+export type Address = {
+  id: string;
+  country: string;
+  city: string;
+  street: string;
+  building: string;
+  recipientName: string;
+  recipientPhone: string;
+};
+export type Variant = {
+  id: string;
+  sku: string;
+  name: string;
+  barcode: string | null;
+  price: number;
+  oldPrice: number | null;
+  stockQuantity: number;
+  isActive: boolean;
+};
+export type Attribute = {
+  attributeId: string;
+  variantId?: string | null;
+  optionId?: string | null;
+  stringValue?: string | null;
+  numberValue?: number | null;
+  boolValue?: boolean | null;
+};
+export type AttributeDefinition = Lookup & {
+  type: string;
+  unit?: string;
+  isRequired: boolean;
+  options: Lookup[];
+};
+export type ProductImage = {
+  id: string;
+  imageUrl: string;
+  isMain: boolean;
+  sortOrder: number;
+};
+export type Product = {
+  id: string;
+  name: string;
+  slug: string;
+  storeId: string;
+  storeName: string;
+  sellerName: string;
+  categoryId: string;
+  categoryName: string;
+  brandId: string;
+  brandName: string;
+  status: string;
+  shortDescription: string;
+  description: string;
+  sku: string;
+  price: number;
+  stockQuantity: number;
+  warrantyMonths: number;
+  countryOfOrigin: string;
+  manufacturerPartNumber: string;
+  updatedAt: string;
+  createdAt: string;
+  images: ProductImage[];
+  variants: Variant[];
+  attributes: Attribute[];
+};
+export type Category = {
+  id: string;
+  name: string;
+  slug: string;
+  isActive: boolean;
+  children: Category[];
+  description?: string;
+  imageUrl?: string;
+  sortOrder: number;
+};
+export type Change = { field: string; before?: string; after?: string };
+export type ModerationEvent = {
+  id: string;
+  occurredAt: string;
+  actorName: string;
+  decision: string;
+  reason?: string;
+};
+export type OrderRow = {
+  id: string;
+  orderNumber: string;
+  customerId: string;
+  customerName: string;
+  status: string;
+  totalAmount: number;
+  currency: string;
+  itemCount: number;
+  createdAt: string;
+};
+export type Order = {
+  summary: OrderRow;
+  recipientPhone: string;
+  recipientEmail: string;
+  customerComment?: string;
+  subtotal: number;
+  discountAmount: number;
+  deliveryPrice: number;
+  address?: Address;
+  items: {
+    id: string;
+    productName: string;
+    variantName: string;
+    sku: string;
+    quantity: number;
+    unitPrice: number;
+    totalPrice: number;
+  }[];
+  history: {
+    previousStatus: string;
+    newStatus: string;
+    comment?: string;
+    createdAt: string;
+  }[];
+  version: string;
+  allowedStatuses: string[];
+  partialOrder: boolean;
+  delivery?: {
+    trackingNumber?: string;
+    provider?: string;
+    status?: string;
+    method?: string;
+  };
+};
+export type TicketRow = {
+  id: string;
+  orderId?: string;
+  orderNumber?: string;
+  customerId: string;
+  customerName: string;
+  kind: string;
+  subject: string;
+  status: string;
+  updatedAt: string;
+  version: string;
+  unreadCount: number;
+  lastMessage?: string;
+  productName?: string;
+};
+export type Message = {
+  id: string;
+  authorName: string;
+  authorRole: string;
+  message: string;
+  internal: boolean;
+  createdAt: string;
+};
+export type Ticket = {
+  summary: TicketRow;
+  messages: Message[];
+  allowedStatuses: string[];
+  hasEarlierMessages: boolean;
+};
+export type Coupon = {
+  id?: string;
+  code: string;
+  usageLimit: number;
+  usageLimitPerUser: number;
+  usedCount?: number;
+  active: boolean;
+};
+export type Promotion = {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  status: string;
+  startAt: string;
+  endAt: string;
+  discountValue: number;
+  maximumDiscount: number | null;
+  minimumOrderAmount: number | null;
+  productId: string | null;
+  categoryId: string | null;
+  brandId: string | null;
+  sellerId: string | null;
+  version?: string;
+  coupons: Coupon[];
+};
+export type Seller = {
+  id: string;
+  userId: string;
+  companyName: string;
+  taxNumber: string;
+  description?: string;
+  phone?: string;
+  email?: string;
+  status: number;
+  createdAt: string;
+};
+export type SellerApplication = {
+  id: string;
+  companyName: string;
+  storeName: string;
+  taxNumber: string;
+  contactName: string;
+  position: string;
+  email: string;
+  phone: string;
+  status: string;
+  reviewNote?: string;
+  createdAt: string;
+  version: string;
+  sellerId?: string;
+};
+export type Review = {
+  id: string;
+  productName: string;
+  productSlug: string;
+  authorName: string;
+  authorEmail: string;
+  rating: number;
+  title: string;
+  comment: string;
+  status: string;
+  verifiedPurchase: boolean;
+  createdAt: string;
+};
+export type Customer = {
+  id: string;
+  name: string;
+  email: string;
+  orders: number;
+  orderedAmount: number;
+  reviews: number;
+  lastOrderAt?: string;
+};
+export type CustomerDetails = {
+  customer: Customer;
+  orders: OrderRow[];
+  reviews: {
+    id: string;
+    productName: string;
+    rating: number;
+    comment?: string;
+    status: string;
+    createdAt: string;
+  }[];
+  tickets: TicketRow[];
+};
+export type Feed = {
+  unreadCount: number;
+  items: {
+    key: string;
+    kind: string;
+    title: string;
+    text: string;
+    path: string;
+    scope: string;
+    createdAt: string;
+    read: boolean;
+  }[];
+};
+export type ImportJob = {
+  id: string;
+  sourceUrl: string;
+  status: string;
+  error?: string;
+  previewId?: string;
+  productId?: string;
+  categoryId?: string;
+  attempts: number;
+};
+export type ImportPreview = {
+  id: string;
+  name: string;
+  description: string;
+  brandName: string;
+  brandId?: string;
+  categoryId: string;
+  categoryName: string;
+  sourcePrice?: number;
+  manufacturerPartNumber: string;
+  barcode: string;
+  images: string[];
+  characteristics: { name: string; value: string }[];
+  duplicates: { id: string; name: string; storeName: string; reason: string }[];
+  canClassifyCategory: boolean;
+  productId?: string;
+};

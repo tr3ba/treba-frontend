@@ -52,8 +52,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       for (const key of ["treba_demo_users", "treba_demo_session"]) sessionStorage.removeItem(key);
     } catch { /* Cookie authentication also works when browser storage is unavailable. */ }
     let active = true;
-    void sessionRequest().then(async result => {
-      if (!result.user || !canUseCustomerAccount(result.user.role)) return;
+    void sessionRequest().catch(async () => {
+      const response = await fetch("/admin-api/session", { cache: "no-store" });
+      return response.ok ? response.json() : { user: null };
+    }).then(async result => {
+      if (!result.user) return;
+      if (canOpenAdmin(result.user.role)) { if (active) setUser({ ...result.user, name: `${result.user.firstName ?? ""} ${result.user.lastName ?? ""}`.trim() }); return; }
+      if (!canUseCustomerAccount(result.user.role)) return;
       let loaded = result.user;
       try { const preferences = await accountRequest<Preferences>("preferences"); loaded = withPreferences(result.user, preferences.values); if (active) setPreferencesVersion(preferences.version); } catch { /* Profile writes retry this request before saving. */ }
       if (active) setUser(loaded);
@@ -104,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const result = await sessionRequest({ action: "guard-complete", id, browserSecret, remember });
     return acceptUser(result.user);
   }
-  async function logout() { try { await sessionRequest({ action: "logout" }); } finally { setUser(null); setPreferencesVersion(null); } }
+  async function logout() { try { if (canOpenAdmin(user?.role)) await fetch("/admin-api/logout", { method: "POST" }); else await sessionRequest({ action: "logout" }); } finally { setUser(null); setPreferencesVersion(null); } }
   async function updateProfile(patch: UserProfile) {
     if (!user) throw new Error("Потрібно увійти в акаунт.");
     const version = preferencesVersion ?? (await accountRequest<Preferences>("preferences")).version;

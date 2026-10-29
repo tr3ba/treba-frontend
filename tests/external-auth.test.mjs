@@ -73,10 +73,10 @@ test("Google and Facebook authorization creates protected website sessions and r
     assert.equal(session.status, 200); const text = await session.text(); assert.ok(text.includes("social-customer")); assert.ok(!text.includes("private-website"));
   });
 
-  await t.test("a staff OAuth login creates only a short-lived admin handoff", async () => {
+  await t.test("a staff OAuth login creates an isolated workspace session", async () => {
     const response = await callback("google", await start("google"), "staff");
-    assert.equal(response.status, 303); assert.equal(response.headers.get("location"), "https://admin.treba.duckdns.org/site-login/start");
-    assert.ok(response.headers.getSetCookie().some(value => value.startsWith("treba_staff_handoff=private-website-access;") && /Path=\/shop-api\/admin-entry/i.test(value)));
+    assert.equal(response.status, 303); assert.equal(new URL(response.headers.get("location"), origin).pathname, "/admin");
+    assert.ok(response.headers.getSetCookie().some(value => value.startsWith("treba_staff_access=private-website-access;") && /Path=\//i.test(value)));
     assert.ok(!response.headers.getSetCookie().some(value => value.startsWith("treba_access=private-website-access;")));
   });
 

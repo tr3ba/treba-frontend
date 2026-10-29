@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
-import { adminOrigin, canOpenAdmin, workspaceLabel } from "../../lib/admin";
+import { canOpenAdmin, workspaceLabel } from "../../lib/admin";
 import styles from "./AccountSidebar.module.css";
 import Icon from "../common/Icon";
 
@@ -91,7 +91,7 @@ export default function AccountSidebar({
       </section>
 
       {canOpenAdmin(user.role) && (
-        <a href={adminOrigin + "/site-login/start"} className={styles.adminEntry}>
+        <a href={"/admin"} className={styles.adminEntry}>
           {workspaceLabel(user.role)}
           <span aria-hidden="true">↗</span>
         </a>

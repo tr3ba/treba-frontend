@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import styles from "../../app/page.module.css";
+import styles from "../../app/(store)/page.module.css";
 import ProductCard from "./ProductCard";
 import BannerSlider from "./BannerSlider";
 import FooterAbout from "./FooterAbout";

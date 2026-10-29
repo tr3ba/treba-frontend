@@ -1,6 +1,1 @@
-import PageLoader from "../components/layout/PageLoader";
-
-// Next показывает это, пока страница загружает данные на сервере
-export default function Loading() {
-  return <PageLoader />;
-}
+export default function Loading() { return <main style={{ padding: "15vh 24px", textAlign: "center" }} role="status">Завантаження…</main>; }

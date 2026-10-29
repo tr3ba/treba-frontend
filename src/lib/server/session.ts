@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { canOpenAdmin } from "../admin";
+import { clearStaffSession, saveStaffSession } from "./staff-session";
 
 const origin = (process.env.TREBA_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "https://treba.duckdns.org").replace(/\/+$/, "");
 type Authentication = { accessToken: string; refreshToken: string; expiresAt: string; role?: string; roleName?: string };
@@ -27,9 +28,11 @@ export function clearAdminHandoff(response: NextResponse) {
 export function saveLoginSession(response: NextResponse, authentication: Authentication, remember = true) {
   if (canOpenAdmin(authentication.role ?? authentication.roleName)) {
     clearSession(response);
-    // The staff credential is only sent to the one-time admin handoff, never to customer APIs.
-    response.cookies.set("treba_staff_handoff", authentication.accessToken, handoffOptions);
+    // Workspace credentials have their own cookies and are never used by customer proxies.
+    clearAdminHandoff(response);
+    saveStaffSession(response, authentication, remember);
   } else {
+    clearStaffSession(response);
     clearAdminHandoff(response);
     saveSession(response, authentication, remember);
   }

@@ -8,7 +8,7 @@ import SellApplicationForm from "./SellApplicationForm";
 import { IconCheck } from "./SellIcons";
 import styles from "./SellApply.module.css";
 import { useAuth } from "../../context/AuthContext";
-import { adminOrigin, canOpenAdmin, workspaceLabel } from "../../lib/admin";
+import { canOpenAdmin, workspaceLabel } from "../../lib/admin";
 import { getSellerApplication } from "../../lib/api/sellerApplication";
 
 const PERKS = [
@@ -42,7 +42,7 @@ export default function SellApply() {
           ? "У вас уже є доступ до кабінету продавця. Керуйте товарами та замовленнями у своїй панелі."
           : "Це обліковий запис співробітника TREBA. Заявка продавця призначена для покупців; робочі інструменти доступні у вашій панелі."}</p>
         <div className={styles.successActions}>
-          <a href={adminOrigin + "/site-login/start"} className={styles.btnPrimary}>{workspaceLabel(user.role)} ↗</a>
+          <a href={"/admin"} className={styles.btnPrimary}>{workspaceLabel(user.role)} ↗</a>
           <Link href="/" className={styles.btnSecondary}>До магазину</Link>
         </div>
       </div>
@@ -104,7 +104,7 @@ export default function SellApply() {
                 >
                   Подати виправлену заявку
                 </button>}
-                {submitted.status === "approved" && <a href={adminOrigin + "/site-login/start"} className={styles.btnPrimary}>Відкрити кабінет продавця</a>}
+                {submitted.status === "approved" && <a href={"/admin"} className={styles.btnPrimary}>Відкрити кабінет продавця</a>}
               </div>
             </div>
           ) : (

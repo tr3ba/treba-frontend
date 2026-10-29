@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "../../context/AuthContext";
 import styles from "./UserMenu.module.css";
-import { adminOrigin, canOpenAdmin, canApplyAsSeller, roleLabel, workspaceLabel } from "../../lib/admin";
+import { canOpenAdmin, canApplyAsSeller, roleLabel, workspaceLabel } from "../../lib/admin";
 import HeaderIcon from "../layout/HeaderIcon";
 import iconStyles from "../layout/HeaderIcon.module.css";
 
@@ -59,7 +59,7 @@ export default function UserMenu() {
           <p className={styles.userEmail}>{user.email}</p>
           {roleLabel(user.role) && <span className={styles.roleBadge}>{roleLabel(user.role)}</span>}
           {!canOpenAdmin(user.role) && <Link href="/account/notifications" className={styles.accountLink} onClick={() => setIsOpen(false)}>Сповіщення</Link>}
-          {canOpenAdmin(user.role) && <a href={adminOrigin + "/site-login/start"} className={styles.accountLink}>{workspaceLabel(user.role)}</a>}
+          {canOpenAdmin(user.role) && <a href={"/admin"} className={styles.accountLink}>{workspaceLabel(user.role)}</a>}
           {!canOpenAdmin(user.role) && <Link
             href="/account"
             className={styles.accountLink}

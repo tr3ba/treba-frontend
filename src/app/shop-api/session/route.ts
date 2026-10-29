@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { authenticated, backend, clearSession, clearAdminHandoff, json, sameOrigin, saveSession, saveLoginSession } from "../../../lib/server/session";
 import { canUseCustomerAccount } from "../../../lib/admin";
 import { resultCookie, transientOptions } from "../../../lib/server/external-auth";
+import { clearStaffSession } from "../../../lib/server/staff-session";
 
 export const runtime = "nodejs";
 function profile(data: Record<string, unknown>) {
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
       const session = await authenticated(request);
       try { if (session) await backend("/api/auth/logout", { method: "POST", headers: { Authorization: `Bearer ${session.token}` }, body: JSON.stringify({ refreshToken: session.renewed?.refreshToken ?? request.cookies.get("treba_refresh")?.value }) }); }
       finally { /* Local cookies are cleared even if the backend has already expired the session. */ }
-      const response = json({ user: null }); clearSession(response); clearAdminHandoff(response); return response;
+      const response = json({ user: null }); clearSession(response); clearAdminHandoff(response); clearStaffSession(response); return response;
     }
     const path = routes[input.action];
     if (!path) return json({}, 400);
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
       return json({ message: result.status === 401 ? "Невірні дані входу або код підтвердження." : "Не вдалося виконати запит. Перевірте дані та спробуйте ще раз." }, result.status);
     }
     if (input.action === "password-reset-complete") {
-      const response = json({ ok: true }); clearSession(response); clearAdminHandoff(response); return response;
+      const response = json({ ok: true }); clearSession(response); clearAdminHandoff(response); clearStaffSession(response); return response;
     }
     if (result.status === 204) return json({ ok: true });
     const data = await result.json();
