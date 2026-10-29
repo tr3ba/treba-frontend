@@ -106,7 +106,7 @@ export default function Overview() {
         title={`Вітаємо, ${user.firstName || "колего"}`}
         description="Усе важливе для роботи з маркетплейсом — в одному місці."
         action={
-          <div className="ad-avatar">
+          <div className="treba-admin-avatar">
             <Icon name="grid" />
           </div>
         }
@@ -121,17 +121,17 @@ export default function Overview() {
             ))}
           </select>
         </Filters>
-        <p className="ad-note">
+        <p className="treba-admin-note">
           Показники за вибраний період. Черги відображають поточний стан.
         </p>
       </Card>
       <Alert message={dashboard.error || metrics.error || stats.error} />
-      <div className="ad-stats">
+      <div className="treba-admin-stats">
         {cards
           .filter((c) => c[2] !== undefined && c[2] !== null)
           .map((c) => (
-            <Link className="ad-stat" key={String(c[1])} href={String(c[3])}>
-              <div className="ad-stat-icon">
+            <Link className="treba-admin-stat" key={String(c[1])} href={String(c[3])}>
+              <div className="treba-admin-stat-icon">
                 <Icon name={String(c[0])} />
               </div>
               <small>{c[1]}</small>
@@ -142,9 +142,9 @@ export default function Overview() {
       </div>
       {stats.loading && <Loading />}
       {metrics.data && (
-        <div className="ad-two-grid">
+        <div className="treba-admin-two-grid">
           <Card title="Замовлення за період">
-            <div className="ad-detail-list">
+            <div className="treba-admin-detail-list">
               <div>
                 <dt>Сума розміщених замовлень</dt>
                 <dd>
@@ -156,13 +156,13 @@ export default function Overview() {
                 <dd>{metrics.data.cancelledOrders}</dd>
               </div>
             </div>
-            <p className="ad-note">
+            <p className="treba-admin-note">
               Без скасованих і повернутих замовлень. Цей показник не є
               підтвердженою виручкою.
             </p>
           </Card>
           <Card title="Потребує уваги">
-            <div className="ad-detail-list">
+            <div className="treba-admin-detail-list">
               <div>
                 <dt>Звернення без відповіді понад 48 год</dt>
                 <dd>{metrics.data.overdueTickets}</dd>
@@ -193,23 +193,23 @@ export default function Overview() {
               { title: "Час", render: (row) => date(row.occurredAt) },
             ]}
           />
-          <p className="ad-note">
+          <p className="treba-admin-note">
             Останній стан записів. Повна історія дій доступна в журналі аудиту.
           </p>
         </Card>
       )}
       {user.role === "Seller" && (
         <Card title="Почніть з каталогу">
-          <p className="ad-note">
+          <p className="treba-admin-note">
             Створюйте товари, завантажуйте фотографії та відправляйте картки на
             перевірку.
           </p>
-          <div className="ad-actions">
-            <Link className="ad-button primary" href="/admin/products/new">
+          <div className="treba-admin-actions">
+            <Link className="treba-admin-button primary" href="/admin/products/new">
               <Icon name="plus" />
               Додати товар
             </Link>
-            <Link className="ad-button secondary" href="/admin/products/import">
+            <Link className="treba-admin-button secondary" href="/admin/products/import">
               <Icon name="upload" />
               Імпорт за посиланням
             </Link>

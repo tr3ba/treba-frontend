@@ -44,13 +44,13 @@ function Thumbnail({ images }: { images: ProductImage[] }) {
       unoptimized
       width={42}
       height={44}
-      className="ad-thumb"
+      className="treba-admin-thumb"
       src={resolveMediaUrl(image.imageUrl) ?? "/icons/box.svg"}
       alt=""
       onError={() => setFailed(true)}
     />
   ) : (
-    <span className="ad-thumb">
+    <span className="treba-admin-thumb">
       <Icon name="image" />
     </span>
   );
@@ -223,9 +223,9 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
           </select>
         </Filters>
         {!moderation && selected.length > 0 && staff.role !== "Moderator" && (
-          <div className="ad-bulk">
+          <div className="treba-admin-bulk">
             <b>Вибрано: {selected.length}</b>
-            <div className="ad-filters">
+            <div className="treba-admin-filters">
               <input
                 type="number"
                 min="0.01"
@@ -317,7 +317,7 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
                   {
                     title: "Товар",
                     render: (p) => (
-                      <div className="ad-product-cell">
+                      <div className="treba-admin-product-cell">
                         <Thumbnail images={p.images} />
                         <div>
                           <strong>{p.name}</strong>
@@ -353,10 +353,10 @@ export function Products({ moderation = false }: { moderation?: boolean }) {
                   {
                     title: "Дії",
                     render: (p) => (
-                      <div className="ad-actions">
+                      <div className="treba-admin-actions">
                         {staff.role !== "Moderator" && (
                           <Link
-                            className="ad-text-link"
+                            className="treba-admin-text-link"
                             href={`/admin/products/${p.id}/edit`}
                           >
                             Редагувати
@@ -501,10 +501,10 @@ function ModerationDetails({ product }: { product: Product }) {
       </Button>
       {open && (
         <>
-          <p className="ad-note">{product.description}</p>
-          <div className="ad-photo-grid">
+          <p className="treba-admin-note">{product.description}</p>
+          <div className="treba-admin-photo-grid">
             {product.images.map((i) => (
-              <div className="ad-photo" key={i.id}>
+              <div className="treba-admin-photo" key={i.id}>
                 <Image
                   unoptimized
                   width={320}
@@ -517,21 +517,21 @@ function ModerationDetails({ product }: { product: Product }) {
           </div>
           <Alert message={comparison.error || history.error} />
           {!comparison.data?.capturedAt ? (
-            <p className="ad-note">
+            <p className="treba-admin-note">
               Попередній знімок для порівняння відсутній.
             </p>
           ) : (
             comparison.data.changes.map((c, i) => (
               <div key={i}>
                 <b>{c.field}</b>
-                <div className="ad-comparison">
+                <div className="treba-admin-comparison">
                   <pre>{c.before || "—"}</pre>
                   <pre>{c.after || "—"}</pre>
                 </div>
               </div>
             ))
           )}
-          <div className="ad-timeline">
+          <div className="treba-admin-timeline">
             {history.data?.map((e) => (
               <div key={e.id}>
                 <b>
@@ -736,7 +736,7 @@ export function ProductEditor({ id }: { id?: string }) {
         title={id ? "Редагування товару" : "Новий товар"}
         description="Заповніть картку, додайте варіанти та фотографії."
         action={
-          <Link className="ad-button secondary" href="/admin/products">
+          <Link className="treba-admin-button secondary" href="/admin/products">
             До каталогу
           </Link>
         }
@@ -745,7 +745,7 @@ export function ProductEditor({ id }: { id?: string }) {
       <Feedback action={action} />
       {recovery && (
         <Card title="Знайдено незбережену чернетку">
-          <div className="ad-actions">
+          <div className="treba-admin-actions">
             <Button
               onClick={() => {
                 setModel(normalizeProduct(recovery.model));
@@ -774,10 +774,10 @@ export function ProductEditor({ id }: { id?: string }) {
           void save();
         }}
       >
-        <div className="ad-two-grid">
+        <div className="treba-admin-two-grid">
           <div>
             <Card title="Основна інформація">
-              <div className="ad-form-grid">
+              <div className="treba-admin-form-grid">
                 <Field label="Назва *" wide>
                   <input
                     value={model.name}
@@ -822,7 +822,7 @@ export function ProductEditor({ id }: { id?: string }) {
             </Card>
             <Card title="Ціни та варіанти">
               {!model.variants.length ? (
-                <div className="ad-three-grid">
+                <div className="treba-admin-three-grid">
                   <Field label="SKU *">
                     <input
                       required
@@ -854,7 +854,7 @@ export function ProductEditor({ id }: { id?: string }) {
                 </div>
               ) : (
                 model.variants.map((v, index) => (
-                  <div className="ad-editor-row" key={v.id}>
+                  <div className="treba-admin-editor-row" key={v.id}>
                     <Field label="Назва">
                       <input
                         value={v.name}
@@ -920,7 +920,7 @@ export function ProductEditor({ id }: { id?: string }) {
                         }
                       />
                     </Field>
-                    <label className="ad-check">
+                    <label className="treba-admin-check">
                       <input
                         type="checkbox"
                         checked={v.isActive}
@@ -945,7 +945,7 @@ export function ProductEditor({ id }: { id?: string }) {
                   </div>
                 ))
               )}
-              <div className="ad-actions">
+              <div className="treba-admin-actions">
                 <Button
                   tone="secondary"
                   icon="plus"
@@ -969,7 +969,7 @@ export function ProductEditor({ id }: { id?: string }) {
             </Card>
             <Card title="Характеристики">
               <Alert message={definitions.error} />
-              <div className="ad-actions">
+              <div className="treba-admin-actions">
                 <Button
                   tone="secondary"
                   icon="plus"
@@ -995,12 +995,12 @@ export function ProductEditor({ id }: { id?: string }) {
                 </Button>
               </div>
               {duplicates?.map((d, i) => (
-                <p className="ad-note" key={i}>
+                <p className="treba-admin-note" key={i}>
                   {d.name} · {d.storeName} · {d.reason}
                 </p>
               ))}
               {duplicates?.length === 0 && (
-                <p className="ad-note">Схожих товарів не знайдено.</p>
+                <p className="treba-admin-note">Схожих товарів не знайдено.</p>
               )}
               <Characteristics
                 definitions={definitions.data ?? []}
@@ -1009,7 +1009,7 @@ export function ProductEditor({ id }: { id?: string }) {
                 onChange={(values) => change("attributes", values)}
               />
               {!definitions.data?.length && (
-                <p className="ad-note">
+                <p className="treba-admin-note">
                   Оберіть категорію, щоб побачити її характеристики.
                 </p>
               )}
@@ -1017,7 +1017,7 @@ export function ProductEditor({ id }: { id?: string }) {
           </div>
           <div>
             <Card title="Публікація">
-              <div className="ad-form-grid">
+              <div className="treba-admin-form-grid">
                 {[
                   ["categoryId", "Категорія", categories.data],
                   ["brandId", "Бренд", brands.data],
@@ -1060,14 +1060,14 @@ export function ProductEditor({ id }: { id?: string }) {
                   />
                 </Field>
               </div>
-              <p className="ad-note">
+              <p className="treba-admin-note">
                 {savedDraft
                   ? "Текст чернетки збережено на цьому пристрої."
                   : "Незбережені зміни зберігаються на цьому пристрої."}{" "}
                 Фотографії також зберігаються в чернетці та завантажуються під
                 час збереження.
               </p>
-              <div className="ad-actions">
+              <div className="treba-admin-actions">
                 <Button
                   type="submit"
                   icon="check"
@@ -1086,12 +1086,12 @@ export function ProductEditor({ id }: { id?: string }) {
               </div>
             </Card>
             <Card title="Фотографії">
-              <p className="ad-note">
+              <p className="treba-admin-note">
                 До 8 зображень, JPEG / PNG / WebP / GIF, до 5 МБ кожне.
               </p>
-              <div className="ad-photo-grid">
+              <div className="treba-admin-photo-grid">
                 {model.images.map((image) => (
-                  <div className="ad-photo" key={image.id}>
+                  <div className="treba-admin-photo" key={image.id}>
                     <Image
                       unoptimized
                       width={320}
@@ -1127,7 +1127,7 @@ export function ProductEditor({ id }: { id?: string }) {
                   </div>
                 ))}
                 {files.map((file, i) => (
-                  <div className="ad-photo" key={i}>
+                  <div className="treba-admin-photo" key={i}>
                     <small>{file.name}</small>
                     <Button
                       tone="icon"
@@ -1140,7 +1140,7 @@ export function ProductEditor({ id }: { id?: string }) {
                   </div>
                 ))}
               </div>
-              <label className="ad-upload">
+              <label className="treba-admin-upload">
                 <Icon name="upload" />
                 <input
                   type="file"

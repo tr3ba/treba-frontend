@@ -53,7 +53,7 @@ export function Badge({ value }: { value: string | number }) {
         ? "orange"
         : "gray";
   return (
-    <span className={`ad-badge ${tone}`}>
+    <span className={`treba-admin-badge ${tone}`}>
       <i />
       {label(text)}
     </span>
@@ -71,9 +71,9 @@ export function Hero({
   eyebrow?: string;
 }) {
   return (
-    <header className="ad-hero">
+    <header className="treba-admin-hero">
       <div>
-        <div className="ad-eyebrow">{eyebrow}</div>
+        <div className="treba-admin-eyebrow">{eyebrow}</div>
         <h1>{title}</h1>
         {description && <p>{description}</p>}
       </div>
@@ -91,7 +91,7 @@ export function Card({
   className?: string;
 }) {
   return (
-    <section className={`ad-card ${className}`}>
+    <section className={`treba-admin-card ${className}`}>
       {title && <h2>{title}</h2>}
       {children}
     </section>
@@ -99,7 +99,7 @@ export function Card({
 }
 export function Alert({ message }: { message?: string }) {
   return message ? (
-    <div className="ad-alert" role="alert">
+    <div className="treba-admin-alert" role="alert">
       <Icon name="shield" />
       {message}
     </div>
@@ -107,7 +107,7 @@ export function Alert({ message }: { message?: string }) {
 }
 export function Loading() {
   return (
-    <div className="ad-skeleton" role="status" aria-label="Завантаження">
+    <div className="treba-admin-skeleton" role="status" aria-label="Завантаження">
       <span />
       <span />
       <span />
@@ -123,7 +123,7 @@ export function Empty({
   description?: string;
 }) {
   return (
-    <div className="ad-empty">
+    <div className="treba-admin-empty">
       <span>
         <Icon name="box" size={32} />
       </span>
@@ -142,7 +142,7 @@ export function Field({
   wide?: boolean;
 }) {
   return (
-    <label className={`ad-field${wide ? " wide" : ""}`}>
+    <label className={`treba-admin-field${wide ? " wide" : ""}`}>
       <span>{label}</span>
       {children}
     </label>
@@ -166,7 +166,7 @@ export function Button({
   return (
     <button
       type={type}
-      className={`ad-button ${tone}`}
+      className={`treba-admin-button ${tone}`}
       disabled={disabled}
       onClick={onClick}
     >
@@ -185,7 +185,7 @@ export function ActionLink({
   icon?: string;
 }) {
   return (
-    <Link className="ad-button primary" href={href}>
+    <Link className="treba-admin-button primary" href={href}>
       <Icon name={icon} size={18} />
       {children}
     </Link>
@@ -200,7 +200,7 @@ export function Table<T>({
 }) {
   if (!rows.length) return <Empty />;
   return (
-    <div className="ad-table-wrap">
+    <div className="treba-admin-table-wrap">
       <table>
         <thead>
           <tr>
@@ -244,9 +244,9 @@ export function Filters({
     router.push(path + "?" + next);
   }
   return (
-    <form key={params.toString()} className="ad-filters" action={submit}>
+    <form key={params.toString()} className="treba-admin-filters" action={submit}>
       {search && (
-        <div className="ad-search">
+        <div className="treba-admin-search">
           <Icon name="search" />
           <input
             aria-label="Пошук"
@@ -275,7 +275,7 @@ export function Filters({
         Застосувати
       </Button>
       {params.size > 0 && (
-        <Link className="ad-text-link" href={path}>
+        <Link className="treba-admin-text-link" href={path}>
           Скинути
         </Link>
       )}
@@ -295,13 +295,13 @@ export function Pagination({
     return path + "?" + p;
   };
   return (
-    <nav className="ad-pagination" aria-label="Сторінки">
+    <nav className="treba-admin-pagination" aria-label="Сторінки">
       <span>
         Усього: <b>{data.totalElements}</b>
       </span>
       <div>
         {data.page > 1 && (
-          <Link className="ad-button secondary" href={url(data.page - 1)}>
+          <Link className="treba-admin-button secondary" href={url(data.page - 1)}>
             ← Назад
           </Link>
         )}
@@ -309,7 +309,7 @@ export function Pagination({
           {data.page} / {Math.max(1, data.totalPages)}
         </span>
         {data.page < data.totalPages && (
-          <Link className="ad-button secondary" href={url(data.page + 1)}>
+          <Link className="treba-admin-button secondary" href={url(data.page + 1)}>
             Далі →
           </Link>
         )}
@@ -351,7 +351,7 @@ export function Feedback({
     <>
       <Alert message={action.error} />
       {action.success && (
-        <div className="ad-success" role="status">
+        <div className="treba-admin-success" role="status">
           <Icon name="check" />
           {action.success}
         </div>
@@ -388,14 +388,14 @@ export function Confirm({
   }, []);
   return (
     <div
-      className="ad-overlay"
+      className="treba-admin-overlay"
       onClick={() => {
         if (!busy) onClose();
       }}
     >
       <section
         ref={dialog}
-        className="ad-dialog"
+        className="treba-admin-dialog"
         role="dialog"
         aria-modal="true"
         aria-label={title}
@@ -426,7 +426,7 @@ export function Confirm({
         <h2>{title}</h2>
         <Alert message={error} />
         <div>{children}</div>
-        <div className="ad-actions">
+        <div className="treba-admin-actions">
           <Button tone="secondary" onClick={onClose} disabled={busy}>
             Скасувати
           </Button>

@@ -32,7 +32,7 @@ export default function Settings({ section }: { section?: string }) {
         title="Налаштування"
         description="Доступи, можливості та інтеграції маркетплейсу."
       />
-      <div className="ad-settings-grid">
+      <div className="treba-admin-settings-grid">
         {[
           [
             "features",
@@ -60,7 +60,7 @@ export default function Settings({ section }: { section?: string }) {
           ],
         ].map(([path, title, description, icon]) => (
           <Link
-            className="ad-setting-link"
+            className="treba-admin-setting-link"
             key={path}
             href={"/admin/settings/" + path}
           >
@@ -104,11 +104,11 @@ function Features() {
               f.key === "support.chat-deletion" ? "Видалення чатів" : f.key
             }
           >
-            <p className="ad-note">
+            <p className="treba-admin-note">
               Дозволяє адміністраторам і менеджерам переміщувати чати в кошик.
               Історія зберігається, відновлення залишається доступним.
             </p>
-            <div className="ad-actions">
+            <div className="treba-admin-actions">
               <Badge value={f.enabled ? "ACTIVE" : "DRAFT"} />
               <Button
                 tone="secondary"
@@ -118,7 +118,7 @@ function Features() {
                 {f.enabled ? "Вимкнути" : "Увімкнути"}
               </Button>
             </div>
-            <small className="ad-note">Оновлено: {date(f.updatedAt)}</small>
+            <small className="treba-admin-note">Оновлено: {date(f.updatedAt)}</small>
           </Card>
         ))
       )}
@@ -251,7 +251,7 @@ function Staff() {
                 });
             }}
           >
-            <div className="ad-form-grid">
+            <div className="treba-admin-form-grid">
               {[
                 ["email", "Email", "email"],
                 ["password", "Пароль (від 12 символів)", "password"],
@@ -302,7 +302,7 @@ function Staff() {
               ))}
             </select>
           </Field>
-          <label className="ad-check">
+          <label className="treba-admin-check">
             <input
               type="checkbox"
               checked={blocked}
@@ -391,9 +391,9 @@ function Audit() {
                       <details>
                         <summary>{r.changes.length} змін</summary>
                         {r.changes.map((c, i) => (
-                          <div className="ad-note" key={i}>
+                          <div className="treba-admin-note" key={i}>
                             <b>{c.field}</b>
-                            <div className="ad-comparison">
+                            <div className="treba-admin-comparison">
                               <pre>{c.before ?? "—"}</pre>
                               <pre>{c.after ?? "—"}</pre>
                             </div>
@@ -442,7 +442,7 @@ function Telegram() {
             );
           }}
         >
-          <div className="ad-form-grid">
+          <div className="treba-admin-form-grid">
             <Field label="Ключ зовнішньої категорії">
               <input
                 name="externalKey"
@@ -461,7 +461,7 @@ function Telegram() {
               </select>
             </Field>
           </div>
-          <div className="ad-actions">
+          <div className="treba-admin-actions">
             <Button type="submit" disabled={action.busy}>
               Зберегти відповідність
             </Button>
@@ -522,7 +522,7 @@ export function Categories() {
       <Alert message={resource.error} />
       <Feedback action={action} />
       <Card>
-        <div className="ad-filters">
+        <div className="treba-admin-filters">
           <input
             aria-label="Знайти категорію"
             placeholder="Знайти категорію…"
@@ -534,9 +534,9 @@ export function Categories() {
           <Loading />
         ) : (
           visible.map((c) => (
-            <div className="ad-tree-row" key={c.id}>
+            <div className="treba-admin-tree-row" key={c.id}>
               <div
-                className="ad-tree-name"
+                className="treba-admin-tree-name"
                 style={{ paddingLeft: c.depth * 20 }}
               >
                 <Button
@@ -561,11 +561,11 @@ export function Categories() {
                 <Icon name="layers" />
                 <div>
                   <strong>{c.name}</strong>
-                  <small className="ad-note"> /{c.slug}</small>
+                  <small className="treba-admin-note"> /{c.slug}</small>
                 </div>
                 <Badge value={c.isActive ? "ACTIVE" : "DRAFT"} />
               </div>
-              <div className="ad-actions">
+              <div className="treba-admin-actions">
                 <Button tone="secondary" onClick={() => setEdit(c)}>
                   Редагувати
                 </Button>
@@ -619,7 +619,7 @@ export function Categories() {
               });
           }}
         >
-          <div className="ad-form-grid">
+          <div className="treba-admin-form-grid">
             <Field label="Назва *">
               <input
                 value={edit.name ?? ""}
@@ -656,7 +656,7 @@ export function Categories() {
               />
             </Field>
           </div>
-          <label className="ad-check">
+          <label className="treba-admin-check">
             <input
               type="checkbox"
               checked={edit.isActive}

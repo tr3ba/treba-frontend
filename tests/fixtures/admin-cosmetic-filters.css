@@ -1,0 +1,8 @@
+/* Generic EasyList selectors that previously hid the authenticated workspace.
+   Source: https://easylist.to/easylist/easylist.txt (2026-10-30). */
+.ad-content,
+.ad-hero,
+.ad-main,
+.ad-sidebar {
+  display: none !important;
+}

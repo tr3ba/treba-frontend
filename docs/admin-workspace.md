@@ -7,6 +7,7 @@ The .NET repository contains the API, business services and database integration
 
 - `(store)` owns storefront providers, catalog navigation, customer contexts and intercepted authentication dialogs. Existing public URLs are unchanged.
 - `/admin` has a separate shell, navigation, styles, session bootstrap and role matrix.
+- Workspace styles use the `treba-admin-` namespace. Generic `ad-*` names collide with cosmetic advertising filters, which can hide the authenticated sidebar and page content without a JavaScript error. Deployment checks use `data-treba-workspace`, independently of CSS names.
 - `/admin-api` is an explicit allowlist of methods and resources. It forwards to the existing `/api/v1/admin`, seller, support, profile, security and Telegram APIs.
 - Workspace cookies use the `treba_staff_*` prefix, HttpOnly, SameSite=Lax, Secure in production and Path=/ so they are available to the workspace and its server routes. Customer proxies only read `treba_*` customer cookies. A successful login clears the other session's cookies.
 - Password, second-factor and external-provider flows use the existing authentication endpoints. Staff logins open `/admin` directly. Existing Blazor cookies are not imported: users sign in once after migration.
@@ -43,6 +44,8 @@ node --test tests/*.test.mjs
 ```
 
 `tests/admin-workspace.test.mjs` runs the production Next server against a disposable local fixture. It checks all administrative read routes, cookie isolation, authorization forwarding, Origin checks, version conflicts, multipart uploads, refresh rotation and logout. Existing customer, OAuth and role-login suites cover the updated login destination and storefront behavior. Real API/domain rules remain covered by the .NET suite.
+
+`tests/admin-cosmetic-filters.test.mjs` prevents workspace elements from reusing generic EasyList selectors. Browser regression checks should apply `tests/fixtures/admin-cosmetic-filters.css` to the production workspace: authenticated navigation and content must remain visible at desktop and mobile widths.
 
 For visual QA only, run `node tests/helpers/admin-fixture.mjs`, then run Next with both API URL variables pointing to `http://127.0.0.1:3199`. Fixture accounts are disposable names such as `Administrator@example.test` and `Seller@example.test`; they never connect to a real database. Do not use fixture credentials with the hosted service.
 

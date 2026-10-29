@@ -80,6 +80,9 @@ check_login_redirect() {
     location=$(curl -sS --max-time 5 -o /dev/null -D - "$1/shop-api/admin-entry?state=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" | tr -d '\r' | sed -n 's/^[Ll]ocation: //p')
     [[ "$location" == /admin ]] || { echo 'Legacy admin entry must open the integrated workspace.'; return 1; }
 }
+check_workspace_document() {
+    curl -fsS --max-time 10 "$1/admin" | grep 'data-treba-workspace=' >/dev/null
+}
 run_frontend "$candidate" '127.0.0.1:'
 address=$(docker port "$candidate" 3000/tcp)
 wait_for "http://$address" / 200
@@ -88,6 +91,7 @@ wait_for "http://$address" /shop-api/admin-entry 307
 check_login_redirect "http://$address"
 wait_for "http://$address" /admin-api/session 401
 wait_for "http://$address" /admin 200
+check_workspace_document "http://$address"
 docker rm -f "$candidate" >/dev/null
 
 docker stop treba-frontend >/dev/null
@@ -101,6 +105,7 @@ wait_for https://treba.duckdns.org /shop-api/admin-entry 307
 check_login_redirect https://treba.duckdns.org
 wait_for https://treba.duckdns.org /admin-api/session 401
 wait_for https://treba.duckdns.org /admin 200
+check_workspace_document https://treba.duckdns.org
 wait_for https://treba.duckdns.org / 200
 completed=1
 echo "Frontend deployment passed. Revision: $revision"

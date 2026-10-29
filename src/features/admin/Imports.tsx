@@ -104,7 +104,7 @@ export default function Imports() {
             ))}
           </select>
         </Field>
-        <div className="ad-actions">
+        <div className="treba-admin-actions">
           <Button
             icon="upload"
             disabled={action.busy || !urls.trim()}
@@ -152,7 +152,7 @@ export default function Imports() {
             {
               title: "Дії",
               render: (j) => (
-                <div className="ad-actions">
+                <div className="treba-admin-actions">
                   {j.previewId && (
                     <Button
                       tone="secondary"
@@ -176,7 +176,7 @@ export default function Imports() {
                   )}
                   {j.productId && (
                     <Link
-                      className="ad-text-link"
+                      className="treba-admin-text-link"
                       href={`/admin/products/${j.productId}/edit`}
                     >
                       Відкрити товар →
@@ -190,9 +190,9 @@ export default function Imports() {
       </Card>
       {preview.data && (
         <Card title="Перевірка імпортованого товару">
-          <div className="ad-photo-grid">
+          <div className="treba-admin-photo-grid">
             {preview.data.images.map((image, i) => (
-              <div className="ad-photo" key={i}>
+              <div className="treba-admin-photo" key={i}>
                 <Image
                   unoptimized
                   width={320}
@@ -203,12 +203,12 @@ export default function Imports() {
               </div>
             ))}
           </div>
-          <p className="ad-note">
+          <p className="treba-admin-note">
             Категорія: {preview.data.categoryName} · Бренд:{" "}
             {preview.data.brandName}
           </p>
           {preview.data.canClassifyCategory && (
-            <div className="ad-editor-row">
+            <div className="treba-admin-editor-row">
               <Field label="Категорія TREBA">
                 <select
                   value={categoryId || preview.data.categoryId}
@@ -258,7 +258,7 @@ export default function Imports() {
             </div>
           )}
           <form key={preview.data.id + preview.data.categoryId} action={submit}>
-            <div className="ad-form-grid">
+            <div className="treba-admin-form-grid">
               <Field label="Назва *" wide>
                 <input name="name" defaultValue={preview.data.name} required />
               </Field>
@@ -372,17 +372,17 @@ export default function Imports() {
               <>
                 <Alert message="Знайдено схожі товари. Перевірте, чи не створюєте дублікат." />
                 {preview.data.duplicates.map((d) => (
-                  <p className="ad-note" key={d.id}>
+                  <p className="treba-admin-note" key={d.id}>
                     {d.name} · {d.storeName} · {d.reason}
                   </p>
                 ))}
-                <label className="ad-check">
+                <label className="treba-admin-check">
                   <input type="checkbox" name="duplicateConfirmed" required />Я
                   перевірив схожі товари та підтверджую створення
                 </label>
               </>
             )}
-            <div className="ad-actions">
+            <div className="treba-admin-actions">
               <Button
                 type="submit"
                 disabled={action.busy || !!preview.data.productId}
@@ -391,7 +391,7 @@ export default function Imports() {
               </Button>
             </div>
           </form>
-          <div className="ad-editor-row">
+          <div className="treba-admin-editor-row">
             <Field label="Бренду немає у списку?">
               <input
                 value={brandName}
