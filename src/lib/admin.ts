@@ -30,8 +30,5 @@ export function getLoginDestination(role?: string, next?: string | null): string
   const path = getSafeNextPath(next);
   if (!canOpenAdmin(role)) return next ? path : null;
 
-  // Complete an existing admin handoff instead of restarting it and replacing its state cookie.
-  const target = new URL(path, "https://treba.invalid");
-  if (target.pathname === "/shop-api/admin-entry" && /^[A-F0-9]{64}$/.test(target.searchParams.get("state") ?? "")) return path;
-  return adminOrigin + "/site-login/start";
+  return path === "/admin" || path.startsWith("/admin/") ? path : "/admin";
 }

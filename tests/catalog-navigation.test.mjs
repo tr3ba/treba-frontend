@@ -114,7 +114,7 @@ test("catalog search keeps filter values and pagination in the URL and backend r
 
 test("notification links keep the exact admin destination and reject external paths", () => {
   const target = notificationHref({ scope: "admin", path: "/orders/fixture" });
-  assert.equal(new URL(target).pathname, "/site-login/start"); assert.equal(new URL(target).searchParams.get("returnUrl"), "/orders/fixture");
+  assert.equal(target, "/admin/orders/fixture");
   assert.equal(notificationHref({ scope: "shop", path: "/account/messages?ticket=fixture" }), "/account/messages?ticket=fixture");
   for (const path of ["//outside.test", "/%2f%2foutside.test", "/\\outside.test", "https://outside.test", "/login?next=%2Flogin"]) assert.equal(notificationHref({ scope: "shop", path }), "/account/notifications");
 });

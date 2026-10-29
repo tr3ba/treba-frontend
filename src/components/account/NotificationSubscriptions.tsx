@@ -5,7 +5,7 @@ import AccountPageShell from "./AccountPageShell";
 import PageTitle from "./PageTitle";
 import { accountRequest } from "../../lib/api/account";
 import { useAuth } from "../../context/AuthContext";
-import styles from "../../app/account/subscriptions/page.module.css";
+import styles from "../../app/(store)/account/subscriptions/page.module.css";
 
 type Settings = { ordersEmail: boolean; ordersTelegram: boolean; supportEmail: boolean; supportTelegram: boolean; version: string; emailAvailable: boolean; telegramAvailable: boolean };
 type LinkStatus = { configured: boolean; linked: boolean; username?: string; telegramUserId?: number; pendingId?: string; pendingTelegramName?: string; pendingUsername?: string };
