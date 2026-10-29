@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
   let input;
   try { const text = await request.text(); if (text.length > 12000) return json({}, 413); input = JSON.parse(text); } catch { return json({}, 400); }
   if (!input || typeof input !== "object" || Array.isArray(input)) return json({}, 400);
-  const routes: Record<string, string> = { login: "/api/auth/login", register: "/api/auth/register", verify: "/api/auth/2fa/verify", email: "/api/auth/2fa/email/send", "guard-start": "/api/telegram/guard", "guard-status": "/api/telegram/guard/status", "guard-complete": "/api/telegram/guard/complete" };
+  const routes: Record<string, string> = { login: "/api/auth/login", register: "/api/auth/register", "registration-verify": "/api/auth/registration/verify", "registration-resend": "/api/auth/registration/resend", "password-reset-request": "/api/auth/password-reset/request", "password-reset-complete": "/api/auth/password-reset/complete", verify: "/api/auth/2fa/verify", email: "/api/auth/2fa/email/send", "guard-start": "/api/telegram/guard", "guard-status": "/api/telegram/guard/status", "guard-complete": "/api/telegram/guard/complete" };
   try {
     if (input.action === "logout") {
       const session = await authenticated(request);
@@ -36,17 +36,34 @@ export async function POST(request: NextRequest) {
     }
     const path = routes[input.action];
     if (!path) return json({}, 400);
-    const body = input.action === "register" ? { email: input.email, password: input.password, firstName: input.firstName, lastName: input.lastName, phoneNumber: input.phone, roleName: "Customer" }
+    const body = input.action === "register" ? { email: input.email, password: input.password, firstName: input.firstName, lastName: input.lastName, phoneNumber: input.phone, roleName: "Customer", verificationMethod: input.verificationMethod }
+      : input.action === "password-reset-request" ? { email: input.email, verificationMethod: input.verificationMethod }
+      : input.action === "password-reset-complete" ? { challengeId: input.challengeId, code: input.code, newPassword: input.newPassword }
       : input.action === "login" ? { email: input.email, password: input.password }
-      : input.action === "email" ? { challengeId: input.challengeId }
+      : input.action === "email" || input.action === "registration-resend" ? { challengeId: input.challengeId }
+      : input.action === "registration-verify" ? { challengeId: input.challengeId, code: input.code }
       : input.action === "guard-start" ? { deviceName: "Вхід із сайту TREBA", loginChallengeId: input.challengeId }
       : input.action === "guard-status" || input.action === "guard-complete" ? { id: input.id, browserSecret: input.browserSecret }
       : { challengeId: input.challengeId, method: input.method, code: input.code };
     if (input.action === "guard-start" && typeof input.challengeId !== "string") return json({}, 400);
     const result = await backend(path, { method: "POST", body: JSON.stringify(body) });
-    if (!result.ok) return json({ message: result.status === 401 ? "Невірні дані входу або код підтвердження." : "Не вдалося виконати запит. Перевірте дані та спробуйте ще раз." }, result.status);
+    if (!result.ok) {
+      if (input.action === "register" || input.action === "registration-verify" || input.action === "registration-resend"
+        || input.action === "password-reset-request" || input.action === "password-reset-complete") {
+        const error = await result.json().catch(() => ({}));
+        const message = result.status === 429 ? "Забагато запитів. Зачекайте хвилину та спробуйте ще раз."
+          : result.status === 401 ? "Невірний або прострочений код. Спробуйте ще раз або надішліть новий код."
+          : error.message ?? error.title;
+        return json({ message: typeof message === "string" ? message.slice(0, 500) : "Не вдалося виконати підтвердження." }, result.status);
+      }
+      return json({ message: result.status === 401 ? "Невірні дані входу або код підтвердження." : "Не вдалося виконати запит. Перевірте дані та спробуйте ще раз." }, result.status);
+    }
+    if (input.action === "password-reset-complete") {
+      const response = json({ ok: true }); clearSession(response); clearAdminHandoff(response); return response;
+    }
     if (result.status === 204) return json({ ok: true });
     const data = await result.json();
+    if (input.action === "register" || input.action === "registration-resend" || input.action === "password-reset-request") return json({ challenge: data });
     if (input.action === "guard-start" || input.action === "guard-status") return json(data);
     if (data.challenge) return json({ challenge: data.challenge });
     const authentication = data.authentication ?? data;

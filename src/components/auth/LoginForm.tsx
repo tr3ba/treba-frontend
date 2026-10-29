@@ -9,6 +9,7 @@ import { EyeIcon, EyeOffIcon, GoogleIcon } from "./Icons";
 import styles from "./AuthForm.module.css";
 import GuardVerification from "./GuardVerification";
 import Icon from "../common/Icon";
+import ForgotPasswordForm from "./ForgotPasswordForm";
 
 type LoginFormProps = {
   /** Закрывает модалку покупателя, если нет явного адреса возврата. */
@@ -23,6 +24,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   const [method, setMethod] = useState("");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
+  const [recoverPassword, setRecoverPassword] = useState(false);
 
   // Куда вернуть после входа (?next=/sell#apply)
   const nextParam = searchParams.get("next");
@@ -116,6 +118,8 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
     window.location.assign(`/shop-api/external/${provider}/start?${new URLSearchParams({ next: nextPath, remember: rememberMe ? "1" : "0" })}`);
   }
 
+  if (recoverPassword) return <ForgotPasswordForm initialEmail={email} onBack={() => { setRecoverPassword(false); setPassword(""); setFormError(""); }} />;
+
   return (
     <>
       <div className={styles.formColumn}>
@@ -187,8 +191,8 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
               Запам&apos;ятати мене
             </label>
 
-            <button type="button" className={styles.textLink}>
-              Нагадати пароль
+            <button type="button" className={styles.textLink} disabled={busy} onClick={() => { setPassword(""); setRecoverPassword(true); }}>
+              Забули пароль?
             </button>
           </div>
 

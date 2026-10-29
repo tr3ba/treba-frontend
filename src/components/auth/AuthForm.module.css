@@ -476,3 +476,16 @@
         animation: none;
     }
 }
+.registrationMethods {
+  display: grid;
+  gap: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 16px;
+  margin: 0;
+}
+
+.registrationMethods legend { padding: 0 6px; font-weight: 600; }
+.registrationMethods label { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.registrationMethods label:has(input:disabled) { color: #6b7280; cursor: default; }
+.registrationMethods input { accent-color: #f97316; }

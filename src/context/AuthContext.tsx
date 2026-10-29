@@ -12,10 +12,16 @@ export type UserProfile = {
 };
 export type User = { id: string; name: string; email: string; role?: string } & UserProfile;
 export type LoginChallenge = { challengeId: string; methods: string[]; maskedEmail: string; expiresAt: string };
+export type RegistrationChallenge = { challengeId: string; method: "email" | "sms"; maskedDestination: string; expiresAt: string; resendAvailableAt: string };
+export type PasswordResetChallenge = { challengeId: string; method: "email" | "sms"; expiresAt: string; resendAvailableAt: string; message: string };
 export type LoginResult = { challenge: LoginChallenge; user?: never } | { user: User; challenge?: never };
 type AuthContextValue = {
   user: User | null; isLoading: boolean;
-  register: (name: string, email: string, password: string, profile?: UserProfile) => Promise<void>;
+  register: (name: string, email: string, password: string, verificationMethod: "email" | "sms", profile?: UserProfile) => Promise<RegistrationChallenge>;
+  verifyRegistration: (challengeId: string, code: string) => Promise<User>;
+  resendRegistration: (challengeId: string) => Promise<RegistrationChallenge>;
+  requestPasswordReset: (email: string, verificationMethod: "email" | "sms") => Promise<PasswordResetChallenge>;
+  completePasswordReset: (challengeId: string, code: string, newPassword: string) => Promise<void>;
   login: (email: string, password: string, remember?: boolean) => Promise<LoginResult>;
   verify: (challengeId: string, method: string, code: string, remember?: boolean) => Promise<User>;
   sendEmailCode: (challengeId: string) => Promise<void>;
@@ -54,9 +60,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }).catch(() => {}).finally(() => { if (active) setIsLoading(false); });
     return () => { active = false; };
   }, []);
-  async function register(name: string, email: string, password: string, profile?: UserProfile) {
-    const result = await sessionRequest({ action: "register", email, password, firstName: profile?.firstName ?? name.split(" ")[0], lastName: profile?.lastName ?? name.split(" ").slice(1).join(" "), phone: profile?.phone });
-    await acceptUser(result.user);
+  async function register(name: string, email: string, password: string, verificationMethod: "email" | "sms", profile?: UserProfile): Promise<RegistrationChallenge> {
+    const result = await sessionRequest({ action: "register", email, password, verificationMethod, firstName: profile?.firstName ?? name.split(" ")[0], lastName: profile?.lastName ?? name.split(" ").slice(1).join(" "), phone: profile?.phone });
+    return result.challenge;
+  }
+  async function verifyRegistration(challengeId: string, code: string) {
+    const result = await sessionRequest({ action: "registration-verify", challengeId, code });
+    return acceptUser(result.user);
+  }
+  async function resendRegistration(challengeId: string): Promise<RegistrationChallenge> {
+    const result = await sessionRequest({ action: "registration-resend", challengeId });
+    return result.challenge;
+  }
+  async function requestPasswordReset(email: string, verificationMethod: "email" | "sms"): Promise<PasswordResetChallenge> {
+    const result = await sessionRequest({ action: "password-reset-request", email, verificationMethod });
+    return result.challenge;
+  }
+  async function completePasswordReset(challengeId: string, code: string, newPassword: string) {
+    await sessionRequest({ action: "password-reset-complete", challengeId, code, newPassword });
+    setUser(null); setPreferencesVersion(null);
   }
   async function acceptUser(value: User | null | undefined): Promise<User> {
     if (!value?.id) throw new Error("Не вдалося підтвердити вхід.");
@@ -90,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setPreferencesVersion(result.version);
     setUser(previous => previous?.id === user.id ? withPreferences(previous, result.values) : previous);
   }
-  return <AuthContext.Provider value={{ user, isLoading, register, login, verify, sendEmailCode, verifyGuard, logout, updateProfile }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, isLoading, register, verifyRegistration, resendRegistration, requestPasswordReset, completePasswordReset, login, verify, sendEmailCode, verifyGuard, logout, updateProfile }}>{children}</AuthContext.Provider>;
 }
 export function useAuth() {
   const context = useContext(AuthContext);
