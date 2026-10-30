@@ -8,28 +8,17 @@ export default function LanguageSelector() {
   return (
     <div
       className={styles.selector}
-      role="group"
-      aria-label={t("Мова інтерфейсу")}
     >
       <Icon name="globe" size={17} />
-      <button
-        type="button"
-        lang="uk"
-        aria-label="Українська"
-        aria-pressed={language === "uk"}
-        onClick={() => setLanguage("uk")}
+      <select
+        aria-label={t("Мова інтерфейсу")}
+        value={language}
+        onChange={(event) => setLanguage(event.target.value === "en" ? "en" : "uk")}
       >
-        UK
-      </button>
-      <button
-        type="button"
-        lang="en"
-        aria-label="English"
-        aria-pressed={language === "en"}
-        onClick={() => setLanguage("en")}
-      >
-        EN
-      </button>
+        <option value="uk" lang="uk">Українська</option>
+        <option value="en" lang="en">English</option>
+      </select>
+      <Icon name="chevron" size={14} />
     </div>
   );
 }
