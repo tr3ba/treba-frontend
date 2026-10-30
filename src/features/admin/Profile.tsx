@@ -2,11 +2,15 @@
 import { useAdminI18n } from "@/features/admin/i18n/provider";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import AvatarCropModal from "@/components/admin/AvatarCropModal";
+import UserAvatar from "@/components/admin/UserAvatar";
+import { useUpdateStaff } from "@/components/admin/AdminShell";
 import {
   Alert,
   Button,
   Card,
+  Confirm,
   Feedback,
   Field,
   Hero,
@@ -16,15 +20,25 @@ import {
 import { useResource } from "./api";
 import type { Feed, User } from "./types";
 import { normalizeLanguage, type AdminLanguage } from "./i18n/core";
-import { resolveMediaUrl } from "@/lib/api/client";
 export default function Profile() {
   const { t, language, setLanguage } = useAdminI18n();
+  const updateStaff = useUpdateStaff();
+  const photoInput = useRef<HTMLInputElement>(null);
+  const [photo, setPhoto] = useState<File | null>(null);
   const [preferredLanguage, setPreferredLanguage] =
     useState<AdminLanguage | null>(null);
   const resource = useResource<User>("profile"),
     [edited, setModel] = useState<User | null>(null),
     action = useAction(resource.reload);
   const model = edited ?? resource.data;
+  function applyAvatar(result: User) {
+    resource.setData(result);
+    updateStaff(result);
+    setModel(current => current ? {
+      ...current,
+      profile: { ...current.profile, avatarUrl: result.profile?.avatarUrl },
+    } : null);
+  }
   return (
     <>
       <Hero
@@ -32,7 +46,7 @@ export default function Profile() {
         description={t("Особисті дані та захист облікового запису.")}
       />
       <Alert message={resource.error} />
-      <Feedback action={action} />
+      {!photo && <Feedback action={action} />}
       {!model ? (
         <Loading />
       ) : (
@@ -60,6 +74,7 @@ export default function Profile() {
                   )
                   .then((result) => {
                     if (result) {
+                      updateStaff(result);
                       setModel(null);
                       setPreferredLanguage(null);
                       setLanguage(normalizeLanguage(result.profile?.language));
@@ -141,52 +156,62 @@ export default function Profile() {
             </form>
           </Card>
           <Card icon="image" title={t("Фото профілю")}>
-            {resource.data?.profile?.avatarUrl && (
-              <Image
-                unoptimized
-                width={80}
-                height={80}
-                className="treba-admin-profile-photo"
-                src={
-                  resolveMediaUrl(resource.data?.profile?.avatarUrl) ??
-                  "/icons/box.svg"
+            <div className="treba-admin-photo-picker">
+              <UserAvatar user={resource.data ?? model} size={96} className="treba-admin-profile-photo" />
+              <div>
+                <p className="treba-admin-note">{t("Це фото відображатиметься у вашому профілі та в шапці робочого простору.")}</p>
+                <p className="treba-admin-note">{t("JPG, PNG, WebP або GIF, до 5 МБ. Перед збереженням ви зможете вибрати центр фото.")}</p>
+              </div>
+            </div>
+            <input
+              ref={photoInput}
+              type="file"
+              hidden
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              aria-label={t("Обрати фото")}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                e.target.value = "";
+                if (!file) return;
+                action.setError("");
+                action.setSuccess("");
+                if (file.size > 5 * 1024 * 1024) {
+                  action.setError(t("Максимальний розмір фото — 5 МБ."));
+                  return;
                 }
-                alt={t("Фото профілю")}
-              />
-            )}
-            <Field label={t("Оберіть фото (до 5 МБ)")}>
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  if (file.size > 5 * 1024 * 1024) {
-                    action.setError(t("Максимальний розмір фото — 5 МБ."));
-                    return;
-                  }
-                  const form = new FormData();
-                  form.append("avatar", file);
-                  void action.run("profile/avatar", form);
-                }}
-              />
-            </Field>
-            {resource.data?.profile?.avatarUrl && (
-              <div className="treba-admin-actions">
+                if (!/^image\/(jpeg|png|webp|gif)$/.test(file.type) && !/\.(jpe?g|png|webp|gif)$/i.test(file.name)) {
+                  action.setError(t("Оберіть фото у форматі JPG, PNG, WebP або GIF."));
+                  return;
+                }
+                setPhoto(file);
+              }}
+            />
+            <div className="treba-admin-actions">
+              <Button icon="upload" disabled={action.busy} onClick={() => photoInput.current?.click()}>
+                {resource.data?.profile?.avatarUrl ? t("Змінити фото") : t("Обрати фото")}
+              </Button>
+              {resource.data?.profile?.avatarUrl && (
                 <Button
                   icon="trash"
                   tone="danger"
-                  onClick={() =>
-                    void action.run("profile/avatar", undefined, "DELETE")
-                  }
+                  disabled={action.busy}
+                  onClick={() => void action.run<User>("profile/avatar", undefined, "DELETE").then(result => { if (result) applyAvatar(result); })}
                 >
                   {t("Видалити фото")}
                 </Button>
-              </div>
-            )}
+              )}
+            </div>
           </Card>
         </div>
       )}
+      {photo && <AvatarCropModal file={photo} busy={action.busy} error={action.error} onClose={() => setPhoto(null)} onSave={async file => {
+        const form = new FormData();
+        form.append("avatar", file);
+        const result = await action.run<User>("profile/avatar", form);
+        if (!result) return false;
+        applyAvatar(result);
+        return true;
+      }} />}
       <div className="treba-admin-two-grid">
         <Security />
         <TelegramLink />
@@ -212,11 +237,34 @@ function Security() {
       maskedEmail: string;
     } | null>(null),
     [code, setCode] = useState(""),
-    [mode, setMode] = useState("");
+    [mode, setMode] = useState<"authenticator/confirm" | "authenticator/disable" | "email/confirm" | "email/disable/confirm" | null>(null);
+  const form = useRef<HTMLFormElement>(null);
+  const ready = mode === "authenticator/disable" || (mode === "authenticator/confirm" ? !!setup : !!emailChallenge);
+  function close(completed = false) {
+    setMode(null);
+    setSetup(null);
+    setEmailChallenge(null);
+    setCode("");
+    action.setError("");
+    if (!completed) action.setSuccess("");
+  }
+  function start(next: NonNullable<typeof mode>) {
+    setMode(next);
+    setCode("");
+    setSetup(null);
+    setEmailChallenge(null);
+    action.setError("");
+    action.setSuccess("");
+    if (next === "authenticator/confirm") {
+      void action.run<typeof setup>("security/authenticator/setup", {}).then(result => { if (result) setSetup(result); });
+    } else if (next.startsWith("email/")) {
+      void action.run<typeof emailChallenge>(`security/email/${next === "email/confirm" ? "setup" : "disable/start"}`, {}).then(result => { if (result) setEmailChallenge(result); });
+    }
+  }
   return (
-    <Card icon="file" title={t("Захист облікового запису")}>
+    <Card icon="shield" title={t("Захист облікового запису")}>
       <Alert message={resource.error} />
-      <Feedback action={action} />
+      {!mode && <Feedback action={action} />}
       <p className="treba-admin-note">
         Google Authenticator:{" "}
         {resource.data?.authenticatorEnabled ? t("увімкнено") : t("вимкнено")}
@@ -228,23 +276,8 @@ function Security() {
         <Button
           icon="lock"
           tone="secondary"
-          disabled={action.busy}
-          onClick={() => {
-            setCode("");
-            setEmailChallenge(null);
-            if (resource.data?.authenticatorEnabled) {
-              setSetup(null);
-              setMode("authenticator/disable");
-            } else
-              void action
-                .run<typeof setup>("security/authenticator/setup", {})
-                .then((result) => {
-                  if (result) {
-                    setSetup(result);
-                    setMode("authenticator/confirm");
-                  }
-                });
-          }}
+          disabled={action.busy || !resource.data}
+          onClick={() => start(resource.data?.authenticatorEnabled ? "authenticator/disable" : "authenticator/confirm")}
         >
           {resource.data?.authenticatorEnabled
             ? t("Вимкнути Authenticator")
@@ -253,56 +286,39 @@ function Security() {
         <Button
           icon="mail"
           tone="secondary"
-          disabled={action.busy}
-          onClick={() => {
-            setCode("");
-            setSetup(null);
-            const disabling = resource.data?.emailTwoFactorEnabled;
-            void action
-              .run<typeof emailChallenge>(
-                `security/email/${disabling ? "disable/start" : "setup"}`,
-                {},
-              )
-              .then((result) => {
-                if (result) {
-                  setEmailChallenge(result);
-                  setMode(
-                    disabling ? "email/disable/confirm" : "email/confirm",
-                  );
-                }
-              });
-          }}
+          disabled={action.busy || !resource.data}
+          onClick={() => start(resource.data?.emailTwoFactorEnabled ? "email/disable/confirm" : "email/confirm")}
         >
           {resource.data?.emailTwoFactorEnabled
             ? t("Вимкнути пошту")
             : t("Підключити пошту")}
         </Button>
       </div>
-      {setup && (
-        <>
-          <Image
-            unoptimized
-            src={setup.qrCodeDataUrl}
-            alt={t("QR-код для Authenticator")}
-            width={180}
-            height={180}
-          />
-          <p className="treba-admin-note">
-            {t("Ключ: ")}
-            {setup.manualKey}
-          </p>
-        </>
-      )}
-      {emailChallenge && (
-        <p className="treba-admin-note">
-          {t("Код надіслано на ")}
-          {emailChallenge.maskedEmail}.
-        </p>
-      )}
       {mode && (
-        <form
+        <Confirm
+          title={mode.startsWith("authenticator/")
+            ? mode === "authenticator/disable" ? t("Вимкнути Authenticator") : t("Підключити Authenticator")
+            : mode === "email/disable/confirm" ? t("Вимкнути пошту") : t("Підключити пошту")}
+          onClose={() => close()}
+          onConfirm={() => form.current?.requestSubmit()}
+          busy={action.busy}
+          confirmDisabled={!ready}
+          error={action.error}
+        >
+          {action.busy && !ready && <Loading />}
+          {!ready && !action.busy && <Button tone="secondary" icon="refresh" onClick={() => start(mode)}>{t("Спробувати ще раз")}</Button>}
+          {setup && <div className="treba-admin-security-setup">
+            <p className="treba-admin-note">{t("Відскануйте QR-код у застосунку Authenticator або введіть ключ вручну. Потім введіть шестизначний код.")}</p>
+            <Image unoptimized src={setup.qrCodeDataUrl} alt={t("QR-код для Authenticator")} width={180} height={180} />
+            <p className="treba-admin-note">{t("Ключ: ")}<code>{setup.manualKey}</code></p>
+          </div>}
+          {emailChallenge && <p className="treba-admin-note">{t("Код надіслано на ")}{emailChallenge.maskedEmail}.</p>}
+          {mode === "authenticator/disable" && <p className="treba-admin-note">{t("Введіть поточний шестизначний код із застосунку Authenticator, щоб підтвердити вимкнення.")}</p>}
+          {ready && <form
+          ref={form}
           onSubmit={(e) => {
             e.preventDefault();
+            if (action.busy) return;
             void action
               .run("security/" + mode, {
                 code,
@@ -312,10 +328,7 @@ function Security() {
               })
               .then((result) => {
                 if (result === undefined) return;
-                setCode("");
-                setSetup(null);
-                setEmailChallenge(null);
-                setMode("");
+                close(true);
               });
           }}
         >
@@ -324,29 +337,15 @@ function Security() {
               inputMode="numeric"
               pattern="[0-9]{6}"
               autoComplete="one-time-code"
+              disabled={action.busy}
               required
               value={code}
               onChange={(e) => setCode(e.target.value)}
               maxLength={6}
             />
           </Field>
-          <div className="treba-admin-actions">
-            <Button icon="check" type="submit" disabled={action.busy}>
-              {t("Підтвердити")}
-            </Button>
-            <Button
-              icon="close"
-              tone="secondary"
-              onClick={() => {
-                setMode("");
-                setSetup(null);
-                setEmailChallenge(null);
-              }}
-            >
-              {t("Скасувати")}
-            </Button>
-          </div>
-        </form>
+        </form>}
+        </Confirm>
       )}
     </Card>
   );

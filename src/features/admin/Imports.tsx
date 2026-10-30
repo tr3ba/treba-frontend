@@ -2,19 +2,22 @@
 import { useAdminI18n } from "@/features/admin/i18n/provider";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Alert,
   Badge,
   Button,
   Card,
+  Confirm,
   Feedback,
   Field,
   Hero,
+  Loading,
   Table,
   useAction,
 } from "@/components/admin/ui";
 import { useResource } from "./api";
+import { importedAttributeValue } from "./import-attributes";
 import type {
   AttributeDefinition,
   ImportJob,
@@ -22,7 +25,8 @@ import type {
   Lookup,
 } from "./types";
 export default function Imports() {
-  const { t } = useAdminI18n();
+  const { t, error: translateError } = useAdminI18n();
+  const previewForm = useRef<HTMLFormElement>(null);
   const jobs = useResource<ImportJob[]>("imports/queue", 3000),
     options = useResource<{
       categories: Lookup[];
@@ -45,7 +49,7 @@ export default function Imports() {
         : null,
     );
   async function submit(form: FormData) {
-    if (!preview.data) return;
+    if (!preview.data || action.busy) return;
     const fields = Object.fromEntries(form);
     const attributes = (definitions.data ?? []).flatMap((d) => {
       const values = form
@@ -83,7 +87,7 @@ export default function Imports() {
           "Додайте посилання, перевірте дані та створіть картку у своєму магазині.",
         )}
       />
-      <Alert message={jobs.error || options.error || preview.error} />
+      <Alert message={jobs.error || options.error} />
       <Feedback action={action} />
       <Card icon="file" title={t("Посилання на товари")}>
         <Field label={t("Кожне посилання з нового рядка, до 20 за раз")}>
@@ -148,7 +152,7 @@ export default function Imports() {
               render: (j) => (
                 <>
                   <Badge value={j.status} />
-                  <small>{j.error}</small>
+                  <small>{j.error ? translateError(j.error) : ""}</small>
                 </>
               ),
             },
@@ -156,16 +160,17 @@ export default function Imports() {
               title: t("Дії"),
               render: (j) => (
                 <div className="treba-admin-actions">
-                  {j.previewId && (
+                  {j.previewId && j.status.toUpperCase() !== "EXPIRED" && (
                     <Button
                       icon="shield"
                       tone="secondary"
-                      onClick={() => setPreviewId(j.previewId!)}
+                      disabled={action.busy}
+                      onClick={() => { action.setError(""); action.setSuccess(""); setPreviewId(j.previewId!); if (previewId === j.previewId) void preview.reload(); }}
                     >
                       {t("Перевірити")}
                     </Button>
                   )}
-                  {j.status === "FAILED" && (
+                  {["FAILED", "EXPIRED"].includes(j.status.toUpperCase()) && (
                     <Button
                       tone="secondary"
                       disabled={action.busy}
@@ -192,8 +197,15 @@ export default function Imports() {
           ]}
         />
       </Card>
-      {preview.data && (
-        <Card icon="file" title={t("Перевірка імпортованого товару")}>
+      {previewId && (
+        <Confirm title={t("Перевірка імпортованого товару")} className="treba-admin-import-dialog"
+          busy={action.busy} error={action.error || preview.error}
+          confirmLabel={t("Створити товар")} confirmIcon="plus"
+          confirmDisabled={!preview.data || preview.data.id !== previewId || !!preview.data.productId || preview.loading}
+          onClose={() => setPreviewId(null)} onConfirm={() => previewForm.current?.requestSubmit()}>
+          {(preview.loading || (!preview.data && !preview.error)) && <Loading />}
+          {preview.error && <Button tone="secondary" icon="refresh" onClick={() => void preview.reload()}>{t("Спробувати ще раз")}</Button>}
+          {preview.data?.id === previewId && <>
           <div className="treba-admin-photo-grid">
             {preview.data.images.map((image, i) => (
               <div className="treba-admin-photo" key={i}>
@@ -212,6 +224,12 @@ export default function Imports() {
             {preview.data.categoryName}
             {t(" · Бренд:")} {preview.data.brandName}
           </p>
+          {preview.data.sourceCurrency && preview.data.sourceCurrency !== "UAH" && <Alert message={t("Ціну джерела вказано у {0}. Укажіть власну ціну в гривнях перед створенням товару.", [preview.data.sourceCurrency])} />}
+          {preview.data.sourceWarnings?.map(warning => <Alert key={warning} message={warning} />)}
+          {!preview.data.images.length && <p className="treba-admin-note">{t("Фото на сторінці не знайдено. Їх можна додати в редакторі товару.")}</p>}
+          {preview.data.characteristics.length > 0 && <details className="treba-admin-import-source-details"><summary>{t("Характеристики джерела ({0})", [preview.data.characteristics.length])}</summary>
+            <dl>{preview.data.characteristics.map((item, index) => <div key={index}><dt>{item.name}</dt><dd>{item.value}</dd></div>)}</dl>
+          </details>}
           {preview.data.canClassifyCategory && (
             <div className="treba-admin-editor-row">
               <Field label={t("Категорія TREBA")}>
@@ -264,7 +282,7 @@ export default function Imports() {
               </Button>
             </div>
           )}
-          <form key={preview.data.id + preview.data.categoryId} action={submit}>
+          <form ref={previewForm} key={preview.data.id + preview.data.categoryId} onSubmit={event => { event.preventDefault(); void submit(new FormData(event.currentTarget)); }}>
             <div className="treba-admin-form-grid">
               <Field label={t("Назва *")} wide>
                 <input name="name" defaultValue={preview.data.name} required />
@@ -300,7 +318,7 @@ export default function Imports() {
                 </select>
               </Field>
               <Field label="SKU *">
-                <input name="sku" required />
+                <input name="sku" required defaultValue={preview.data.sourceSku ?? ""} />
               </Field>
               <Field label={t("Артикул виробника")}>
                 <input
@@ -337,6 +355,7 @@ export default function Imports() {
                       name={"attr:" + d.id}
                       multiple={d.type.toUpperCase() === "MULTI_SELECT"}
                       required={d.isRequired}
+                      defaultValue={importedAttributeValue(d, preview.data!.characteristics)}
                     >
                       <option value="">{t("Оберіть значення")}</option>
                       {d.options.map((o) => (
@@ -346,7 +365,7 @@ export default function Imports() {
                       ))}
                     </select>
                   ) : ["BOOL", "BOOLEAN"].includes(d.type.toUpperCase()) ? (
-                    <select name={"attr:" + d.id} required={d.isRequired}>
+                    <select name={"attr:" + d.id} required={d.isRequired} defaultValue={importedAttributeValue(d, preview.data!.characteristics)}>
                       <option value="">{t("Не вказано")}</option>
                       <option value="true">{t("Так")}</option>
                       <option value="false">{t("Ні")}</option>
@@ -366,9 +385,7 @@ export default function Imports() {
                         d.type.toUpperCase() === "NUMBER" ? "any" : undefined
                       }
                       defaultValue={
-                        preview.data?.characteristics.find(
-                          (c) => c.name.toLowerCase() === d.name.toLowerCase(),
-                        )?.value ?? ""
+                        importedAttributeValue(d, preview.data!.characteristics)
                       }
                     />
                   )}
@@ -393,15 +410,7 @@ export default function Imports() {
                 </label>
               </>
             )}
-            <div className="treba-admin-actions">
-              <Button
-                icon="plus"
-                type="submit"
-                disabled={action.busy || !!preview.data.productId}
-              >
-                {t("Створити товар")}
-              </Button>
-            </div>
+            <p className="treba-admin-note">{t("Залишок у вашому магазині вкажіть самостійно. Наявність на сайті джерела збережено лише для довідки.")}</p>
           </form>
           <div className="treba-admin-editor-row">
             <Field label={t("Бренду немає у списку?")}>
@@ -424,7 +433,8 @@ export default function Imports() {
               {t("Створити бренд")}
             </Button>
           </div>
-        </Card>
+          </>}
+        </Confirm>
       )}
     </>
   );

@@ -65,6 +65,7 @@ export type ProductImage = {
   imageUrl: string;
   isMain: boolean;
   sortOrder: number;
+  altText?: string | null;
 };
 export type Product = {
   id: string;
@@ -238,6 +239,7 @@ export type SellerApplication = {
 };
 export type Review = {
   id: string;
+  productId: string;
   productName: string;
   productSlug: string;
   authorName: string;
@@ -248,6 +250,17 @@ export type Review = {
   status: string;
   verifiedPurchase: boolean;
   createdAt: string;
+  staffReply?: string | null;
+  staffRepliedAt?: string | null;
+};
+export type ReviewReplyTemplate = {
+  id: string;
+  name: string;
+  textUk: string;
+  textEn: string;
+  enabled: boolean;
+  version: string;
+  updatedAt: string;
 };
 export type Customer = {
   id: string;
@@ -303,6 +316,9 @@ export type ImportPreview = {
   categoryId: string;
   categoryName: string;
   sourcePrice?: number;
+  sourceSku?: string;
+  sourceCurrency?: string;
+  sourceWarnings?: string[];
   manufacturerPartNumber: string;
   barcode: string;
   images: string[];

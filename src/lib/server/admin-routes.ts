@@ -48,6 +48,7 @@ const rules: [string, RegExp, string][] = [
     "/api/v1/admin/",
   ],
   ["GET", /^reviews(?:\/pending-count)?$/, "/api/v1/admin/"],
+  ["GET", /^reviews\/reply-templates$/, "/api/v1/admin/"],
   ["PUT", new RegExp(`^reviews/${id}/moderate$`), "/api/v1/admin/"],
   ["GET|POST", /^categories$/, "/api/v1/"],
   ["PATCH", new RegExp(`^categories/${id}$`), "/api/v1/"],
@@ -60,10 +61,12 @@ const rules: [string, RegExp, string][] = [
   ["PATCH", new RegExp(`^support/${id}/status$`), "/api/v1/"],
   ["GET|POST", /^settings\/staff$/, "/api/v1/admin/"],
   ["GET", /^settings\/(audit|features)$/, "/api/v1/admin/"],
+  ["GET|POST", /^settings\/review-replies$/, "/api/v1/admin/"],
+  ["PUT", new RegExp(`^settings/review-replies/${id}$`), "/api/v1/admin/"],
   [
     "PUT",
     new RegExp(
-      `^settings/(staff/${id}/access|features/support.chat-deletion)$`,
+      `^settings/(staff/${id}/access|features/(?:support\\.chat-deletion|notifications\\.sms-sending))$`,
     ),
     "/api/v1/admin/",
   ],

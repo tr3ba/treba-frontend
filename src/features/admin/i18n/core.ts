@@ -51,6 +51,10 @@ export function formatDate(language: AdminLanguage, value?: string) {
 }
 
 export const statusMessages: Record<string, string> = {
+  ENABLED: "Увімкнено",
+  DISABLED: "Вимкнено",
+  EXPIRED: "Термін минув",
+  SUBMITTED: "Імпортовано",
   ACTIVE: "Активний",
   PENDING_MODERATION: "На модерації",
   PENDING: "На перевірці",

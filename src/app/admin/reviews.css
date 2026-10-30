@@ -1,0 +1,349 @@
+.treba-admin-review-tabs {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid #ccd7e9;
+  border-radius: 14px;
+  padding: 5px;
+  background: #edf2fa;
+  isolation: isolate;
+}
+.treba-admin-review-tabs::before {
+  content: "";
+  position: absolute;
+  inset: 5px auto 5px 5px;
+  width: calc((100% - 10px) / 4);
+  border-radius: 10px;
+  background: var(--treba-admin-blue);
+  box-shadow: 0 4px 12px #2457ee26;
+  transform: translateX(calc(var(--review-tab) * 100%));
+  transition: transform .24s cubic-bezier(.2, .8, .2, 1);
+  z-index: -1;
+}
+.treba-admin-review-tabs button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 9px;
+  min-height: 46px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #536277;
+  font-size: 13px;
+  font-weight: 600;
+  transition: color .2s;
+}
+.treba-admin-review-tabs [aria-selected="true"] {
+  color: white;
+}
+.treba-admin-review-tabs b {
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 7px;
+  background: #2457ee12;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.treba-admin-review-tabs [aria-selected="true"] b {
+  background: #ffffff30;
+}
+.treba-admin-review-search {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.treba-admin-review-search .treba-admin-search {
+  flex: 1 1 300px;
+}
+.treba-admin-review-results-count {
+  font-size: 13px;
+  color: var(--treba-admin-muted);
+  margin: 4px 0 16px;
+}
+.treba-admin-customer-reviews {
+  display: grid;
+  gap: 22px;
+}
+.treba-admin-customer-review {
+  border: 1px solid var(--treba-admin-line);
+  border-radius: 18px;
+  padding: 26px;
+  background: white;
+  box-shadow: 0 5px 22px #17233c06;
+  overflow: hidden;
+  animation: treba-review-enter .25s ease both;
+}
+.treba-admin-customer-review > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5ebf4;
+}
+.treba-admin-review-product {
+  display: flex;
+  gap: 12px;
+  min-width: 0;
+}
+.treba-admin-review-product > span {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 43px;
+  height: 43px;
+  border: 1px solid #d6e1fc;
+  border-radius: 12px;
+  background: #eef3ff;
+  color: var(--treba-admin-blue);
+}
+.treba-admin-review-product small {
+  display: block;
+  color: var(--treba-admin-muted);
+  font-size: 11px;
+  margin-bottom: 3px;
+}
+.treba-admin-review-product a {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.treba-admin-review-product a:hover {
+  color: var(--treba-admin-blue);
+}
+.treba-admin-review-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 13px;
+}
+.treba-admin-review-initials {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e9eefb;
+  color: #4d62a2;
+  font-size: 12px;
+  font-weight: 600;
+}
+.treba-admin-review-author > div {
+  min-width: 0;
+}
+.treba-admin-review-author strong {
+  font-size: 13px;
+}
+.treba-admin-review-author small {
+  display: block;
+  color: var(--treba-admin-muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.treba-admin-review-author time {
+  margin-left: auto;
+  color: var(--treba-admin-muted);
+  font-size: 11px;
+}
+.treba-admin-review-rating {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 17px;
+}
+.treba-admin-review-rating > span {
+  display: flex;
+  gap: 3px;
+}
+.treba-admin-review-rating small {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  color: #257a60;
+  background: #edf8f2;
+  padding: 4px 9px;
+  border-radius: 7px;
+  font-size: 10px;
+}
+.treba-admin-customer-review > h2 {
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0 0 8px;
+  overflow-wrap: anywhere;
+}
+.treba-admin-review-comment,
+.treba-admin-staff-reply > p,
+.treba-admin-review-quote p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.8;
+  margin: 0;
+}
+.treba-admin-customer-review > footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #e5ebf4;
+  padding-top: 18px;
+  margin-top: 22px;
+}
+.treba-admin-staff-reply {
+  background: #f3f6fd;
+  border: 1px solid #d9e3fa;
+  border-left: 3px solid var(--treba-admin-blue);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 20px;
+}
+.treba-admin-staff-reply > header {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 9px;
+}
+.treba-admin-staff-reply strong {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--treba-admin-blue);
+}
+.treba-admin-staff-reply small {
+  font-size: 10px;
+  color: var(--treba-admin-muted);
+}
+.treba-admin-review-quote {
+  padding: 15px;
+  background: #f5f7fc;
+  border: 1px solid #dce4f1;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+.treba-admin-review-quote strong {
+  font-size: 13px;
+}
+.treba-admin-review-quote small {
+  display: block;
+  color: var(--treba-admin-muted);
+  font-size: 11px;
+  margin: 6px 0;
+}
+.treba-admin-reply-selects {
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.treba-admin-reply-limit {
+  color: #b64739;
+}
+.treba-admin-template-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+.treba-admin-template-heading p {
+  margin: 0;
+}
+.treba-admin-template-heading button {
+  flex-shrink: 0;
+}
+.treba-admin-reply-templates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.treba-admin-reply-template {
+  border: 1px solid #d7e1ef;
+  border-radius: 14px;
+  padding: 18px;
+  background: #f8faff;
+}
+.treba-admin-reply-template > header,
+.treba-admin-reply-template > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.treba-admin-reply-template h3 {
+  margin: 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.treba-admin-reply-template p {
+  font-size: 12px;
+  color: var(--treba-admin-muted);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 13px 0 17px;
+}
+.treba-admin-reply-template footer small {
+  font-size: 10px;
+  color: var(--treba-admin-muted);
+}
+.treba-admin-template-state {
+  padding: 3px 8px;
+  border-radius: 7px;
+  font-size: 10px;
+  color: #5a6780;
+  background: #e9eef6;
+}
+.treba-admin-template-state.enabled {
+  color: #247458;
+  background: #e4f4ec;
+}
+.treba-admin-template-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 18px;
+  font-size: 13px;
+}
+@keyframes treba-review-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 900px) {
+  .treba-admin-reply-templates { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .treba-admin-review-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .treba-admin-review-tabs::before {
+    inset: 5px auto auto 5px;
+    width: calc((100% - 10px) / 2);
+    height: calc((100% - 10px) / 2);
+    transform: translate(calc(var(--review-col) * 100%), calc(var(--review-row) * 100%));
+  }
+  .treba-admin-review-tabs button { font-size: 12px; padding: 10px 6px; }
+  .treba-admin-review-search > button { flex: 1; justify-content: center; }
+  .treba-admin-customer-review { padding: 18px; }
+  .treba-admin-customer-review > header { flex-wrap: wrap; gap: 12px; }
+  .treba-admin-review-author { flex-wrap: wrap; }
+  .treba-admin-review-author time { margin-left: 52px; width: 100%; }
+  .treba-admin-customer-review > footer { justify-content: stretch; }
+  .treba-admin-customer-review > footer > button { flex: 1; justify-content: center; font-size: 12px; }
+  .treba-admin-template-heading { align-items: flex-start; flex-direction: column; }
+  .treba-admin-reply-selects { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .treba-admin-customer-review { animation: none; }
+  .treba-admin-review-tabs::before,
+  .treba-admin-review-tabs button { transition: none; }
+}

@@ -20,6 +20,7 @@ import {
   useAction,
 } from "@/components/admin/ui";
 import { visibleCategories } from "./category-tree";
+import ReviewReplyTemplates from "./ReviewReplyTemplates";
 import { useResource } from "./api";
 import type { Category, Change, Lookup, Paged, User } from "./types";
 export default function Settings({ section }: { section?: string }) {
@@ -79,6 +80,15 @@ export default function Settings({ section }: { section?: string }) {
 }
 function Features() {
   const { date, t } = useAdminI18n();
+  const featureCopy = (key: string) => key === "notifications.sms-sending" ? {
+    title: t("SMS через TurboSMS"),
+    description: t("Надсилання SMS-кодів підтвердження під час реєстрації. Для відправлення потрібен токен TurboSMS на сервері. Підпис відправника: MAGAZIN."),
+    icon: "mail",
+  } : key === "support.chat-deletion" ? {
+    title: t("Видалення чатів"),
+    description: t("Дозволяє адміністраторам і менеджерам переміщувати чати в кошик. Історія зберігається, відновлення залишається доступним."),
+    icon: "trash",
+  } : { title: t("Додаткова функція"), description: key, icon: "settings" };
   const resource = useResource<
       {
         key: string;
@@ -108,19 +118,15 @@ function Features() {
       ) : (
         resource.data?.map((f) => (
           <Card
-            icon="file"
+            icon={featureCopy(f.key).icon}
             key={f.key}
-            title={
-              f.key === "support.chat-deletion" ? t("Видалення чатів") : f.key
-            }
+            title={featureCopy(f.key).title}
           >
             <p className="treba-admin-note">
-              {t(
-                "Дозволяє адміністраторам і менеджерам переміщувати чати в кошик. Історія зберігається, відновлення залишається доступним.",
-              )}
+              {featureCopy(f.key).description}
             </p>
             <div className="treba-admin-actions">
-              <Badge value={f.enabled ? "ACTIVE" : "DRAFT"} />
+              <Badge value={f.enabled ? "ENABLED" : "DISABLED"} />
               <Button
                 icon="check"
                 tone="secondary"
@@ -137,6 +143,7 @@ function Features() {
           </Card>
         ))
       )}
+      <ReviewReplyTemplates />
       {confirm && (
         <Confirm
           error={action.error}
@@ -156,7 +163,7 @@ function Features() {
           }
         >
           <p>
-            {confirm.key}: {confirm.enabled ? t("вимкнути") : t("увімкнути")}
+            {featureCopy(confirm.key).title}: {confirm.enabled ? t("вимкнути") : t("увімкнути")}
           </p>
         </Confirm>
       )}
@@ -475,7 +482,7 @@ function Telegram() {
               <input
                 name="externalKey"
                 required
-                placeholder={t("c12345 або prom:…")}
+                placeholder={t("c12345, prom:…, epic:… або web:…")}
               />
             </Field>
             <Field label={t("Категорія TREBA")}>

@@ -1,0 +1,17 @@
+.reply {
+  border-left: 3px solid #3158df;
+  border-radius: 0 10px 10px 0;
+  background: #f3f6fd;
+  margin-top: 16px;
+  padding: 14px 16px;
+}
+.heading {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+.heading strong { color: #3158a8; font-size: 12px; }
+.heading time { font-size: 11px; color: #768097; }
+.reply p { margin: 0; color: #4c586e; font-size: 13px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }

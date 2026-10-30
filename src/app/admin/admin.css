@@ -1,4 +1,21 @@
 /* Keep workspace classes namespaced: generic ad-* classes match cosmetic ad filters. */
+.treba-admin-import-source-details { margin: 15px 0 22px; border: 1px solid #d3deef; border-radius: 12px; background: #f7f9fd; padding: 12px 15px; }
+.treba-admin-import-source-details summary { cursor: pointer; font-weight: 600; color: #335baf; font-size: 12px; }
+.treba-admin-import-source-details dl { margin-bottom: 0; font-size: 12px; }
+.treba-admin-import-source-details dl > div { display: grid; grid-template-columns: minmax(80px, 35%) minmax(0, 1fr); gap: 12px; padding: 8px 0; border-bottom: 1px solid #e2e9f4; }
+.treba-admin-import-source-details dl > div:last-child { border-bottom: 0; }
+.treba-admin-import-source-details dt { color: #71819a; overflow-wrap: anywhere; }
+.treba-admin-import-source-details dd { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.treba-admin-dialog.treba-admin-import-dialog { max-width: 980px; padding: 0; display: flex; flex-direction: column; overflow: hidden; }
+.treba-admin-import-dialog > h2 { margin: 0; padding: 20px 24px; border-bottom: 1px solid #dce4f0; flex-shrink: 0; }
+.treba-admin-import-dialog > .treba-admin-dialog-content { padding: 20px 24px; overflow-y: auto; min-height: 0; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #b9c8df transparent; }
+.treba-admin-import-dialog > .treba-admin-actions { margin: 0; padding: 16px 24px; border-top: 1px solid #dce4f0; background: #f8faff; flex-shrink: 0; }
+.treba-admin-import-dialog > .treba-admin-alert { margin: 12px 24px 0; padding: 10px 12px; flex-shrink: 0; }
+@media (max-width: 600px) {
+  .treba-admin-import-dialog > .treba-admin-dialog-content { padding: 16px; }
+  .treba-admin-import-dialog > h2 { font-size: 16px; padding: 16px; }
+  .treba-admin-import-dialog > .treba-admin-actions { padding: 12px 16px; gap: 8px; }
+}
 .treba-admin-shell,
 .treba-admin-boot {
   --treba-admin-blue: #2457ee;
@@ -100,8 +117,16 @@
 }
 .treba-admin-nav-scroll {
   padding: 0 16px;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 0;
   flex: 1;
+  scrollbar-width: none;
+}
+.treba-admin-nav-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 .treba-admin-nav-label {
   text-transform: uppercase;
@@ -133,7 +158,7 @@
   box-shadow: 0 4px 12px #07142d44;
 }
 .treba-admin-sidebar-bottom {
-  padding: 18px;
+  padding: 12px 18px;
   border-top: 1px solid #31425d;
   display: flex;
   align-items: center;
@@ -142,15 +167,8 @@
   font-size: 11px;
   color: #b2c2dc;
 }
-.treba-admin-online-dot {
-  width: 6px;
-  height: 6px;
-  background: #27b28a;
-  border-radius: 100%;
-}
 .treba-admin-sidebar-bottom .treba-admin-button {
   width: 100%;
-  margin-top: 6px;
   justify-content: flex-start;
   color: #d5e3fb;
   font-size: 13px;
@@ -222,6 +240,14 @@
   background: #eef2ff;
   color: var(--treba-admin-blue);
   font-weight: 600;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.treba-admin-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .treba-admin-profile-link b {
   display: block;
@@ -841,6 +867,8 @@
   width: 100%;
   max-height: 90dvh;
   overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #b9c8df transparent;
   box-shadow: 0 25px 80px #14274740;
 }
 .treba-admin-dialog h2 {
@@ -1113,11 +1141,459 @@
   color: #95a0b4;
 }
 .treba-admin-profile-photo {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
   border-radius: 22px;
+  font-size: 28px;
+}
+.treba-admin-review-toolbar,
+.treba-admin-review-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.treba-admin-review-toolbar {
+  margin-bottom: 22px;
+}
+.treba-admin-review-count {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--treba-admin-blue);
+}
+.treba-admin-review-count span {
+  font-size: 12px;
+  color: var(--treba-admin-muted);
+}
+.treba-admin-review-count strong {
+  display: block;
+  color: var(--treba-admin-ink);
+  font-size: 26px;
+  line-height: 1.2;
+}
+.treba-admin-review-modes {
+  display: flex;
+  padding: 5px;
+  border: 1px solid #ccd6e9;
+  border-radius: 12px;
+  background: #eef2f9;
+}
+.treba-admin-review-modes button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 14px;
+  color: #536277;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+}
+.treba-admin-review-modes button[aria-pressed="true"] {
+  background: var(--treba-admin-blue);
+  color: white;
+  box-shadow: 0 3px 9px #2457ee26;
+}
+.treba-admin-review-navigation {
+  padding-top: 18px;
+  border-top: 1px solid #dce4ef;
+  font-size: 13px;
+  color: var(--treba-admin-muted);
+}
+.treba-admin-review-navigation .treba-admin-actions {
+  margin: 0;
+}
+.treba-admin-review-card {
+  overflow: hidden;
+  border: 1px solid var(--treba-admin-line);
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 5px 22px #17233c06;
+  margin-bottom: 24px;
+}
+.treba-admin-review-main {
+  display: grid;
+  grid-template-columns: minmax(240px, .85fr) minmax(0, 1.15fr);
+}
+.treba-admin-review-gallery {
+  min-width: 0;
+  padding: 26px;
+  background: #f4f7fc;
+  border-right: 1px solid #dce4ef;
+}
+.treba-admin-review-image {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid #dce4ef;
+  border-radius: 14px;
+  background: white;
+  color: #8193af;
+}
+.treba-admin-review-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.treba-admin-review-placeholder {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 22px;
+  font-size: 13px;
+}
+.treba-admin-review-gallery-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.treba-admin-review-gallery-nav .treba-admin-button {
+  padding: 8px;
+  font-size: 11px;
+  min-height: 36px;
+  gap: 5px;
+}
+.treba-admin-review-thumbnails {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.treba-admin-review-thumbnails button {
+  width: 60px;
+  height: 60px;
+  border: 2px solid #dce4ef;
+  border-radius: 10px;
+  overflow: hidden;
+  color: #8193af;
+  background: white;
+  padding: 3px;
+}
+.treba-admin-review-thumbnails button[aria-pressed="true"] {
+  border-color: var(--treba-admin-blue);
+  box-shadow: 0 0 0 2px #2457ee15;
+}
+.treba-admin-review-thumbnails img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.treba-admin-review-gallery > a {
+  font-size: 12px;
+}
+.treba-admin-review-content {
+  min-width: 0;
+  padding: 28px;
+}
+.treba-admin-review-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
   margin-bottom: 16px;
+}
+.treba-admin-review-heading > small {
+  color: var(--treba-admin-muted);
+  font-size: 11px;
+}
+.treba-admin-review-category {
+  color: var(--treba-admin-blue);
+  font-size: 12px;
+  margin-bottom: 6px;
+  overflow-wrap: anywhere;
+}
+.treba-admin-review-content h2 {
+  font-size: 23px;
+  line-height: 1.4;
+  margin: 0 0 20px;
+  overflow-wrap: anywhere;
+}
+.treba-admin-review-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 18px;
+  margin-bottom: 20px;
+}
+.treba-admin-review-meta dt,
+.treba-admin-review-facts span {
+  color: var(--treba-admin-muted);
+  font-size: 11px;
+}
+.treba-admin-review-meta dd {
+  font-size: 13px;
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+.treba-admin-review-summary {
+  font-size: 13px;
+  color: var(--treba-admin-muted);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.treba-admin-review-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #dce4ef;
+  border-radius: 12px;
+  background: #f4f7fc;
+  margin: 20px 0;
+}
+.treba-admin-review-facts strong {
+  display: block;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+.treba-admin-review-section {
+  padding: 22px 28px;
+  border-top: 1px solid #dce4ef;
+}
+.treba-admin-review-section h3,
+.treba-admin-review-history summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.treba-admin-review-section h3 > svg,
+.treba-admin-review-history summary > svg {
+  color: var(--treba-admin-blue);
+}
+.treba-admin-review-description {
+  font-size: 13px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.8;
+  margin: 0;
+}
+.treba-admin-review-attributes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 28px;
+}
+.treba-admin-review-attributes > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid #edf0f6;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.treba-admin-review-attributes dt {
+  color: var(--treba-admin-muted);
+}
+.treba-admin-review-attributes dt small {
+  display: block;
+  font-size: 11px;
+}
+.treba-admin-review-attributes dd {
+  margin: 0;
+}
+.treba-admin-review-history summary {
+  cursor: pointer;
+  margin: 0;
+}
+.treba-admin-review-history[open] summary {
+  margin-bottom: 24px;
+}
+.treba-admin-review-change {
+  margin: 14px 0;
+  font-size: 13px;
+}
+.treba-admin-review-change .treba-admin-comparison {
+  margin-top: 8px;
+}
+.treba-admin-review-change pre {
+  margin: 4px 0 0;
+}
+.treba-admin-review-change .treba-admin-comparison > div:last-child pre {
+  background: #eef8f2;
+}
+@media (max-width: 1100px) {
+  .treba-admin-review-main {
+    grid-template-columns: minmax(210px, .8fr) minmax(0, 1.2fr);
+  }
+  .treba-admin-review-gallery,
+  .treba-admin-review-content {
+    padding: 20px;
+  }
+}
+@media (max-width: 800px) {
+  .treba-admin-review-main,
+  .treba-admin-review-attributes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .treba-admin-review-gallery {
+    border-right: 0;
+    border-bottom: 1px solid #dce4ef;
+  }
+  .treba-admin-review-gallery > .treba-admin-review-image {
+    max-width: 440px;
+    margin: 0 auto;
+  }
+  .treba-admin-review-section {
+    padding: 20px;
+  }
+}
+@media (max-width: 480px) {
+  .treba-admin-review-toolbar > .treba-admin-review-modes {
+    order: 1;
+    width: 100%;
+  }
+  .treba-admin-review-modes button {
+    flex: 1;
+    padding: 9px;
+  }
+  .treba-admin-review-navigation .treba-admin-actions {
+    width: 100%;
+  }
+  .treba-admin-review-navigation .treba-admin-button {
+    flex: 1 1 130px;
+    justify-content: center;
+    font-size: 11px;
+    padding: 9px;
+  }
+  .treba-admin-review-content h2 {
+    font-size: 20px;
+  }
+  .treba-admin-review-facts {
+    padding: 12px;
+    gap: 8px;
+  }
+  .treba-admin-review-facts strong {
+    font-size: 13px;
+  }
+  .treba-admin-review-change .treba-admin-comparison {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.treba-admin-photo-picker {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 18px;
+  margin-bottom: 22px;
+  border: 1px solid #dce4f1;
+  border-radius: 16px;
+  background: #f5f7fc;
+}
+.treba-admin-photo-picker > div {
+  flex: 1 1 180px;
+}
+.treba-admin-photo-picker p {
+  margin: 0;
+}
+.treba-admin-photo-picker p + p {
+  margin-top: 8px;
+  font-size: 12px;
+}
+.treba-admin-crop-help {
+  color: var(--treba-admin-muted);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+.treba-admin-crop-frame {
+  position: relative;
+  width: min(100%, 300px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #e8edf6;
+  box-shadow: 0 0 0 1px #c9d5e8;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+}
+.treba-admin-crop-frame:active {
+  cursor: grabbing;
+}
+.treba-admin-crop-frame:focus-visible {
+  outline: 3px solid var(--treba-admin-blue);
+  outline-offset: 4px;
+}
+.treba-admin-crop-frame > img {
+  position: absolute;
+  display: block;
+  max-width: none;
+  pointer-events: none;
+}
+.treba-admin-crop-guide {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 2px #ffffffbb;
+  background:
+    linear-gradient(to right, transparent calc(100% / 3 - .5px), #ffffff66 calc(100% / 3), transparent calc(100% / 3 + .5px), transparent calc(200% / 3 - .5px), #ffffff66 calc(200% / 3), transparent calc(200% / 3 + .5px)),
+    linear-gradient(to bottom, transparent calc(100% / 3 - .5px), #ffffff66 calc(100% / 3), transparent calc(100% / 3 + .5px), transparent calc(200% / 3 - .5px), #ffffff66 calc(200% / 3), transparent calc(200% / 3 + .5px));
+}
+.treba-admin-crop-controls {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+}
+.treba-admin-crop-controls .treba-admin-field > span {
+  display: flex;
+  justify-content: space-between;
+}
+.treba-admin-crop-controls output {
+  color: var(--treba-admin-blue);
+  font-variant-numeric: tabular-nums;
+}
+.treba-admin-shell .treba-admin-crop-controls input[type="range"] {
+  width: 100%;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  accent-color: var(--treba-admin-blue);
+  cursor: pointer;
+}
+.treba-admin-crop-controls > button {
+  justify-self: start;
+}
+.treba-admin-security-setup {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.treba-admin-security-setup p {
+  width: 100%;
+  margin: 0;
+}
+.treba-admin-security-setup img {
+  border: 1px solid #dce4f1;
+  border-radius: 12px;
+  padding: 10px;
+  background: white;
+}
+.treba-admin-security-setup code {
+  display: block;
+  padding: 12px;
+  margin-top: 7px;
+  border: 1px solid #dce4f1;
+  border-radius: 10px;
+  background: #f5f7fc;
+  color: var(--treba-admin-ink);
+  overflow-wrap: anywhere;
+  user-select: all;
 }
 .treba-admin-comparison {
   display: grid;

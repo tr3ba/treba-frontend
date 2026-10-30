@@ -25,6 +25,8 @@ function mapReview(dto: ApiReview): Review {
     title: dto.title || undefined,
     text: dto.comment,
     verifiedPurchase: dto.verifiedPurchase,
+    staffReply: dto.staffReply,
+    staffRepliedAt: dto.staffRepliedAt,
   };
 }
 
