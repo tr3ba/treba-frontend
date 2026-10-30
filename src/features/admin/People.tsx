@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useStaff } from "@/components/admin/AdminShell";
+import UserAvatar from "@/components/admin/UserAvatar";
+import { roleLabel } from "@/lib/admin";
+import Icon from "@/components/admin/Icon";
 import {
   ActionLink,
   Alert,
@@ -80,6 +83,9 @@ export function Sellers({
     [approve, setApprove] = useState(true),
     [allowed, setAllowed] = useState<string[] | null>(null),
     [descendants, setDescendants] = useState<Record<string, boolean>>({});
+  const permittedCategoryIds =
+    allowed ?? grants.data?.map((grant) => grant.categoryId) ?? [];
+  const permittedCategoryCount = allowed?.length ?? grants.data?.length;
   async function createSeller(form: FormData) {
     const body = Object.fromEntries(form);
     const result = await action.run<{
@@ -313,29 +319,37 @@ export function Sellers({
                 </div>
               </Card>
               {staff.role === "Administrator" && (
-                <Card icon="layers" title={t("Дозволені категорії")}>
-                  <Field label={t("Категорії продавця")}>
-                    <select
-                      multiple
-                      size={8}
-                      value={
-                        allowed ?? grants.data?.map((g) => g.categoryId) ?? []
-                      }
-                      onChange={(e) =>
-                        setAllowed(
-                          Array.from(e.target.selectedOptions, (o) => o.value),
-                        )
-                      }
-                    >
-                      {categories.data?.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
-                  </Field>
-                  {(allowed ?? grants.data?.map((g) => g.categoryId) ?? []).map(
-                    (categoryId) => (
+                <details className="treba-admin-card treba-admin-category-access">
+                  <summary>
+                    <span className="treba-admin-heading-icon">
+                      <Icon name="layers" size={20} />
+                    </span>
+                    <strong>{t("Дозволені категорії")}</strong>
+                    <span className="treba-admin-category-access-count">
+                      {t("Вибрано категорій: {0}", [permittedCategoryCount ?? "—"])}
+                    </span>
+                    <Icon name="chevron" size={18} />
+                  </summary>
+                  <div className="treba-admin-category-access-content">
+                    <Field label={t("Категорії продавця")}>
+                      <select
+                        multiple
+                        size={8}
+                        value={permittedCategoryIds}
+                        onChange={(e) =>
+                          setAllowed(
+                            Array.from(e.target.selectedOptions, (o) => o.value),
+                          )
+                        }
+                      >
+                        {categories.data?.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    </Field>
+                    {permittedCategoryIds.map((categoryId) => (
                       <label className="treba-admin-check" key={categoryId}>
                         <input
                           type="checkbox"
@@ -359,41 +373,37 @@ export function Sellers({
                         }{" "}
                         {t("· включати підкатегорії")}
                       </label>
-                    ),
-                  )}
-                  <div className="treba-admin-actions">
-                    <Button
-                      icon="lock"
-                      disabled={
-                        action.busy ||
-                        (!allowed && !Object.keys(descendants).length)
-                      }
-                      onClick={() =>
-                        void action.run(
-                          `telegram/sellers/${id}/categories`,
-                          {
-                            grants: (
-                              allowed ??
-                              grants.data?.map((g) => g.categoryId) ??
-                              []
-                            ).map((categoryId) => ({
-                              categoryId,
-                              includeDescendants:
-                                descendants[categoryId] ??
-                                grants.data?.find(
-                                  (g) => g.categoryId === categoryId,
-                                )?.includeDescendants ??
-                                true,
-                            })),
-                          },
-                          "PUT",
-                        )
-                      }
-                    >
-                      {t("Зберегти доступ")}
-                    </Button>
+                    ))}
+                    <div className="treba-admin-actions">
+                      <Button
+                        icon="lock"
+                        disabled={
+                          action.busy ||
+                          (!allowed && !Object.keys(descendants).length)
+                        }
+                        onClick={() =>
+                          void action.run(
+                            `telegram/sellers/${id}/categories`,
+                            {
+                              grants: permittedCategoryIds.map((categoryId) => ({
+                                categoryId,
+                                includeDescendants:
+                                  descendants[categoryId] ??
+                                  grants.data?.find(
+                                    (g) => g.categoryId === categoryId,
+                                  )?.includeDescendants ??
+                                  true,
+                              })),
+                            },
+                            "PUT",
+                          )
+                        }
+                      >
+                        {t("Зберегти доступ")}
+                      </Button>
+                    </div>
                   </div>
-                </Card>
+                </details>
               )}
             </>
           )
@@ -532,12 +542,21 @@ export function Users({
   id?: string;
   create?: boolean;
 }) {
-  const { date, t } = useAdminI18n();
+  const { date, language, t } = useAdminI18n();
   const params = useSearchParams(),
     list = useResource<Paged<User>>(!id && !create ? "users?" + params : null),
     detail = useResource<User>(id ? "users/" + id : null),
     action = useAction(detail.reload),
     [confirm, setConfirm] = useState(false);
+  const formatBirthDate = (value?: string | null) => {
+    if (!value) return "—";
+    const parsed = new Date(`${value}T00:00:00Z`);
+    if (!Number.isFinite(parsed.getTime())) return value;
+    return new Intl.DateTimeFormat(language === "en" ? "en-GB" : "uk-UA", {
+      dateStyle: "medium",
+      timeZone: "UTC",
+    }).format(parsed);
+  };
   async function submit(form: FormData) {
     const result = await action.run<User>("users", Object.fromEntries(form));
     if (result) window.location.assign("/admin/users/" + result.id);
@@ -595,38 +614,148 @@ export function Users({
           <Loading />
         ) : (
           detail.data && (
-            <Card icon="user" title={t("Обліковий запис")}>
-              <div className="treba-admin-detail-list">
-                {[
-                  ["Email", detail.data.email],
-                  [t("Телефон"), detail.data.phone],
-                  [t("Дата реєстрації"), date(detail.data.createdAt)],
-                  [t("Останній вхід"), date(detail.data.lastLoginAt)],
-                ].map(([title, value]) => (
-                  <div key={title}>
-                    <dt>{title}</dt>
-                    <dd>{value || "—"}</dd>
+            <>
+              <Card icon="user" title={t("Обліковий запис")}>
+                <div className="treba-admin-user-identity">
+                  <UserAvatar user={detail.data} size={58} className="treba-admin-user-avatar-large" />
+                  <div>
+                    <h3>{[detail.data.firstName, detail.data.middleName, detail.data.lastName].filter(Boolean).join(" ")}</h3>
+                    <div className="treba-admin-user-identity-meta">
+                      {detail.data.role && <span className="treba-admin-user-role">{t(roleLabel(detail.data.role) ?? detail.data.role)}</span>}
+                      <Badge value={detail.data.status} />
+                    </div>
                   </div>
-                ))}
-              </div>
-              <div className="treba-admin-actions">
-                <Badge value={detail.data.status} />
-                <Button
-                  tone="danger"
-                  disabled={action.busy}
-                  onClick={() => setConfirm(true)}
+                </div>
+                <div className="treba-admin-detail-list">
+                  {[
+                    [t("ID користувача"), detail.data.id],
+                    ["Email", detail.data.email],
+                    [t("Телефон"), detail.data.phone],
+                    [t("Дата реєстрації"), date(detail.data.createdAt)],
+                    [t("Останній вхід"), date(detail.data.lastLoginAt)],
+                    [t("Дата оновлення"), date(detail.data.updatedAt)],
+                  ].map(([title, value]) => (
+                    <div key={title}>
+                      <dt>{title}</dt>
+                      <dd>{value || "—"}</dd>
+                    </div>
+                  ))}
+                </div>
+                <div className="treba-admin-user-verifications">
+                  <span data-verified={detail.data.emailVerified === true}>
+                    <Icon name={detail.data.emailVerified ? "check" : "close"} size={15} />
+                    {t(detail.data.emailVerified ? "Email підтверджено" : "Email не підтверджено")}
+                  </span>
+                  <span data-verified={detail.data.phoneVerified === true}>
+                    <Icon name={detail.data.phoneVerified ? "check" : detail.data.phone ? "close" : "info"} size={15} />
+                    {t(detail.data.phoneVerified ? "Телефон підтверджено" : detail.data.phone ? "Телефон не підтверджено" : "Телефон не вказано")}
+                  </span>
+                </div>
+                <div className="treba-admin-actions">
+                  <Button
+                    tone="danger"
+                    disabled={action.busy}
+                    onClick={() => setConfirm(true)}
+                  >
+                    {detail.data.status === "BLOCKED"
+                      ? t("Розблокувати")
+                      : t("Заблокувати")}
+                  </Button>
+                </div>
+              </Card>
+              <div className="treba-admin-user-detail-grid">
+                <Card icon="file" title={t("Профіль користувача")}>
+                  {detail.data.profile ? (
+                    <div className="treba-admin-detail-list">
+                      <div>
+                        <dt>{t("Дата народження")}</dt>
+                        <dd>{formatBirthDate(detail.data.profile.birthDate)}</dd>
+                      </div>
+                      <div>
+                        <dt>{t("Стать")}</dt>
+                        <dd>
+                          {detail.data.profile.gender
+                            ? t(
+                                ({
+                                  female: "Жіноча",
+                                  male: "Чоловіча",
+                                  other: "Інша",
+                                } as Record<string, string>)[
+                                  detail.data.profile.gender.toLowerCase()
+                                ] ?? detail.data.profile.gender,
+                              )
+                            : t("Не вказано")}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>{t("Мова інтерфейсу")}</dt>
+                        <dd>
+                          {detail.data.profile.language === "en"
+                            ? "English"
+                            : detail.data.profile.language === "uk"
+                              ? "Українська"
+                              : detail.data.profile.language || "—"}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>{t("Маркетингові листи")}</dt>
+                        <dd>
+                          {detail.data.profile.marketingEmailsEnabled
+                            ? t("Так")
+                            : t("Ні")}
+                        </dd>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="treba-admin-note">
+                      {t("Профіль користувача ще не заповнено.")}
+                    </p>
+                  )}
+                </Card>
+                <Card
+                  icon="truck"
+                  title={t("Адреси доставки ({0})", [detail.data.addresses?.length ?? 0])}
                 >
-                  {detail.data.status === "BLOCKED"
-                    ? t("Розблокувати")
-                    : t("Заблокувати")}
-                </Button>
+                  {detail.data.addresses?.length ? (
+                    detail.data.addresses.map((address) => (
+                      <article className="treba-admin-user-address" key={address.id}>
+                        <header>
+                          <strong>{address.recipientName}</strong>
+                          {address.defaultAddress && (
+                            <span>{t("Основна адреса")}</span>
+                          )}
+                        </header>
+                        <p>
+                          {[
+                            address.country,
+                            address.region,
+                            address.city,
+                            address.street,
+                            address.building && `${t("Будинок")} ${address.building}`,
+                            address.apartment && `${t("Квартира")} ${address.apartment}`,
+                          ]
+                            .filter(Boolean)
+                            .join(", ")}
+                        </p>
+                        <small>
+                          {[
+                            address.postalCode &&
+                              `${t("Поштовий індекс")}: ${address.postalCode}`,
+                            address.recipientPhone,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ") || "—"}
+                        </small>
+                      </article>
+                    ))
+                  ) : (
+                    <p className="treba-admin-note">
+                      {t("Збережених адрес доставки немає.")}
+                    </p>
+                  )}
+                </Card>
               </div>
-              {detail.data.addresses?.map((a) => (
-                <p className="treba-admin-note" key={a.id}>
-                  {a.city}, {a.street}, {a.building} · {a.recipientName}
-                </p>
-              ))}
-            </Card>
+            </>
           )
         )
       ) : (
