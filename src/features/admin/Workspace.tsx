@@ -7,14 +7,14 @@ import {
   Customers,
   Orders,
   OrderDetails,
-  Support,
-  TicketDetails,
 } from "./Operations";
 import { Reviews, Sellers, Users } from "./People";
 import Promotions from "./Promotions";
 import Settings, { Categories } from "./Settings";
 import Profile, { Notifications } from "./Profile";
 import Imports from "./Imports";
+import ModerationQueue from "./ModerationQueue";
+import Support from "./Support";
 export default function Workspace({ segments }: { segments: string[] }) {
   const { t } = useAdminI18n();
   const [section, id, action] = segments;
@@ -25,16 +25,12 @@ export default function Workspace({ segments }: { segments: string[] }) {
       return <ProductEditor key={id} id={id === "new" ? undefined : id} />;
     if (!id) return <Products />;
   }
-  if (section === "moderation" && !id) return <Products moderation />;
+  if (section === "moderation" && !id) return <ModerationQueue />;
   if (section === "categories" && !id) return <Categories />;
   if (section === "orders")
     return id ? <OrderDetails key={id} id={id} /> : <Orders />;
   if (section === "support")
-    return id && id !== "trash" ? (
-      <TicketDetails key={id} id={id} />
-    ) : (
-      <Support trash={id === "trash"} />
-    );
+    return <Support trash={id === "trash"} ticketId={id && id !== "trash" ? id : undefined} />;
   if (section === "sellers")
     return (
       <Sellers

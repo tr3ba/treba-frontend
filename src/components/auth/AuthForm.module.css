@@ -9,8 +9,6 @@
     z-index: 100;
     overflow-y: auto;
 }
-.languageBar { position: absolute; top: 16px; left: 24px; }
-.card.localizedCard { padding-top: 76px; }
 
 .verificationMethods {
     display: grid;

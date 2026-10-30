@@ -6,6 +6,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../../../context/AuthContext";
 import AccountPageShell from "../../../../components/account/AccountPageShell";
+import ReviewReply from "../../../../components/product/ReviewReply";
 import PageTitle from "../../../../components/account/PageTitle";
 import EmptyState from "../../../../components/account/EmptyState";
 import ReviewForm from "../../../../components/account/ReviewForm";
@@ -90,7 +91,7 @@ function ReviewsContent() {
           </article>;
         })}</div>
       : mine.length === 0 ? <EmptyState icon="/icons/star.svg" title="Ви ще не залишали відгуків" subtitle="Тут з’являться ваші відгуки та результати перевірки модератором." />
-        : <div className={styles.list}>{mine.map(review => <article key={review.id} className={styles.myReview}><div className={styles.reviewMeta}><strong aria-label={`Оцінка ${review.rating} з 5`}>{"★".repeat(review.rating)}</strong><span>{statusLabel(review.status)}</span></div>{review.title && <h2>{review.title}</h2>}<p className={styles.reviewText}>{review.comment}</p><Link href="/account/orders">До моїх замовлень</Link></article>)}</div>}
+        : <div className={styles.list}>{mine.map(review => <article key={review.id} className={styles.myReview}><div className={styles.reviewMeta}><strong aria-label={`Оцінка ${review.rating} з 5`}>{"★".repeat(review.rating)}</strong><span>{statusLabel(review.status)}</span></div>{review.title && <h2>{review.title}</h2>}<p className={styles.reviewText}>{review.comment}</p><ReviewReply text={review.staffReply} repliedAt={review.staffRepliedAt} /><Link href="/account/orders">До моїх замовлень</Link></article>)}</div>}
     {!loading && !error && totalPages > 1 && <nav className={styles.pillsRow} aria-label="Сторінки відгуків"><button className={styles.pill} disabled={page <= 1} onClick={() => setPage(value => value - 1)}>Назад</button><span>{page} / {totalPages}</span><button className={styles.pill} disabled={page >= totalPages} onClick={() => setPage(value => value + 1)}>Далі</button></nav>}
     </> : <EmptyState icon="/icons/star.svg" title="Немає відгуків про продавців" subtitle="Тут з’являться ваші відгуки про продавців після покупки" />}
   </AccountPageShell>;

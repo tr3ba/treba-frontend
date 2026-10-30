@@ -9,6 +9,8 @@ export type Review = {
   /** Отзыв от покупателя, который купил товар на TREBA */
   verifiedPurchase?: boolean;
   photos?: string[];
+  staffReply?: string | null;
+  staffRepliedAt?: string | null;
 };
 
 /** Страница отзывов о товаре: первые отзывы + общее количество. */
@@ -57,6 +59,8 @@ export type ApiReview = {
   helpfulCount: number;
   createdAt: string;
   updatedAt: string;
+  staffReply?: string | null;
+  staffRepliedAt?: string | null;
 };
 
 export type ApiReviewsPage = {

@@ -8,7 +8,6 @@ import {
   useAdminI18n,
 } from "@/features/admin/i18n/provider";
 import { languageCookie } from "@/features/admin/i18n/core";
-import LanguageSelector from "@/components/admin/LanguageSelector";
 
 type AuthModalProps = {
   onClose: () => void;
@@ -74,13 +73,10 @@ function LocalizedAuthModal({ onClose, children }: AuthModalProps) {
       role="presentation"
     >
       <div
-        className={`${styles.card} ${styles.localizedCard}`}
+        className={styles.card}
         role="dialog"
         aria-modal="true"
       >
-        <div className={styles.languageBar}>
-          <LanguageSelector />
-        </div>
         <button
           type="button"
           className={styles.closeButton}

@@ -7,6 +7,7 @@ import http from "node:http";
 import { readFile } from "node:fs/promises";
 import ts from "typescript";
 import { createAdminFixture, ids } from "./helpers/admin-fixture.mjs";
+import { avatarFixturePng } from "./helpers/avatar-fixture.mjs";
 const dataUrl = (text) =>
   "data:text/javascript;base64," + Buffer.from(text).toString("base64");
 async function compile(file) {
@@ -35,6 +36,9 @@ test("admin transport only accepts explicit resources and methods", async () => 
   ])
     assert.equal(adminBackendPath("POST", route), null);
   assert.equal(adminBackendPath("DELETE", "settings/staff"), null);
+  assert.equal(adminBackendPath("PUT", "settings/features/notifications.sms-sending"), "/api/v1/admin/settings/features/notifications.sms-sending");
+  assert.equal(adminBackendPath("PUT", "settings/features/notificationsXsms-sending"), null);
+  assert.equal(adminBackendPath("PUT", "settings/features/supportXchat-deletion"), null);
 });
 test("calendar filters preserve the panel timezone across daylight-saving changes", async () => {
   const { adminDateBoundary } = await import(
@@ -270,6 +274,9 @@ test(
         "sellers/" + ids.seller,
         "seller-applications",
         "reviews",
+        "reviews/pending-count",
+        "reviews/reply-templates",
+        "settings/review-replies",
         "operations/customers",
         "operations/customers/" + ids.user,
         "promotions",
@@ -390,6 +397,82 @@ test(
         assert.ok(call.bytes > 10);
       },
     );
+    await t.test("profile avatar uploads update the session and deletion restores the fallback", async () => {
+      const image = avatarFixturePng(512, 512);
+      const form = new FormData();
+      form.append("avatar", new Blob([image], { type: "image/png" }), "profile-avatar.png");
+      const response = await request("/admin-api/profile/avatar", cookie, "POST", form);
+      assert.equal(response.status, 200);
+      const user = await response.json();
+      assert.ok(user.profile.avatarUrl);
+      const call = fixture.calls.findLast(c => c.path === "/api/users/me/avatar");
+      assert.equal(call.authorization, "Bearer fixture-Administrator");
+      assert.match(call.contentType, /multipart\/form-data; boundary=/);
+      assert.deepEqual(call.upload, { name: "profile-avatar.png", type: "image/png", bytes: image.length });
+      const session = await (await request("/admin-api/session", cookie)).json();
+      assert.equal(session.user.profile.avatarUrl, user.profile.avatarUrl);
+      assert.deepEqual(Buffer.from(await (await fetch(user.profile.avatarUrl)).arrayBuffer()), image);
+      const removed = await request("/admin-api/profile/avatar", cookie, "DELETE");
+      assert.equal(removed.status, 200);
+      assert.equal((await removed.json()).profile.avatarUrl, null);
+      assert.equal((await (await request("/admin-api/session", cookie)).json()).user.profile.avatarUrl, null);
+    });
+    await t.test("TurboSMS can be enabled, survives reload, and rejects stale feature versions", async () => {
+      const get = async () => (await (await request("/admin-api/settings/features", cookie)).json()).find(row => row.key === "notifications.sms-sending");
+      const initial = await get(); assert.equal(initial.enabled, false);
+      const enabled = await request("/admin-api/settings/features/notifications.sms-sending", cookie, "PUT", { enabled: true, expectedVersion: initial.version });
+      assert.equal(enabled.status, 200); assert.equal((await get()).enabled, true);
+      assert.equal((await request("/admin-api/settings/features/notifications.sms-sending", cookie, "PUT", { enabled: false, expectedVersion: initial.version })).status, 409);
+      const current = await get();
+      assert.equal((await request("/admin-api/settings/features/notifications.sms-sending", cookie, "PUT", { enabled: false, expectedVersion: current.version })).status, 200);
+      assert.equal((await get()).enabled, false);
+    });
+    await t.test("review templates and edited replies cross the authenticated proxy with their versions intact", async () => {
+      const body = { name: "Transport fixture", textUk: "Дякуємо, {customer}!", textEn: "Thank you, {customer}!", enabled: true };
+      const createdResponse = await request("/admin-api/settings/review-replies", cookie, "POST", body);
+      assert.equal(createdResponse.status, 200);
+      const created = await createdResponse.json();
+      const updated = await request("/admin-api/settings/review-replies/" + created.id, cookie, "PUT", { ...body, enabled: false, expectedVersion: created.version });
+      assert.equal(updated.status, 200);
+      assert.notEqual((await updated.json()).version, created.version);
+      assert.equal((await request("/admin-api/settings/review-replies/" + created.id, cookie, "PUT", { ...body, expectedVersion: created.version })).status, 409);
+      const active = await (await request("/admin-api/reviews/reply-templates", cookie)).json();
+      assert.ok(active.every(row => row.id !== created.id));
+      const decision = { status: "PUBLISHED", reply: "Edited customer reply" };
+      assert.equal((await request(`/admin-api/reviews/${ids.product}/moderate`, cookie, "PUT", decision)).status, 204);
+      assert.deepEqual(fixture.calls.findLast(call => call.path.endsWith("/moderate")).body, decision);
+      const published = await (await request("/admin-api/reviews?status=PUBLISHED", cookie)).json();
+      assert.equal(published.content[0].staffReply, decision.reply);
+      assert.equal(await (await request("/admin-api/reviews/pending-count", cookie)).json(), 0);
+    });
+    await t.test("support inbox retains history and versioned trash/restore operations through the proxy", async () => {
+      const id = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+      const created = await request("/admin-api/support", cookie, "POST", { subject: "Support lifecycle", message: "Delivery question", kind: "QUESTION", orderId: ids.order, clientRequestId: id });
+      assert.equal(created.status, 200);
+      assert.equal((await created.json()).summary.id, id);
+      const path = "/admin-api/support/" + id;
+      const original = await (await request(path, cookie)).json();
+      assert.equal((await request(path + "/read", cookie, "POST", { messageId: original.messages[0].id })).status, 204);
+      const failed = await request(path + "/messages", cookie, "POST", { message: "fixture-error", clientMessageId: ids.product });
+      assert.equal(failed.status, 503);
+      assert.equal((await (await request(path, cookie)).json()).messages.length, 1);
+      assert.equal((await request(path + "/messages", cookie, "POST", { message: "Internal draft preserved", internal: true, clientMessageId: ids.product })).status, 204);
+      const replied = await (await request(path, cookie)).json();
+      assert.equal(replied.messages.at(-1).internal, true);
+      assert.equal((await request(path + "/status", cookie, "PATCH", { status: "CLOSED", expectedVersion: original.summary.version })).status, 409);
+      assert.equal((await request(path + "/status", cookie, "PATCH", { status: "CLOSED", expectedVersion: replied.summary.version })).status, 204);
+      const closed = await (await request(path, cookie)).json();
+      assert.equal(closed.summary.status, "CLOSED");
+      assert.equal((await request(path, cookie, "DELETE", { expectedVersion: closed.summary.version })).status, 204);
+      assert.equal((await request(path, cookie)).status, 404);
+      const deleted = await (await request("/admin-api/support/deleted?search=Support", cookie)).json();
+      assert.equal(deleted.content.length, 1);
+      assert.equal(deleted.content[0].id, id);
+      assert.equal((await request(path + "/restore", cookie, "POST", { expectedVersion: deleted.content[0].version })).status, 204);
+      const restored = await (await request(path, cookie)).json();
+      assert.equal(restored.messages.length, closed.messages.length);
+      assert.equal(restored.summary.status, "CLOSED");
+    });
     await t.test(
       "unknown paths and methods never reach the upstream API",
       async () => {

@@ -1,6 +1,7 @@
 import styles from "./ProductReviews.module.css";
 import { Review } from "../../types/review";
 import Link from "next/link";
+import ReviewReply from "./ReviewReply";
 
 type ProductReviewsProps = {
   reviews: Review[];
@@ -49,6 +50,7 @@ export default function ProductReviews({ reviews, total }: ProductReviewsProps) 
 
               {review.title && <h3 className={styles.reviewTitle}>{review.title}</h3>}
               <p className={styles.text}>{review.text}</p>
+              <ReviewReply text={review.staffReply} repliedAt={review.staffRepliedAt} />
             </article>
           ))}
         </div>

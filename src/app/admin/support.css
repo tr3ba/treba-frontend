@@ -1,0 +1,164 @@
+.treba-admin-inbox-tabs {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin: 0 0 18px;
+}
+.treba-admin-inbox-tabs a {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 16px;
+  border-radius: 11px;
+  color: #536782;
+  border: 1px solid transparent;
+  font-weight: 600;
+}
+.treba-admin-inbox-tabs a:hover { background: #f6f8ff; }
+.treba-admin-inbox-tabs a.active { color: #2457ee; background: white; border-color: #ccd7ec; box-shadow: 0 3px 7px #17233c06; }
+.treba-admin-inbox {
+  display: grid;
+  grid-template-columns: minmax(280px, 34%) minmax(0, 1fr);
+  height: clamp(680px, calc(100dvh - 250px), 940px);
+  border: 1px solid #cbd6e7;
+  border-radius: 18px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 8px 24px #17233c06;
+}
+.treba-admin-inbox-list { min-width: 0; min-height: 0; display: flex; flex-direction: column; border-right: 1px solid #d5deed; }
+.treba-admin-inbox-filters { padding: 18px 18px 12px; background: #fafbfe; border-bottom: 1px solid #dde5f0; }
+.treba-admin-inbox-filters form { display: flex; align-items: center; gap: 8px; padding: 4px 6px 4px 12px; background: white; border: 1px solid #cfdaeb; border-radius: 10px; color: #7c8ba5; }
+.treba-admin-inbox-filters input { min-width: 0; width: 100%; background: transparent; border: 0; padding: 8px 0; color: #17233c; font-size: 12px; }
+.treba-admin-inbox-filters form button { color: #2457ee; border: 0; border-radius: 7px; background: #edf2ff; padding: 6px; }
+.treba-admin-inbox-filter-row { display: flex; gap: 8px; margin: 10px 0 0; }
+.treba-admin-inbox-filter-row select { width: 50%; min-width: 0; border: 1px solid #d7dfec; border-radius: 8px; padding: 8px; background: white; color: #536277; font-size: 11px; }
+.treba-admin-inbox-list-caption { display: flex; gap: 7px; align-items: center; margin-top: 15px; font-size: 11px; color: #61738f; }
+.treba-admin-inbox-list-caption > span { padding: 1px 7px; border-radius: 6px; color: #536782; background: #e8edf5; }
+.treba-admin-inbox-list-caption a { margin-left: auto; color: #2457ee; font-size: 10px; }
+.treba-admin-inbox-tickets { overflow-y: auto; flex: 1; min-height: 0; overscroll-behavior: contain; }
+.treba-admin-ticket { display: flex; align-items: flex-start; gap: 11px; padding: 19px 16px; color: #17233c; border-bottom: 1px solid #e4eaf3; border-left: 3px solid transparent; position: relative; }
+.treba-admin-ticket:hover { background: #f5f8ff; }
+.treba-admin-ticket.selected { background: #edf3ff; border-left-color: #2457ee; }
+.treba-admin-ticket > svg { align-self: center; color: #93a4bd; }
+.treba-admin-ticket-icon, .treba-admin-ticket-avatar { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 12px; background: #edf2ff; color: #3d66d8; flex-shrink: 0; }
+.treba-admin-ticket-icon.return { color: #b7723a; background: #fff1e5; }
+.treba-admin-ticket-icon.chat { color: #23877a; background: #e8f6f2; }
+.treba-admin-ticket-copy { min-width: 0; flex: 1; }
+.treba-admin-ticket-top { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.treba-admin-ticket-top b { font-size: 11px; font-weight: 500; color: #60718b; }
+.treba-admin-ticket-unread { background: #2457ee; color: white; font-size: 10px; line-height: 18px; min-width: 18px; padding: 0 4px; text-align: center; border-radius: 10px; }
+.treba-admin-ticket-copy > strong { display: block; font-size: 12px; margin: 5px 0; line-height: 1.55; font-weight: 600; }
+.treba-admin-ticket.unread .treba-admin-ticket-copy > strong { color: #193c91; font-weight: 700; }
+.treba-admin-ticket-copy > p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #7c8ba2; font-size: 11px; margin: 0 0 12px; }
+.treba-admin-ticket-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.treba-admin-ticket-meta .treba-admin-badge { font-size: 9px; padding: 3px 6px; }
+.treba-admin-ticket-meta time { color: #7c8ba2; font-size: 9px; }
+.treba-admin-inbox-pages { display: flex; justify-content: space-between; align-items: center; min-height: 47px; padding: 9px 18px; border-top: 1px solid #dde5f0; color: #7a89a0; font-size: 11px; }
+.treba-admin-inbox-pages a { color: #2457ee; display: grid; place-items: center; width: 30px; height: 28px; border: 1px solid #d6e0f0; border-radius: 7px; }
+.treba-admin-inbox-pane { min-width: 0; min-height: 0; display: flex; flex-direction: column; position: relative; }
+.treba-admin-inbox-back { align-self: flex-start; display: flex; align-items: center; gap: 7px; padding: 11px 20px 0; color: #647795; font-size: 11px; }
+.treba-admin-inbox-back:hover { color: #2457ee; }
+.treba-admin-inbox-placeholder, .treba-admin-inbox-deleted { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 35px; flex: 1; background: radial-gradient(ellipse at 50% 40%, #f0f5ff 0, transparent 65%); }
+.treba-admin-inbox-empty-icon { color: #4269d5; background: #e9efff; border: 1px solid #d8e2fb; box-shadow: 0 12px 25px #2457ee0a; width: 80px; height: 80px; border-radius: 26px; display: grid; place-items: center; margin-bottom: 24px; }
+.treba-admin-inbox-placeholder h2, .treba-admin-inbox-deleted h2 { font-size: 20px; line-height: 1.5; margin: 0 0 10px; }
+.treba-admin-inbox-placeholder p, .treba-admin-inbox-deleted p { color: #75849b; max-width: 350px; font-size: 13px; margin: 0 0 24px; }
+.treba-admin-inbox-placeholder > div { display: flex; gap: 7px; align-items: center; color: #8a98ae; font-size: 10px; }
+.treba-admin-inbox-deleted .treba-admin-badge { margin-bottom: 20px; }
+.treba-admin-inbox-empty-list { display: flex; align-items: center; flex-direction: column; text-align: center; gap: 12px; padding: 50px 25px; color: #7990ae; font-size: 12px; }
+.treba-admin-inbox-empty-list p { margin: 0; }
+.treba-admin-conversation-header { display: flex; align-items: center; gap: 11px; padding: 18px 22px; }
+.treba-admin-ticket-avatar { width: 40px; height: 40px; font-size: 12px; font-weight: 600; }
+.treba-admin-conversation-header > div { flex: 1; min-width: 0; }
+.treba-admin-conversation-header h2 { font-size: 15px; margin: 0 0 4px; line-height: 1.5; overflow-wrap: anywhere; }
+.treba-admin-conversation-header p { margin: 0; color: #74839c; font-size: 11px; }
+.treba-admin-conversation-header p span { margin: 0 7px; }
+.treba-admin-conversation-header > .treba-admin-badge { font-size: 10px; }
+.treba-admin-conversation-context { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; background: #fafbfe; border-block: 1px solid #e1e8f2; padding: 10px 22px; font-size: 11px; color: #667993; }
+.treba-admin-conversation-context > a, .treba-admin-conversation-context > span, .treba-admin-conversation-context summary { display: flex; align-items: center; gap: 6px; }
+.treba-admin-conversation-context > a { color: #2457ee; }
+.treba-admin-conversation-context details { position: relative; margin-left: auto; }
+.treba-admin-conversation-context summary { cursor: pointer; color: #667993; list-style: none; }
+.treba-admin-conversation-context summary::-webkit-details-marker { display: none; }
+.treba-admin-conversation-context dl { position: absolute; right: 0; top: 100%; width: 270px; z-index: 3; padding: 16px; margin-top: 10px; border: 1px solid #d5dfed; border-radius: 12px; box-shadow: 0 10px 35px #14223b20; background: white; }
+.treba-admin-conversation-context dl div + div { margin-top: 10px; }
+.treba-admin-conversation-context dd { margin: 0; color: #17233c; }
+.treba-admin-conversation-history { padding: 22px; display: flex; flex-direction: column; gap: 18px; flex: 1; min-height: 130px; overflow-y: auto; overscroll-behavior: contain; background: #f5f7fc; }
+.treba-admin-conversation-history > .treba-admin-button { align-self: center; font-size: 10px; padding: 6px 12px; }
+.treba-admin-conversation-message { max-width: 88%; width: fit-content; align-self: flex-start; padding: 12px 15px 9px; background: #fff; border: 1px solid #dde5f1; border-radius: 14px 14px 14px 4px; box-shadow: 0 2px 4px #17233c03; overflow-wrap: anywhere; }
+.treba-admin-conversation-message.staff { align-self: flex-end; background: #eaf0ff; border-color: #d4dfff; border-radius: 14px 14px 4px 14px; }
+.treba-admin-conversation-message.internal { background: #fff5df; border-color: #efdcaf; align-self: stretch; max-width: 100%; width: auto; }
+.treba-admin-conversation-message header { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; font-size: 10px; }
+.treba-admin-conversation-message header span { color: #8491a8; font-size: 9px; }
+.treba-admin-conversation-message p { margin: 7px 0; white-space: pre-wrap; font-size: 12px; }
+.treba-admin-conversation-message time { color: #8392a9; display: block; text-align: right; font-size: 9px; }
+.treba-admin-conversation-message small { display: flex; gap: 5px; align-items: center; color: #98712a; font-size: 9px; margin-top: 5px; }
+.treba-admin-conversation-event { display: flex; align-items: center; justify-content: center; gap: 5px; flex-wrap: wrap; color: #8b99ae; font-size: 9px; text-align: center; }
+.treba-admin-conversation-event time { width: 100%; font-size: 8px; }
+.treba-admin-conversation-controls { padding: 15px 22px; border-top: 1px solid #dfe6f1; }
+.treba-admin-conversation-controls > .treba-admin-alert, .treba-admin-conversation-controls > .treba-admin-success { padding: 8px 12px; font-size: 11px; margin: 0 0 10px; }
+.treba-admin-composer { border: 1px solid #cfdaec; border-radius: 12px; overflow: hidden; }
+.treba-admin-composer:focus-within { border-color: #93afea; box-shadow: 0 0 0 3px #edf2ff; }
+.treba-admin-composer.internal { background: #fffbf1; border-color: #e6d5a9; }
+.treba-admin-composer-modes { display: flex; gap: 12px; padding: 9px 13px 0; }
+.treba-admin-composer-modes button { display: flex; gap: 5px; align-items: center; font-size: 10px; padding: 0 0 7px; color: #8090a8; background: transparent; border: 0; border-bottom: 2px solid transparent; }
+.treba-admin-composer-modes button[aria-pressed="true"] { color: #2457ee; border-bottom-color: #2457ee; }
+.treba-admin-composer.internal .treba-admin-composer-modes button[aria-pressed="true"] { color: #997020; border-bottom-color: #c19847; }
+.treba-admin-composer-label { display: block; font-size: 9px; color: #8494ac; padding: 9px 13px 0; }
+.treba-admin-composer.internal .treba-admin-composer-label { color: #967020; }
+.treba-admin-composer textarea { resize: vertical; min-height: 70px; max-height: 160px; border: 0; outline: 0; width: 100%; background: transparent; color: #17233c; padding: 6px 13px; font-size: 12px; }
+.treba-admin-composer textarea:focus-visible { outline: none; }
+.treba-admin-composer-footer { display: flex; align-items: center; justify-content: space-between; padding: 5px 10px 10px; gap: 12px; }
+.treba-admin-composer-footer small { color: #93a0b4; font-size: 9px; }
+.treba-admin-composer-footer .treba-admin-button { font-size: 11px; padding: 8px 13px; border-radius: 8px; }
+.treba-admin-composer.internal .treba-admin-button { background: #9c752e; }
+.treba-admin-conversation-decisions { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.treba-admin-conversation-decisions > div { display: flex; align-items: center; gap: 7px; }
+.treba-admin-conversation-decisions select { border: 1px solid #d2ddec; border-radius: 8px; padding: 7px; background: white; font-size: 10px; max-width: 170px; }
+.treba-admin-conversation-decisions .treba-admin-button { font-size: 10px; padding: 7px 10px; border-radius: 8px; }
+.treba-admin-conversation-decisions .treba-admin-button svg { width: 15px; height: 15px; }
+.treba-admin-conversation-closed { display: flex; align-items: center; gap: 8px; background: #f1f5fa; color: #7788a2; padding: 14px; border-radius: 10px; font-size: 12px; margin: 0; }
+.treba-admin-inbox-tickets, .treba-admin-conversation-history { scrollbar-width: thin; scrollbar-color: #c1cde1 transparent; }
+.treba-admin-inbox-tickets::-webkit-scrollbar, .treba-admin-conversation-history::-webkit-scrollbar { width: 5px; }
+.treba-admin-inbox-tickets::-webkit-scrollbar-thumb, .treba-admin-conversation-history::-webkit-scrollbar-thumb { background: #c1cde1; border-radius: 8px; }
+.treba-admin-shell .treba-admin-inbox-filters form input { border: 0; border-radius: 0; box-shadow: none; background: transparent; min-height: 34px; padding: 6px 0; font-size: 12px; }
+.treba-admin-shell .treba-admin-composer textarea { border: 0; border-radius: 0; background: transparent; padding: 6px 13px; min-height: 70px; font-size: 13px; }
+.treba-admin-ticket-copy > strong { font-size: 13px; }
+.treba-admin-ticket-top b, .treba-admin-ticket-copy > p { font-size: 12px; }
+.treba-admin-ticket-meta time { font-size: 10px; }
+.treba-admin-conversation-message p { font-size: 13px; }
+.treba-admin-conversation-message header { font-size: 11px; }
+.treba-admin-conversation-message time { font-size: 10px; }
+@media (max-width: 1150px) and (min-width: 801px) {
+  .treba-admin-inbox { grid-template-columns: 290px minmax(0, 1fr); }
+  .treba-admin-ticket-icon { display: none; }
+  .treba-admin-conversation-header { flex-wrap: wrap; padding: 15px; }
+  .treba-admin-conversation-context, .treba-admin-conversation-controls, .treba-admin-conversation-history { padding: 14px; }
+  .treba-admin-conversation-message { max-width: 95%; }
+  .treba-admin-conversation-decisions select { max-width: 150px; }
+}
+@media (max-width: 800px) {
+  .treba-admin-inbox { display: block; height: auto; min-height: 450px; border-radius: 14px; }
+  .treba-admin-inbox-list { border-right: 0; }
+  .treba-admin-inbox-tickets { max-height: none; }
+  .treba-admin-inbox-pane { display: none; }
+  .treba-admin-inbox.has-selection .treba-admin-inbox-list { display: none; }
+  .treba-admin-inbox.has-selection .treba-admin-inbox-pane { display: flex; }
+  .treba-admin-inbox-tabs { gap: 3px; }
+  .treba-admin-inbox-tabs a { padding: 8px 10px; font-size: 11px; gap: 5px; }
+  .treba-admin-conversation-header { display: grid; grid-template-columns: 40px minmax(0, 1fr); padding: 16px; gap: 7px 11px; }
+  .treba-admin-conversation-header > .treba-admin-ticket-avatar { grid-column: 1; grid-row: 1 / span 2; align-self: start; }
+  .treba-admin-conversation-header > div { grid-column: 2; }
+  .treba-admin-conversation-header h2 { font-size: 14px; }
+  .treba-admin-conversation-header > .treba-admin-badge { grid-column: 2; justify-self: start; margin-left: 0; }
+  .treba-admin-conversation-context { position: relative; padding: 10px 16px; gap: 12px; }
+  .treba-admin-conversation-context details { position: static; margin-left: 0; }
+  .treba-admin-conversation-context dl { left: auto; right: 12px; width: min(270px, calc(100vw - 80px)); }
+  .treba-admin-conversation-history { min-height: 240px; max-height: 55dvh; padding: 18px 14px; flex: auto; }
+  .treba-admin-conversation-controls { padding: 14px; }
+  .treba-admin-conversation-message { max-width: 95%; }
+  .treba-admin-composer-modes { gap: 10px; padding-inline: 10px; }
+  .treba-admin-composer-modes button { font-size: 9px; }
+  .treba-admin-shell .treba-admin-composer textarea { min-height: 100px; }
+  .treba-admin-conversation-decisions select { max-width: 150px; }
+}

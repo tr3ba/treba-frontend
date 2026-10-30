@@ -35,7 +35,7 @@ export function Badge({ value }: { value: string | number }) {
   const state = text.toUpperCase();
   const tone = /REJECT|CANCEL|BLOCK|FAIL|SUSPEND/.test(state)
     ? "red"
-    : /ACTIVE|PAID|PUBLISHED|APPROVED|COMPLETED|DELIVERED|READY/.test(state)
+    : /ACTIVE|ENABLED|PAID|PUBLISHED|APPROVED|COMPLETED|DELIVERED|READY/.test(state)
       ? "green"
       : /PENDING|AWAIT|OPEN|QUEUE|PROGRESS|SCHEDULE/.test(state)
         ? "orange"
@@ -51,7 +51,7 @@ export function Hero({
   title,
   description,
   action,
-  eyebrow = message("РОБОЧИЙ ПРОСТІР"),
+  eyebrow,
 }: {
   title: string;
   description?: string;
@@ -67,7 +67,7 @@ export function Hero({
           <Icon name={icon} size={25} />
         </span>
         <div>
-          <div className="treba-admin-eyebrow">{t(eyebrow)}</div>
+          {eyebrow && <div className="treba-admin-eyebrow">{t(eyebrow)}</div>}
           <h1>{title}</h1>
           {description && <p>{description}</p>}
         </div>
@@ -421,6 +421,10 @@ export function Confirm({
   onClose,
   busy,
   error,
+  confirmLabel,
+  confirmIcon = "check",
+  confirmDisabled = false,
+  className = "",
 }: {
   title: string;
   children: ReactNode;
@@ -428,6 +432,10 @@ export function Confirm({
   onClose: () => void;
   busy?: boolean;
   error?: string;
+  confirmLabel?: string;
+  confirmIcon?: string;
+  confirmDisabled?: boolean;
+  className?: string;
 }) {
   const { t } = useAdminI18n();
   const dialog = useRef<HTMLElement>(null);
@@ -437,10 +445,15 @@ export function Confirm({
         ? document.activeElement
         : null;
     const first = dialog.current?.querySelector<HTMLElement>(
-      "button:not([disabled]),input,select,textarea,a[href]",
+      'button:not([disabled]):not([hidden]),input:not([disabled]):not([hidden]),select:not([disabled]),textarea:not([disabled]),a[href],[tabindex="0"]',
     );
-    first?.focus();
-    return () => previous?.focus();
+    (first ?? dialog.current)?.focus();
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = overflow;
+      previous?.focus();
+    };
   }, []);
   return (
     <div
@@ -451,8 +464,9 @@ export function Confirm({
     >
       <section
         ref={dialog}
-        className="treba-admin-dialog"
+        className={`treba-admin-dialog ${className}`}
         role="dialog"
+        tabIndex={-1}
         aria-modal="true"
         aria-label={title}
         onClick={(e) => e.stopPropagation()}
@@ -464,16 +478,18 @@ export function Confirm({
           if (e.key !== "Tab") return;
           const fields = Array.from(
             dialog.current?.querySelectorAll<HTMLElement>(
-              "button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),a[href]",
+              'button:not([disabled]):not([hidden]),input:not([disabled]):not([hidden]),select:not([disabled]),textarea:not([disabled]),a[href],[tabindex="0"]',
             ) ?? [],
           );
           const first = fields[0],
             last = fields.at(-1);
-          if (e.shiftKey && document.activeElement === first) {
+          if (!fields.length) { e.preventDefault(); return; }
+          const hasFieldFocus = fields.some(field => field === document.activeElement);
+          if (e.shiftKey && (document.activeElement === first || !hasFieldFocus)) {
             e.preventDefault();
             last?.focus();
           }
-          if (!e.shiftKey && document.activeElement === last) {
+          if (!e.shiftKey && (document.activeElement === last || !hasFieldFocus)) {
             e.preventDefault();
             first?.focus();
           }
@@ -481,7 +497,7 @@ export function Confirm({
       >
         <h2>{title}</h2>
         <Alert message={error} />
-        <div>{children}</div>
+        <div className="treba-admin-dialog-content">{children}</div>
         <div className="treba-admin-actions">
           <Button
             tone="secondary"
@@ -491,8 +507,8 @@ export function Confirm({
           >
             {t("Скасувати")}
           </Button>
-          <Button icon="check" onClick={onConfirm} disabled={busy}>
-            {t("Підтвердити")}
+          <Button icon={confirmIcon} onClick={onConfirm} disabled={busy || confirmDisabled}>
+            {confirmLabel ?? t("Підтвердити")}
           </Button>
         </div>
       </section>

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   createContext,
   useContext,
+  useCallback,
   useEffect,
   useState,
   type ReactNode,
@@ -16,12 +17,18 @@ import { roleLabel, workspaceLabel } from "@/lib/admin";
 import type { Feed, User } from "@/features/admin/types";
 import Icon from "./Icon";
 import LanguageSelector from "./LanguageSelector";
+import UserAvatar from "./UserAvatar";
 import { Alert, Button, Empty, Loading } from "./ui";
-const StaffContext = createContext<User | null>(null);
+const StaffContext = createContext<{ user: User; updateUser: (user: User) => void } | null>(null);
 export function useStaff() {
-  const user = useContext(StaffContext);
-  if (!user) throw new Error("Staff session required");
-  return user;
+  const session = useContext(StaffContext);
+  if (!session) throw new Error("Staff session required");
+  return session.user;
+}
+export function useUpdateStaff() {
+  const session = useContext(StaffContext);
+  if (!session) throw new Error("Staff session required");
+  return session.updateUser;
 }
 const nav = [
   [message("Робота"), message("Огляд"), "", "grid"],
@@ -52,6 +59,11 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false),
     [leaving, setLeaving] = useState(false);
   const user = session.data?.user;
+  const { setData: setSessionData, reload: reloadSession } = session;
+  const updateUser = useCallback((updated: User) => {
+    setSessionData({ user: updated });
+    void reloadSession();
+  }, [setSessionData, reloadSession]);
   useEffect(() => {
     adoptProfileLanguage(user?.profile?.language);
   }, [adoptProfileLanguage, user?.profile?.language]);
@@ -108,7 +120,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
         ? t("Сповіщення")
         : t(active[1]);
   return (
-    <StaffContext.Provider value={user}>
+    <StaffContext.Provider value={{ user, updateUser }}>
       <div className="treba-admin-shell" data-treba-workspace="ready">
         {open && (
           <button
@@ -166,8 +178,6 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             )}
           </div>
           <div className="treba-admin-sidebar-bottom">
-            <span className="treba-admin-online-dot" />
-            <span>{t("Робочий простір TREBA")}</span>
             <Button
               tone="icon"
               onClick={() => void logout(true)}
@@ -206,11 +216,8 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                   </span>
                 )}
               </Link>
-              <Link className="treba-admin-profile-link" href="/admin/profile">
-                <span className="treba-admin-avatar">
-                  {user.firstName?.[0]}
-                  {user.lastName?.[0]}
-                </span>
+              <Link className="treba-admin-profile-link" href="/admin/profile" aria-label={t("Мій профіль")}>
+                <UserAvatar user={user} />
                 <span>
                   <b>
                     {user.firstName} {user.lastName}
@@ -239,7 +246,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             )}
           </main>
           <footer className="treba-admin-footer">
-            <span>{t("© TREBA · Робочий простір")}</span>
+            <span>© TREBA</span>
             <span>{t("Часовий пояс: Europe/Vilnius")}</span>
           </footer>
         </div>

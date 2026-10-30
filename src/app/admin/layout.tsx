@@ -4,6 +4,8 @@ import AdminShell from "@/components/admin/AdminShell";
 import { AdminI18nProvider } from "@/features/admin/i18n/provider";
 import { languageCookie, normalizeLanguage } from "@/features/admin/i18n/core";
 import "./admin.css";
+import "./reviews.css";
+import "./support.css";
 export async function generateMetadata(): Promise<Metadata> {
   const language = normalizeLanguage(
     (await cookies()).get(languageCookie)?.value,
