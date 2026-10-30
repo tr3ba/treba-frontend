@@ -13,15 +13,13 @@ export type User = {
   middleName?: string;
   email: string;
   phone?: string;
-  emailVerified?: boolean;
-  phoneVerified?: boolean;
   role: string;
   status: string;
   updatedAt?: string;
   profile?: {
-    avatarUrl?: string | null;
-    birthDate?: string | null;
-    gender?: string | null;
+    avatarUrl?: string;
+    birthDate?: string;
+    gender?: string;
     language?: string;
     marketingEmailsEnabled?: boolean;
   };
@@ -32,15 +30,11 @@ export type User = {
 export type Address = {
   id: string;
   country: string;
-  region?: string | null;
   city: string;
   street: string;
   building: string;
-  apartment?: string | null;
-  postalCode?: string | null;
   recipientName: string;
   recipientPhone: string;
-  defaultAddress?: boolean;
 };
 export type Variant = {
   id: string;

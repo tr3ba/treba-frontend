@@ -1,62 +1,44 @@
 .selector {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 3px 9px;
+  gap: 3px;
+  background: #edf2fa;
   border: 1px solid #cbd6e6;
   border-radius: 9px;
-  background: #fff;
+  padding: 3px;
   color: #405575;
   flex-shrink: 0;
-  transition: border-color .16s ease, box-shadow .16s ease;
 }
-
-.selector:focus-within {
-  border-color: #8da8f5;
-  box-shadow: 0 0 0 3px #3158e81a;
+.selector > svg {
+  margin: 0 5px;
 }
-
-.selector > svg:first-child {
-  flex: 0 0 auto;
-  color: #526580;
-}
-
-.selector select {
-  min-width: 94px;
-  min-height: 34px;
-  padding: 5px 0;
-  border: 0 !important;
-  border-radius: 0;
-  outline: 0;
-  background: transparent !important;
-  color: #344560;
+.selector button {
+  border: 0;
+  background: transparent;
+  color: #4f617e;
   font: inherit;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 7px 9px;
   cursor: pointer;
-  appearance: none;
+  min-height: 34px;
 }
-
-.selector > svg:last-child {
-  flex: 0 0 auto;
-  color: #61738f;
-  transform: rotate(90deg);
-  pointer-events: none;
+.selector button[aria-pressed="true"] {
+  background: #2457ee;
+  color: white;
+  box-shadow: 0 2px 5px #203d6820;
 }
-
+.selector button:focus-visible {
+  outline: 3px solid #93b0ff;
+  outline-offset: 2px;
+}
 @media (max-width: 768px) {
-  .selector {
-    gap: 6px;
-    padding: 2px 7px;
-  }
-
-  .selector > svg:first-child {
+  .selector > svg {
     display: none;
   }
-
-  .selector select {
-    min-width: 86px;
-    min-height: 36px;
-    font-size: 11px;
+  .selector button {
+    min-height: 38px;
+    padding: 6px 8px;
   }
 }

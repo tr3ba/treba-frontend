@@ -1,13 +1,14 @@
 "use client";
 import { useAdminI18n } from "@/features/admin/i18n/provider";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useStaff } from "@/components/admin/AdminShell";
 import Icon from "@/components/admin/Icon";
 import {
   Alert,
   Badge,
   Card,
+  Filters,
   Hero,
   Loading,
   Table,
@@ -47,8 +48,6 @@ export default function Overview() {
   const { date, money, t, label } = useAdminI18n();
   const user = useStaff(),
     params = useSearchParams(),
-    router = useRouter(),
-    path = usePathname(),
     days = params.get("days") ?? "30";
   const dashboard = useResource<Dashboard>(
     user.role !== "Seller" ? "dashboard?days=" + days : null,
@@ -113,14 +112,6 @@ export default function Overview() {
             "/admin/support?status=OPEN",
           ],
         ];
-
-  function selectPeriod(value: string) {
-    const next = new URLSearchParams(params);
-    next.set("days", value);
-    next.delete("page");
-    router.push(`${path}?${next}`);
-  }
-
   return (
     <>
       <Hero
@@ -130,22 +121,16 @@ export default function Overview() {
         )}
         action={
           <div className="treba-admin-period">
-            <div className="treba-admin-period-heading">
-              <span className="treba-admin-period-icon"><Icon name="calendar" size={18} /></span>
-              <span>{t("Період")}</span>
-            </div>
-            <div className="treba-admin-period-options" role="group" aria-label={t("Період")}>
-              {[7, 30, 90].map((n) => (
-                <button
-                  key={n}
-                  type="button"
-                  aria-pressed={days === String(n)}
-                  onClick={() => selectPeriod(String(n))}
-                >
-                  {t("{0} днів", [n])}
-                </button>
-              ))}
-            </div>
+            <Icon name="calendar" size={21} />
+            <Filters search={false}>
+              <select name="days" aria-label={t("Період")} defaultValue={days}>
+                {[7, 30, 90].map((n) => (
+                  <option key={n} value={n}>
+                    {t("Останні {0} днів", [n])}
+                  </option>
+                ))}
+              </select>
+            </Filters>
           </div>
         }
       />
