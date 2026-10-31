@@ -82,14 +82,16 @@ export default function ModerationQueue() {
     <Card>
       <div className="treba-admin-review-toolbar">
         <div className="treba-admin-review-count"><Icon name="shield" size={25} /><span>{t("Очікують модерації")}<strong>{pending.data ?? data?.totalElements ?? "—"}</strong></span></div>
-        <div className="treba-admin-review-modes" role="group" aria-label={t("Режим перегляду")}>
-          {([false, true] as const).map(value => <button key={String(value)} type="button" aria-pressed={all === value} disabled={action.busy} onClick={() => {
-            const query = new URLSearchParams(params);
-            query.set("view", value ? "all" : "single");
-            router.replace("/admin/moderation?" + query, { scroll: false });
-          }}><Icon name={value ? "grid" : "file"} size={18} />{value ? t("Усі товари") : t("По одному")}</button>)}
+        <div className="treba-admin-review-tools">
+          <div className="treba-admin-review-modes" role="group" aria-label={t("Режим перегляду")}>
+            {([false, true] as const).map(value => <button key={String(value)} type="button" aria-pressed={all === value} disabled={action.busy} onClick={() => {
+              const query = new URLSearchParams(params);
+              query.set("view", value ? "all" : "single");
+              router.replace("/admin/moderation?" + query, { scroll: false });
+            }}><Icon name={value ? "grid" : "file"} size={18} />{value ? t("Усі товари") : t("По одному")}</button>)}
+          </div>
+          <Button tone="secondary" icon="refresh" disabled={resource.loading || action.busy} onClick={() => { void resource.reload(); void pending.reload(); }}>{t("Оновити")}</Button>
         </div>
-        <Button tone="secondary" icon="refresh" disabled={resource.loading || action.busy} onClick={() => { void resource.reload(); void pending.reload(); }}>{t("Оновити")}</Button>
       </div>
       <Filters>
         {([
