@@ -644,11 +644,17 @@ export function Users({
                 <div className="treba-admin-user-verifications">
                   <span data-verified={detail.data.emailVerified === true}>
                     <Icon name={detail.data.emailVerified ? "check" : "close"} size={15} />
-                    {t(detail.data.emailVerified ? "Email підтверджено" : "Email не підтверджено")}
+                    {detail.data.emailVerified
+                      ? t("Email підтверджено")
+                      : t("Email не підтверджено")}
                   </span>
                   <span data-verified={detail.data.phoneVerified === true}>
                     <Icon name={detail.data.phoneVerified ? "check" : detail.data.phone ? "close" : "info"} size={15} />
-                    {t(detail.data.phoneVerified ? "Телефон підтверджено" : detail.data.phone ? "Телефон не підтверджено" : "Телефон не вказано")}
+                    {detail.data.phoneVerified
+                      ? t("Телефон підтверджено")
+                      : detail.data.phone
+                        ? t("Телефон не підтверджено")
+                        : t("Телефон не вказано")}
                   </span>
                 </div>
                 <div className="treba-admin-actions">
@@ -674,17 +680,15 @@ export function Users({
                       <div>
                         <dt>{t("Стать")}</dt>
                         <dd>
-                          {detail.data.profile.gender
-                            ? t(
-                                ({
-                                  female: "Жіноча",
-                                  male: "Чоловіча",
-                                  other: "Інша",
-                                } as Record<string, string>)[
-                                  detail.data.profile.gender.toLowerCase()
-                                ] ?? detail.data.profile.gender,
-                              )
-                            : t("Не вказано")}
+                          {!detail.data.profile.gender
+                            ? t("Не вказано")
+                            : detail.data.profile.gender.toLowerCase() === "female"
+                              ? t("Жіноча")
+                              : detail.data.profile.gender.toLowerCase() === "male"
+                                ? t("Чоловіча")
+                                : detail.data.profile.gender.toLowerCase() === "other"
+                                  ? t("Інша")
+                                  : t(detail.data.profile.gender)}
                         </dd>
                       </div>
                       <div>
