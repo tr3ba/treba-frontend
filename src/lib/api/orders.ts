@@ -1,5 +1,6 @@
 // Заказы покупателя.
 // - Оформление: POST /api/v1/orders через прокси /shop-api/orders (нужна авторизация).
+// - Отмена: POST /api/v1/orders/{id}/cancel через прокси /shop-api/orders/{id}/cancel.
 // - Список и детали доступны через защищённый API кабинета покупателя.
 
 import type {
@@ -192,4 +193,53 @@ export async function createOrder(form: CheckoutForm, items: CheckoutItem[]): Pr
     discount: dto.discountAmount,
     total: dto.totalAmount,
   };
+}
+
+// ---------- Скасування ----------
+
+/** Покупець може скасувати лише ще не оплачене замовлення — те саме правило перевіряє бэк. */
+export function canCancelOrder(status: string): boolean {
+  return status === "CREATED" || status === "AWAITING_PAYMENT";
+}
+
+/** Готові причини скасування. Останню користувач уточнює власним текстом. */
+export const CANCEL_REASONS = [
+  "Передумав(-ла) купувати",
+  "Знайшов(-ла) дешевше",
+  "Хочу змінити склад замовлення",
+  "Помилка в контактах або адресі доставки",
+  "Інша причина",
+] as const;
+
+export const OTHER_CANCEL_REASON: (typeof CANCEL_REASONS)[number] = "Інша причина";
+
+/** Обмеження бэка на довжину причини. */
+export const CANCEL_REASON_MAX_LENGTH = 500;
+
+function cancelErrorMessage(status: number): string {
+  if (status === 0 || status === 503) return "Сервер недоступний. Спробуйте пізніше.";
+  if (status === 401) return "Потрібно увійти в акаунт знову.";
+  if (status === 404) return "Замовлення не знайдено.";
+  if (status === 409) return "Замовлення вже не можна скасувати: його статус змінився. Оновіть сторінку.";
+  if (status === 400) return `Вкажіть причину скасування (до ${CANCEL_REASON_MAX_LENGTH} символів).`;
+  return "Не вдалося скасувати замовлення. Спробуйте ще раз.";
+}
+
+/** Скасувати замовлення. Бэк сам перевіряє власника і дозволений статус. */
+export async function cancelOrder(orderId: string, reason: string): Promise<void> {
+  let response: Response;
+  try {
+    response = await fetch(`${ORDERS_PROXY_URL}/${encodeURIComponent(orderId)}/cancel`, {
+      method: "POST",
+      cache: "no-store",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(reason.trim()),
+    });
+  } catch {
+    throw new OrderError(0, cancelErrorMessage(0));
+  }
+
+  if (!response.ok) {
+    throw new OrderError(response.status, cancelErrorMessage(response.status));
+  }
 }
