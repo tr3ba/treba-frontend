@@ -1,0 +1,250 @@
+/* Інформаційні сторінки: палітра каталогу/товару */
+
+.layout {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px 32px 60px;
+    color: #28251d;
+}
+
+/* ---------- Хлібні крихти ---------- */
+
+.breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: #8a8578;
+}
+
+.breadcrumbLink {
+    color: #8a8578;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumbSeparator {
+    color: #e5e3dd;
+}
+
+.breadcrumbCurrent {
+    color: #28251d;
+}
+
+/* ---------- Колонки ---------- */
+
+.columns {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 48px;
+    align-items: start;
+}
+
+/* ---------- Бічне меню ---------- */
+
+.sidebar {
+    position: sticky;
+    top: 24px;
+    padding: 20px;
+    border: 1px solid #e5e3dd;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.navGroup+.navGroup {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e3dd;
+}
+
+.navGroupTitle {
+    margin: 0 0 10px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #8a8578;
+}
+
+.navList {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.navLink {
+    display: block;
+    padding: 8px 12px;
+    border-left: 3px solid transparent;
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    color: #28251d;
+    text-decoration: none;
+    transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.navLinkActive {
+    border-left-color: #ff6e2a;
+    background: #fff4ee;
+    color: #ff6e2a;
+    font-weight: 600;
+}
+
+/* ---------- Текст ---------- */
+
+.content {
+    max-width: 760px;
+}
+
+.title {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #28251d;
+}
+
+.description {
+    margin: 0 0 28px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #8a8578;
+}
+
+.section+.section {
+    margin-top: 28px;
+}
+
+.sectionTitle {
+    margin: 0 0 10px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #28251d;
+}
+
+.paragraph {
+    margin: 0 0 10px;
+    font-size: 15px;
+    line-height: 1.65;
+}
+
+.list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding-left: 20px;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.list li::marker {
+    color: #ff6e2a;
+}
+
+.action {
+    display: inline-block;
+    margin-top: 32px;
+    padding: 12px 24px;
+    border-radius: 10px;
+    background: #ff6e2a;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+@media (hover: hover) {
+
+    .breadcrumbLink:hover,
+    .navLink:hover {
+        color: #ff6e2a;
+    }
+
+    .action:hover {
+        background: #f25f1b;
+    }
+}
+
+/* ---------- Планшет і телефон ---------- */
+
+@media (max-width: 900px) {
+    .columns {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 24px;
+    }
+
+    /* Меню — горизонтальна стрічка «таблеток» над текстом */
+    .sidebar {
+        position: static;
+        padding: 0;
+        border: 0;
+        background: none;
+    }
+
+    .sidebar nav {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        scrollbar-width: none;
+    }
+
+    .sidebar nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .navGroup,
+    .navGroup+.navGroup {
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    .navGroupTitle {
+        display: none;
+    }
+
+    .navList {
+        display: flex;
+        gap: 8px;
+    }
+
+    .navLink {
+        padding: 8px 14px;
+        border: 1px solid #e5e3dd;
+        border-radius: 20px;
+        white-space: nowrap;
+        font-size: 13px;
+    }
+
+    .navLinkActive {
+        border-color: #ff6e2a;
+    }
+}
+
+@media (max-width: 768px) {
+    .layout {
+        padding: 16px 16px 40px;
+    }
+
+    .breadcrumbs {
+        margin-bottom: 16px;
+    }
+
+    .title {
+        font-size: 22px;
+    }
+
+    .description {
+        margin-bottom: 20px;
+    }
+
+    .action {
+        display: block;
+        text-align: center;
+    }
+}
