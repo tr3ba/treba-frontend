@@ -1,6 +1,7 @@
 import Link from "next/link";
 import styles from "./Footer.module.css";
 import Icon from "../common/Icon";
+import { SOCIAL_LINKS } from "../../data/socialLinks";
 
 type FooterLink = {
   label: string;
@@ -12,40 +13,31 @@ type FooterColumn = {
   links: FooterLink[];
 };
 
-const socialLinks = [
-  { name: "TikTok", icon: "/icons/TikTok.svg" },
-  { name: "Telegram", icon: "/icons/telegram.svg" },
-  { name: "Facebook", icon: "/icons/facebook.svg" },
-  { name: "YouTube", icon: "/icons/youtube.svg" },
-  { name: "Instagram", icon: "/icons/instagram.svg" },
-  { name: "X", icon: "/icons/x.svg" },
-];
-
-// Ссылки с "#" — страницы ещё не сделаны
+// Інфосторінки — /info/[slug], тексти в src/data/infoPages.ts
 const linkColumns: FooterColumn[] = [
   {
     title: "Про компанію",
     links: [
-      { label: "Про нас", href: "#" },
-      { label: "Умови використання сайту", href: "#" },
-      { label: "Вакансії", href: "#" },
-      { label: "Контакти", href: "#" },
+      { label: "Про нас", href: "/info/about" },
+      { label: "Умови використання сайту", href: "/info/terms" },
+      { label: "Вакансії", href: "/info/careers" },
+      { label: "Контакти", href: "/info/contacts" },
     ],
   },
   {
     title: "Допомога",
     links: [
-      { label: "Доставка та оплата", href: "#" },
-      { label: "Гарантія", href: "#" },
-      { label: "Повернення товару", href: "#" },
+      { label: "Доставка та оплата", href: "/info/delivery" },
+      { label: "Гарантія", href: "/info/warranty" },
+      { label: "Повернення товару", href: "/info/returns" },
     ],
   },
   {
     title: "Партнерам",
     links: [
       { label: "Продавати на TREBA", href: "/sell" },
-      { label: "Реклама на TREBA", href: "#" },
-      { label: "Співпраця з нами", href: "#" },
+      { label: "Реклама на TREBA", href: "/info/advertising" },
+      { label: "Співпраця з нами", href: "/info/partnership" },
     ],
   },
 ];
@@ -60,10 +52,12 @@ export default function Footer() {
           <div className={styles.socialColumn}>
             <p className={styles.columnTitle}>Ми в соціальних мережах</p>
             <div className={styles.socialRow}>
-              {socialLinks.map((social) => (
+              {SOCIAL_LINKS.map((social) => (
                 <a
                   key={social.name}
-                  href="#"
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={styles.socialIcon}
                   aria-label={social.name}
                 >

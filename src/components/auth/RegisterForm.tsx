@@ -1,4 +1,6 @@
 "use client";
+
+import Link from "next/link";
 import { registrationAfterResend } from "@/lib/api/account-security";
 import { useAdminI18n } from "@/features/admin/i18n/provider";
 import { message } from "@/features/admin/i18n/core";
@@ -400,9 +402,10 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
                 />
                 <label htmlFor="agree" className={styles.agreementText}>
                   {t("Реєструючись, ви погоджуєтесь з")}{" "}
-                  <a href="#" className={styles.switchLink}>
+                  {/* Новая вкладка — чтобы не потерять уже введённые данные формы */}
+                  <Link href="/info/terms" target="_blank" rel="noopener noreferrer" className={styles.switchLink}>
                     {t("угодою користувача")}
-                  </a>
+                  </Link>
                 </label>
               </div>
               {errors.agree && (

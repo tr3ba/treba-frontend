@@ -1,0 +1,6 @@
+/* Кнопка картки — це посилання: прибираємо підкреслення, розмір як у кнопки */
+.link {
+    box-sizing: border-box;
+    text-decoration: none;
+    text-align: center;
+}

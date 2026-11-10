@@ -7,9 +7,14 @@ import FooterAbout from "./FooterAbout";
 import Footer from "./Footer";
 import Header from "../layout/Header";
 import Icon from "../common/Icon";
+import WelcomeCard from "./WelcomeCard";
+import { HOME_SOCIAL_NAMES, SOCIAL_LINKS } from "../../data/socialLinks";
 import { getBestOffersProducts, getRecommendedProducts } from "../../lib/api/products";
 import { getCategories } from "../../lib/api/categories";
 import React from "react";
+
+// Соцмережі для картки на головній — у порядку HOME_SOCIAL_NAMES
+const homeSocialLinks = HOME_SOCIAL_NAMES.flatMap((name) => SOCIAL_LINKS.filter((social) => social.name === name));
 
 export default async function Home() {
   const [bestOffers, recommended, categories] = await Promise.all([
@@ -36,46 +41,37 @@ export default async function Home() {
     </Link>
   ))}
 
-  {}
   <Link className={styles.categoryItem} href="/account/messages?new=chat">
     <Icon src="/icons/chat.svg" alt="" className={styles.categoryIcon} />
     <span className={styles.categoryText}>Чат з TREBA</span>
   </Link>
 
-  <a className={styles.categoryItem} href="#">
+  <Link className={styles.categoryItem} href="/account/parcels">
     <Icon src="/icons/box.svg" alt="" className={styles.categoryIcon} />
     <span className={styles.categoryText}>Відстежити посилку</span>
-  </a>
+  </Link>
 </nav>
           </aside>
 
           {/* Два блока под меню */}
           <div className={styles.sidebarBottom}>
-            <section className={styles.welcomeCard}>
-              <h2 className={styles.welcomeTitle}>Ласкаво просимо!</h2>
-              <p className={styles.welcomeText}>
-                Увійдіть, щоб отримувати рекомендації, персональні бонуси та знижки.
-              </p>
-              <button className={styles.welcomeButton}>
-                Увійдіть до особистого кабінету
-              </button>
-            </section>
+            <WelcomeCard />
 
             <section className={styles.socialCard}>
               <p className={styles.socialTitle}>Ми в соціальних мережах</p>
               <div className={styles.socialIconsRow}>
-                <a href="#" className={styles.socialIcon}>
-                  <Icon src="/icons/facebook.svg" alt="Facebook" />
-                </a>
-                <a href="#" className={styles.socialIcon}>
-                  <Icon src="/icons/instagram.svg" alt="Instagram" />
-                </a>
-                <a href="#" className={styles.socialIcon}>
-                  <Icon src="/icons/youtube.svg" alt="YouTube" />
-                </a>
-                <a href="#" className={styles.socialIcon}>
-                  <Icon src="/icons/TikTok.svg" alt="TikTok" />
-                </a>
+                {homeSocialLinks.map((social) => (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.socialIcon}
+                    aria-label={social.name}
+                  >
+                    <Icon src={social.icon} alt={social.name} />
+                  </a>
+                ))}
               </div>
             </section>
           </div>

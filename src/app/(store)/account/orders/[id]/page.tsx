@@ -6,8 +6,9 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../../../../context/AuthContext";
 import AccountPageShell from "../../../../../components/account/AccountPageShell";
 import ReviewForm from "../../../../../components/account/ReviewForm";
+import CancelOrderPanel from "../../../../../components/account/CancelOrderPanel";
 import { accountRequest, type CustomerOrder } from "../../../../../lib/api/account";
-import { getOrderStatusLabel } from "../../../../../lib/api/orders";
+import { canCancelOrder, getOrderStatusLabel } from "../../../../../lib/api/orders";
 import { deliveryCarrierLabel } from "../../../../../lib/api/delivery";
 import { resolveMediaUrl } from "../../../../../lib/api/client";
 import { formatDateTime, formatPrice } from "../../../../../lib/format";
@@ -19,6 +20,7 @@ export default function OrderDetailsPage() {
   const [order, setOrder] = useState<CustomerOrder | null>(null); const [error, setError] = useState("");
   const [reviewItem, setReviewItem] = useState<string | null>(null);
   const [success, setSuccess] = useState("");
+  const [cancelNotice, setCancelNotice] = useState("");
   const [revision, setRevision] = useState(0);
   useEffect(() => {
     if (!userId) return;
@@ -29,7 +31,15 @@ export default function OrderDetailsPage() {
   }, [id, userId, revision]);
   return <AccountPageShell><Link className={styles.link} href="/account/orders">← Усі замовлення</Link>
     {error ? <section className={styles.card} role="alert">{error}</section> : !order ? <p role="status">Завантажуємо замовлення…</p> : <>
-      <section className={styles.card}><h1>Замовлення № {order.orderNumber}</h1><p className={styles.muted}>{formatDateTime(order.createdAt)}</p><span className={styles.badge}>{getOrderStatusLabel(order.status)}</span></section>
+      <section className={styles.card}><h1>Замовлення № {order.orderNumber}</h1><p className={styles.muted}>{formatDateTime(order.createdAt)}</p><span className={styles.badge}>{getOrderStatusLabel(order.status)}</span>
+        {cancelNotice && <p role="status">{cancelNotice}</p>}
+        {canCancelOrder(order.status) && <CancelOrderPanel orderId={order.id} onCancelled={() => {
+          // Сразу прячем форму, затем перезагружаем заказ — подтянется история статусов
+          setOrder(current => current ? { ...current, status: "CANCELLED" } : current);
+          setCancelNotice("Замовлення скасовано.");
+          setRevision(value => value + 1);
+        }} />}
+      </section>
       {order.items.some(item => item.canReview) && <section className={styles.card}><h2>Замовлення отримано</h2><p>Усі товари доставлено. За бажанням поділіться враженнями — залиште відгук про придбані товари нижче.</p></section>}
       {success && <p role="status">{success} <Link href="/account/reviews?tab=mine">Мої відгуки</Link></p>}
       {order.items.map(item => {
