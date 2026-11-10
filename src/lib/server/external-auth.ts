@@ -5,7 +5,7 @@ import { backend } from "./session";
 
 export type ExternalProvider = "google" | "facebook";
 export type ProviderInfo = { name: ExternalProvider; clientId: string; authorizationUrl: string; scopes: string[]; redirectUri: string };
-export type ExternalTransaction = { state: string; verifier: string; redirectUri: string; next: string; remember: boolean; expires: number };
+export type ExternalTransaction = { state: string; verifier: string; redirectUri: string; next: string; remember: boolean; expires: number; purpose?: "link" | "reauth"; actorId?: string; scope?: "customer" | "staff"; target?: string; changeKind?: "email" | "link"; confirmationChallengeId?: string; confirmationCode?: string };
 const prefix = process.env.NODE_ENV === "production" ? "__Host-" : "";
 export const resultCookie = prefix + "treba_external_result";
 export const transientOptions = { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, path: "/", maxAge: 600 };
@@ -53,6 +53,13 @@ export function readTransaction(request: NextRequest, provider: ExternalProvider
     || typeof data.verifier !== "string" || !/^[A-Za-z0-9_-]{43}$/.test(data.verifier)
     || typeof data.redirectUri !== "string" || typeof data.expires !== "number" || data.expires < Date.now()
     || !timingSafeEqual(Buffer.from(state), Buffer.from(data.state))) return null;
+  if (data.purpose !== undefined && (!["link", "reauth"].includes(data.purpose)
+    || typeof data.actorId !== "string" || !/^[0-9a-f-]{36}$/i.test(data.actorId)
+    || !["customer", "staff"].includes(data.scope ?? "") || !["email", "link"].includes(data.changeKind ?? "")
+    || typeof data.target !== "string" || data.target.length > 320
+    || (data.purpose === "link" && (data.changeKind !== "link" || data.target !== provider
+      || typeof data.confirmationChallengeId !== "string" || !/^[0-9a-f-]{36}$/i.test(data.confirmationChallengeId)
+      || typeof data.confirmationCode !== "string" || !/^\d{6}$/.test(data.confirmationCode))))) return null;
   const uri = new URL(data.redirectUri);
   if (uri.origin !== siteOrigin(request) || uri.pathname !== `/api/auth/external/${provider}/callback` || uri.search || uri.hash) return null;
   return { ...data, next: getSafeNextPath(data.next), remember: data.remember !== false } as ExternalTransaction;

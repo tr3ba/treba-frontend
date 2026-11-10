@@ -11,6 +11,10 @@ export async function GET(request: NextRequest, context: { params: Promise<{ pro
   try {
     const transaction = readTransaction(request, provider);
     if (!transaction) response = loginResult(request, undefined, { message: "Час входу минув або запит недійсний. Почніть вхід ще раз." });
+    else if (transaction.purpose) {
+      const { finishAccountOAuth } = await import("../../../../../lib/server/account-oauth");
+      response = await finishAccountOAuth(request, provider, transaction);
+    }
     else if (request.nextUrl.searchParams.has("error")) response = loginResult(request, transaction.next, { message: "Вхід скасовано. Можна спробувати ще раз." });
     else {
       const code = request.nextUrl.searchParams.get("code");

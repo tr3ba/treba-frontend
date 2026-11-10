@@ -27,7 +27,7 @@ test("registration proxy requires contact verification before creating a website
       if (input.verificationMethod === "sms" && !smsEnabled) { response.writeHead(400); response.end(JSON.stringify({ message: "SMS вимкнено. Оберіть пошту." })); return; }
       response.end(JSON.stringify({ ...challenge, method: input.verificationMethod })); return;
     }
-    if (request.url === "/api/auth/registration/resend") { response.end(JSON.stringify({ ...challenge, challengeId: "renewed-registration" })); return; }
+    if (request.url === "/api/auth/registration/resend") { response.end(JSON.stringify({ ...challenge, challengeId: "renewed-registration", method: "", maskedDestination: "" })); return; }
     if (request.url === "/api/auth/registration/verify") {
       if (input.code !== "123456") { response.writeHead(401); response.end("{}"); return; }
       verified = true; response.end(JSON.stringify(authentication)); return;
