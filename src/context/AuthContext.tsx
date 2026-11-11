@@ -13,13 +13,14 @@ export type UserProfile = {
 export type User = { id: string; name: string; email: string; role?: string } & UserProfile;
 export type LoginChallenge = { challengeId: string; methods: string[]; maskedEmail: string; expiresAt: string };
 export type RegistrationChallenge = { challengeId: string; method: "email" | "sms"; maskedDestination: string; expiresAt: string; resendAvailableAt: string };
+export type RegistrationResend = Omit<RegistrationChallenge, "method"> & { method: "" | "email" | "sms" };
 export type PasswordResetChallenge = { challengeId: string; method: "email" | "sms"; expiresAt: string; resendAvailableAt: string; message: string };
 export type LoginResult = { challenge: LoginChallenge; user?: never } | { user: User; challenge?: never };
 type AuthContextValue = {
   user: User | null; isLoading: boolean;
   register: (name: string, email: string, password: string, verificationMethod: "email" | "sms", profile?: UserProfile) => Promise<RegistrationChallenge>;
   verifyRegistration: (challengeId: string, code: string) => Promise<User>;
-  resendRegistration: (challengeId: string) => Promise<RegistrationChallenge>;
+  resendRegistration: (challengeId: string) => Promise<RegistrationResend>;
   requestPasswordReset: (email: string, verificationMethod: "email" | "sms") => Promise<PasswordResetChallenge>;
   completePasswordReset: (challengeId: string, code: string, newPassword: string) => Promise<void>;
   login: (email: string, password: string, remember?: boolean) => Promise<LoginResult>;
@@ -73,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const result = await sessionRequest({ action: "registration-verify", challengeId, code });
     return acceptUser(result.user);
   }
-  async function resendRegistration(challengeId: string): Promise<RegistrationChallenge> {
+  async function resendRegistration(challengeId: string): Promise<RegistrationResend> {
     const result = await sessionRequest({ action: "registration-resend", challengeId });
     return result.challenge;
   }

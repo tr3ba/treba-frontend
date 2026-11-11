@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { registrationAfterResend } from "@/lib/api/account-security";
 import { useAdminI18n } from "@/features/admin/i18n/provider";
 import { message } from "@/features/admin/i18n/core";
 import { useEffect, useState, FormEvent } from "react";
@@ -173,7 +174,8 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
     setBusy(true);
     setFormError("");
     try {
-      setChallenge(await resendRegistration(challenge.challengeId));
+      const renewed = await resendRegistration(challenge.challengeId);
+      setChallenge(registrationAfterResend(challenge, renewed));
       setCode("");
     } catch (error) {
       setFormError(

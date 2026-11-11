@@ -1,0 +1,12 @@
+.card { border: 1px solid #dadada; border-radius: 12px; background: #fff; color: #28251d; padding: 24px; display: grid; gap: 14px; margin-block: 20px; }
+.card h2, .card p { margin: 0; }
+.card h2 { font-size: 20px; }
+.form, .form label { display: grid; gap: 10px; }
+.form { gap: 18px; }
+.form input, .form select { padding: 10px 12px; border: 1px solid #b6b6b6; border-radius: 7px; background: #fff; color: inherit; width: 100%; min-width: 0; }
+.card button { padding: 10px 16px; border: 1px solid #cf5a20; border-radius: 7px; background: #fff; color: #823914; cursor: pointer; font: inherit; }
+.card button:disabled { opacity: .55; cursor: default; }
+.card button[aria-pressed="true"], .form button[type="submit"] { background: #d95419; color: #fff; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.error { color: #a51f1f; }
+.card :focus-visible { outline: 2px solid #dc5c22; outline-offset: 3px; }

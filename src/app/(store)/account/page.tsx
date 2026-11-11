@@ -1,7 +1,9 @@
 "use client";
 
+import { AdminI18nProvider } from "@/features/admin/i18n/provider";
 import { useAuth } from "../../../context/AuthContext";
 import AccountPageShell from "../../../components/account/AccountPageShell";
+import AccountSecurity from "../../../components/account/AccountSecurity";
 import AccountIdentityCard from "../../../components/account/AccountIdentityCard";
 import AccordionSection from "../../../components/account/AccordionSection";
 
@@ -62,6 +64,7 @@ function AccountOverview() {
   return (
     <>
       <AccountIdentityCard />
+      <AdminI18nProvider manageDocumentTitle={false}><AccountSecurity scope="customer" /></AdminI18nProvider>
 
       <AccordionSection
         title="Особисті дані"

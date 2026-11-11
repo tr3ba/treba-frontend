@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { NextRequest } from "next/server";
 import { encode, isProvider, loginResult, newTransaction, providerInfo, redirect, resultCookie, siteOrigin, stateCookie, transientOptions } from "../../../../../lib/server/external-auth";
-import { json } from "../../../../../lib/server/session";
+import { json, sameOrigin } from "../../../../../lib/server/session";
 
 export const runtime = "nodejs";
 export async function GET(request: NextRequest, context: { params: Promise<{ provider: string }> }) {
@@ -26,5 +26,22 @@ export async function GET(request: NextRequest, context: { params: Promise<{ pro
     return response;
   } catch (error) {
     return loginResult(request, next ?? undefined, { message: error instanceof Error ? error.message : "Не вдалося почати вхід." });
+  }
+}
+
+
+export async function POST(request: NextRequest, context: { params: Promise<{ provider: string }> }) {
+  if (!sameOrigin(request)) return json({}, 403);
+  const { provider } = await context.params;
+  if (!isProvider(provider)) return json({}, 404);
+  const { smallJson } = await import("../../../../../lib/server/account-security");
+  let input;
+  try { input = await smallJson(request); } catch { return json({}, 400); }
+  try {
+    const { startAccountOAuth } = await import("../../../../../lib/server/account-oauth");
+    return await startAccountOAuth(request, provider, input);
+  } catch (error) {
+    const { accountErrorResponse } = await import("../../../../../lib/server/account-security");
+    return accountErrorResponse(json({ message: "Не вдалося почати підтвердження." }, 503), error);
   }
 }

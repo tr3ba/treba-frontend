@@ -3,6 +3,7 @@ import { useAdminI18n } from "@/features/admin/i18n/provider";
 import Link from "next/link";
 import Image from "next/image";
 import { useRef, useState } from "react";
+import AccountSecurity from "@/components/account/AccountSecurity";
 import AvatarCropModal from "@/components/admin/AvatarCropModal";
 import UserAvatar from "@/components/admin/UserAvatar";
 import { useUpdateStaff } from "@/components/admin/AdminShell";
@@ -59,7 +60,7 @@ export default function Profile() {
                   .run<User>(
                     "profile",
                     {
-                      email: model.email,
+                      email: resource.data!.email,
                       firstName: model.firstName,
                       lastName: model.lastName,
                       middleName: model.middleName,
@@ -95,6 +96,7 @@ export default function Profile() {
                   <Field key={key} label={title}>
                     <input
                       type={type}
+                      readOnly={key === "email"}
                       required={["firstName", "lastName", "email"].includes(
                         key,
                       )}
@@ -212,6 +214,7 @@ export default function Profile() {
         applyAvatar(result);
         return true;
       }} />}
+      <AccountSecurity scope="staff" />
       <div className="treba-admin-two-grid">
         <Security />
         <TelegramLink />
