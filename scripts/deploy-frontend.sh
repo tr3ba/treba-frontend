@@ -5,6 +5,20 @@ revision="${2:?Git revision is required}"
 [[ "$revision" =~ ^[0-9a-f]{40}$ ]] || exit 1
 [[ "$image" == "019066823315.dkr.ecr.eu-west-1.amazonaws.com/treba-frontend:$revision" ]] || exit 1
 docker container inspect treba-frontend >/dev/null
+# The one-time coordinated Caddy migration must precede private-only releases.
+# Refuse a legacy rollback container that would reclaim Caddy's public port.
+docker inspect treba-frontend | python3 -c '
+import json, sys
+item = json.load(sys.stdin)[0]
+if any((item["HostConfig"].get("PortBindings") or {}).values()):
+    raise SystemExit("Run the coordinated private-routing migration before this deployment.")
+required = {"treba-edge", "treba-app"}
+if not required.issubset(item["NetworkSettings"]["Networks"]):
+    raise SystemExit("The current frontend is not on the reviewed private networks.")
+'
+for network in treba-edge treba-app; do
+    [[ "$(docker network inspect --format '{{.Driver}} {{.Internal}}' "$network")" == 'bridge false' ]] || exit 1
+done
 id="${revision:0:12}-$(date -u +%Y%m%d%H%M%S)"
 candidate="treba-frontend-check-$id"
 previous="treba-frontend-previous-$id"
@@ -58,12 +72,26 @@ aws ecr get-login-password --region eu-west-1 | docker login --username AWS --pa
 docker pull "$image"
 expected=$(docker image inspect --format '{{.Id}}' "$image")
 run_frontend() {
-    docker run -d --name "$1" --restart unless-stopped \
-        --add-host host.docker.internal:host-gateway \
+    local name="$1" port="$2"
+    if [[ -n "$port" ]]; then set -- -p "$port":3000; else set --; fi
+    # Connect both networks before starting Node; candidates get only their own name.
+    docker create --name "$name" --restart unless-stopped \
+        --network treba-edge \
         --label "org.opencontainers.image.revision=$revision" \
-        -e TREBA_API_URL=http://host.docker.internal:5000 \
+        -e TREBA_API_URL=http://treba-backend:5000 \
         -e TREBA_ADMIN_ORIGIN=https://admin.treba.duckdns.org \
-        -p "$2":3000 "$image" >/dev/null
+        "$@" "$image" >/dev/null
+    docker network connect treba-app "$name"
+    docker start "$name" >/dev/null
+}
+check_backend_connection() {
+    docker exec "$1" node -e '
+const origin = process.env.TREBA_API_URL;
+if (origin !== "http://treba-backend:5000") process.exit(1);
+fetch(origin + "/ping", {signal: AbortSignal.timeout(5000)})
+  .then(response => {if (!response.ok) process.exit(1);})
+  .catch(() => process.exit(1));
+'
 }
 wait_for() {
     local origin="$1" path="$2" expected_status="$3"
@@ -85,6 +113,7 @@ check_workspace_document() {
 }
 run_frontend "$candidate" '127.0.0.1:'
 address=$(docker port "$candidate" 3000/tcp)
+check_backend_connection "$candidate"
 wait_for "http://$address" / 200
 wait_for "http://$address" /shop-api/session 401
 wait_for "http://$address" /shop-api/admin-entry 307
@@ -98,9 +127,12 @@ docker stop treba-frontend >/dev/null
 old_stopped=1
 docker rename treba-frontend "$previous"
 renamed=1
-run_frontend treba-frontend 80
+run_frontend treba-frontend ''
 [[ "$(docker inspect --format '{{.Image}}' treba-frontend)" == "$expected" ]]
-wait_for http://127.0.0.1 / 200
+private_address=$(docker inspect --format '{{(index .NetworkSettings.Networks "treba-edge").IPAddress}}' treba-frontend)
+[[ -n "$private_address" ]]
+wait_for "http://$private_address:3000" / 200
+check_backend_connection treba-frontend
 wait_for https://treba.duckdns.org /shop-api/admin-entry 307
 check_login_redirect https://treba.duckdns.org
 wait_for https://treba.duckdns.org /admin-api/session 401
