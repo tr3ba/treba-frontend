@@ -21,6 +21,8 @@ RUN npm run build
 FROM node:24-alpine AS runner
 WORKDIR /app
 
+RUN apk add --no-cache --upgrade 'zlib>=1.4-r0'
+
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
